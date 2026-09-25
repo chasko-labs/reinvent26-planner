@@ -244,12 +244,65 @@ def add_personal_time(
     """Timestamps are UTC YYYY-MM-DDTHH:mm:ss without Z, seconds 00, end after
     start, whole 5-minute duration. Create returns no body; read the new id
     back from get_schedule."""
-    body = {"title": title, "start": start, "end": end}
-    if description:
-        body["description"] = description
+    from reinvent26.schedule import validate_personal_time
+
+    validate_personal_time(title, start, end)
+    body = {
+        "title": title,
+        "description": description,
+        "startDateTime": start,
+        "endDateTime": end,
+    }
     if location:
         body["location"] = location
-    _request("POST", f"/v1/events/{event_id}/personal-time", token=token, body=body)
+    write_with_retry_429(
+        _request,
+        "POST",
+        f"/v1/events/{event_id}/personal-time",
+        token=token,
+        body=body,
+    )
+
+
+def replace_personal_time(
+    event_id: str,
+    token: str,
+    block_id: str,
+    title: str,
+    start: str,
+    end: str,
+    description: str = "",
+    location: str | None = None,
+) -> None:
+    """Replace every field of a personal-time block.
+
+    Omitting location sends an explicit null, which clears it.
+    """
+    from reinvent26.schedule import validate_personal_time
+
+    validate_personal_time(title, start, end)
+    body = {
+        "title": title,
+        "description": description,
+        "startDateTime": start,
+        "endDateTime": end,
+        "location": location,
+    }
+    write_with_retry_429(
+        _request,
+        "PUT",
+        f"/v1/events/{event_id}/personal-time/{block_id}",
+        token=token,
+        body=body,
+    )
+
+
+def delete_personal_time(event_id: str, token: str, block_id: str) -> bool:
+    """Delete a personal-time block. True when removed, False when already
+    absent (404)."""
+    return _delete_once(
+        "DELETE", f"/v1/events/{event_id}/personal-time/{block_id}", token
+    )
 
 
 def with_retry_429(fn, *args, **kwargs):

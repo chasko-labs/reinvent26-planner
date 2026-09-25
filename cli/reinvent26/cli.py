@@ -352,6 +352,85 @@ def cmd_remove_favorite(args):
     _cmd_delete_one("favorite", api.remove_favorite, args)
 
 
+def _check_personal_time(args) -> None:
+    try:
+        schedule.validate_personal_time(args.title, args.start, args.end)
+    except ValueError as e:
+        print(f"error: {e}", file=sys.stderr)
+        raise SystemExit(2)
+
+
+def _block_ids(items: list) -> set:
+    ids = set()
+    for i in items:
+        if isinstance(i, dict):
+            ids.add(i.get("sessionId") or i.get("id") or i.get("blockId"))
+    return ids
+
+
+def cmd_block(args):
+    _check_personal_time(args)
+    if not args.description:
+        args.description = args.title
+    catalog = _catalog_for_confirm(args.event_id, _token(args))
+    before = _block_ids(_confirmed_items(api.get_schedule(args.event_id,
+                                                           _token(args)),
+                                         catalog))
+    api.add_personal_time(
+        args.event_id, _token(args), args.title, args.start, args.end,
+        description=args.description, location=args.location,
+    )
+    after_items = _confirmed_items(api.get_schedule(args.event_id, _token(args)),
+                                   catalog)
+    new = _block_ids(after_items) - before - {None}
+    match = [i for i in after_items
+             if i.get("title") == args.title
+             and (i.get("startTime") == args.start
+                  or i.get("start") == args.start)]
+    if new:
+        print(f"# personal-time created: {sorted(new)[0]}; confirm with: "
+              "schedule command")
+    elif match:
+        print(f"# personal-time created (matched by title+start): "
+              f"{match[0].get('sessionId', match[0].get('id'))}; confirm "
+              "with: schedule command")
+    else:
+        print("# created but no new id found in GetSchedule; "
+              "run the schedule command to confirm", file=sys.stderr)
+
+
+def cmd_reblock(args):
+    _check_personal_time(args)
+    if not args.description:
+        args.description = args.title
+    api.replace_personal_time(
+        args.event_id, _token(args), args.block_id, args.title,
+        args.start, args.end, description=args.description,
+        location=args.location,
+    )
+    if args.location is None:
+        print(f"# personal-time {args.block_id} replaced (location cleared); "
+              "confirm with: schedule command")
+    else:
+        print(f"# personal-time {args.block_id} replaced; confirm with: "
+              "schedule command")
+
+
+def cmd_unblock(args):
+    try:
+        removed = api.delete_personal_time(args.event_id, _token(args),
+                                           args.block_id)
+    except api.EventsError as e:
+        _reconcile_delete("personal-time block", args.event_id, _token(args),
+                          args.block_id, e)
+        return
+    if removed:
+        print(f"# personal-time {args.block_id} deleted; confirm with: "
+              "schedule command")
+    else:
+        print(f"# personal-time {args.block_id} already absent: complete")
+
+
 def cmd_favorite(args):
     ids = [i.strip() for i in args.session_ids.split(",") if i.strip()]
     resps = api.favorite_sessions(args.event_id, _token(args), ids)
@@ -476,6 +555,31 @@ def build_parser() -> argparse.ArgumentParser:
     cr.add_argument("event_id")
     cr.add_argument("session_id")
     cr.set_defaults(fn=cmd_cancel_reservation)
+
+    b = sub.add_parser("block", help="create a personal-time block")
+    b.add_argument("event_id")
+    b.add_argument("--title", required=True, help="1-128 chars")
+    b.add_argument("--start", required=True, help="UTC YYYY-MM-DDTHH:mm:ss, no Z")
+    b.add_argument("--end", required=True, help="UTC YYYY-MM-DDTHH:mm:ss, no Z")
+    b.add_argument("--description", default="")
+    b.add_argument("--location", default=None)
+    b.set_defaults(fn=cmd_block)
+
+    rb = sub.add_parser("reblock", help="replace every field of a personal-time block")
+    rb.add_argument("event_id")
+    rb.add_argument("block_id")
+    rb.add_argument("--title", required=True, help="1-128 chars")
+    rb.add_argument("--start", required=True, help="UTC YYYY-MM-DDTHH:mm:ss, no Z")
+    rb.add_argument("--end", required=True, help="UTC YYYY-MM-DDTHH:mm:ss, no Z")
+    rb.add_argument("--description", default="")
+    rb.add_argument("--location", default=None,
+                    help="omitted clears location")
+    rb.set_defaults(fn=cmd_reblock)
+
+    ub = sub.add_parser("unblock", help="delete a personal-time block (404 means already absent)")
+    ub.add_argument("event_id")
+    ub.add_argument("block_id")
+    ub.set_defaults(fn=cmd_unblock)
 
     return p
 

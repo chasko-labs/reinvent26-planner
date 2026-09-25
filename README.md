@@ -73,6 +73,10 @@ python -m reinvent26 shortlist <eventId> --topics agents --offbeat
 python -m reinvent26 shortlist <eventId>
 python -m reinvent26 shortlist <eventId> --reseed
 
+# local-model ranking over the cached catalog (model ranks, API stays truth)
+python -m reinvent26 rank --cache .cache/<eventId>/sessions.json \
+  --query "agents for a python dev, nothing before 9am"
+
 # favorite (works now, 10 per call)
 python -m reinvent26 favorite <eventId> <id1,id2>
 

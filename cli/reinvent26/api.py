@@ -63,6 +63,39 @@ def _request(
         raise EventsError(e.code, detail or e.reason, retry_after) from e
 
 
+def _sleep(seconds: float) -> None:
+    """Sleep hook (module-level so tests can record instead of waiting)."""
+    time.sleep(seconds)
+
+
+def write_with_retry_429(fn, *args, **kwargs):
+    """Writes: one retry honoring Retry-After on 429 only.
+
+    429 means throttled before processing, so one retry is safe. 500/503
+    or timeouts on writes never blind-retry: reconcile via get_schedule
+    and submit only what remains. Delete operations (cancel/remove) are
+    exempt: they retry once on 500/503 because 404 on retry means
+    already-complete.
+    """
+    try:
+        return fn(*args, **kwargs)
+    except EventsError as e:
+        if e.status == 429:
+            _sleep(e.retry_after or 5.0)
+            return fn(*args, **kwargs)
+        raise
+
+
+def delete_with_retry(fn, *args, **kwargs):
+    """Deletes: like writes, plus one retry on 500/503 (idempotent)."""
+    try:
+        return write_with_retry_429(fn, *args, **kwargs)
+    except EventsError as e:
+        if e.status in (500, 503):
+            return fn(*args, **kwargs)
+        raise
+
+
 def list_events(include_past: bool = False) -> list:
     params = {"includePast": "true"} if include_past else None
     out = _request("GET", "/v1/events", params=params)
@@ -167,6 +200,36 @@ def reserve_sessions(event_id: str, token: str, session_ids: list) -> list:
             )
         )
     return out
+
+
+def _delete_once(method: str, path: str, token: str) -> bool:
+    """One DELETE with idempotent retry. True when removed, False on 404."""
+    try:
+        delete_with_retry(_request, method, path, token=token)
+    except EventsError as e:
+        if e.status == 404:
+            return False
+        raise
+    return True
+
+
+def cancel_reservation(event_id: str, token: str, session_id: str) -> bool:
+    """Cancel one reservation. True when removed, False when already absent.
+
+    404 means already absent (complete on retry). Retried once on
+    500/503 (idempotent); other failures raise so the caller can
+    reconcile via get_schedule before deciding.
+    """
+    return _delete_once(
+        "DELETE", f"/v1/events/{event_id}/reservations/{session_id}", token
+    )
+
+
+def remove_favorite(event_id: str, token: str, session_id: str) -> bool:
+    """Remove one favorite. True when removed, False when already absent."""
+    return _delete_once(
+        "DELETE", f"/v1/events/{event_id}/favorites/{session_id}", token
+    )
 
 
 def add_personal_time(

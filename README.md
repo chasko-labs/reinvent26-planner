@@ -76,6 +76,10 @@ python -m reinvent26 shortlist <eventId> --reseed
 # favorite (works now, 10 per call)
 python -m reinvent26 favorite <eventId> <id1,id2>
 
+# remove a favorite / cancel a reservation (404 means already absent: complete)
+python -m reinvent26 remove-favorite <eventId> <sessionId>
+python -m reinvent26 cancel-reservation <eventId> <sessionId>
+
 # reserve (api opens 8 Oct 2026; 409 before then)
 python -m reinvent26 reserve <eventId> <id1,id2>
 ```

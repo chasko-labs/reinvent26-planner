@@ -59,6 +59,26 @@ fn split_objects(raw: &str) -> Vec<&str> {
     out
 }
 
+// Match a level filter against the "level" field value when present, so a
+// filter like 300 does not match a startTime that merely contains "300".
+// Falls back to a whole-object substring match when no "level" key exists.
+fn level_matches(low_obj: &str, level: &str) -> bool {
+    let mut found_key = false;
+    let mut search = low_obj;
+    while let Some(idx) = search.find("\"level\"") {
+        found_key = true;
+        let window = &search[idx..search.len().min(idx + 48)];
+        if window.contains(level) {
+            return true;
+        }
+        search = &search[idx + 7..];
+    }
+    if found_key {
+        return false;
+    }
+    low_obj.contains(level)
+}
+
 fn main() {
     let topics = split_lower(arg_value("--topics"));
     let levels = split_lower(arg_value("--levels"));
@@ -73,7 +93,7 @@ fn main() {
         if !topics.is_empty() && !topics.iter().any(|t| low.contains(t)) {
             continue;
         }
-        if !levels.is_empty() && !levels.iter().any(|l| low.contains(l)) {
+        if !levels.is_empty() && !levels.iter().any(|l| level_matches(&low, l)) {
             continue;
         }
         if !day.is_empty() && !low.contains(&day.to_lowercase()) {
@@ -87,11 +107,23 @@ fn main() {
 
 #[cfg(test)]
 mod tests {
-    use super::split_objects;
+    use super::{level_matches, split_objects};
 
     #[test]
     fn splits_two_objects() {
         let raw = r#"[{"a":1},{"a":2}]"#;
         assert_eq!(split_objects(raw).len(), 2);
+    }
+
+    #[test]
+    fn level_filter_ignores_timestamps() {
+        let obj = r#"{"sessionId":"a","level":"200","startTime":"2026-12-01T13:00:00"}"#;
+        assert!(!level_matches(&obj.to_lowercase(), "300"));
+        assert!(level_matches(&obj.to_lowercase(), "200"));
+    }
+
+    #[test]
+    fn level_filter_falls_back_without_key() {
+        assert!(level_matches("plain 300 text", "300"));
     }
 }

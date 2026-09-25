@@ -7,7 +7,8 @@ tracks, topics, services, startTime/endTime (ISO strings).
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+import re
+from datetime import datetime, time, timedelta
 
 
 def _parse(ts: str) -> datetime:
@@ -55,8 +56,53 @@ def find_open_slots(
     return out
 
 
+def normalize_session(s: dict) -> dict:
+    """Map a live catalog item onto canonical schedule fields.
+
+    The live API carries the session code in `abbreviation` (not `code`)
+    and the time in `sessionTime: {date, time, length}` (24h, minutes)
+    instead of ISO startTime/endTime. This fills in the canonical fields
+    and leaves everything else untouched; items without usable times
+    stay timeless (kept by filters, skipped by clash/slot logic).
+    Idempotent: already-canonical items pass through unchanged.
+    """
+    s = dict(s)
+    if not s.get("code") and s.get("abbreviation"):
+        s["code"] = s["abbreviation"]
+    if not s.get("id") and s.get("personalTimeId"):
+        s["id"] = s["personalTimeId"]
+    for iso_key, alt_key in (("startTime", "startDateTime"),
+                             ("endTime", "endDateTime")):
+        if not s.get(iso_key) and s.get(alt_key):
+            try:
+                _parse(str(s[alt_key]))
+                s[iso_key] = s[alt_key]
+            except ValueError:
+                pass
+    st = s.get("sessionTime") or {}
+    if not s.get("startTime") and st.get("date") and st.get("time"):
+        try:
+            hh, mm = str(st["time"]).split(":")
+            start = datetime.strptime(
+                f"{st['date']}T{int(hh):02d}:{int(mm):02d}:00",
+                "%Y-%m-%dT%H:%M:%S",
+            )
+            minutes = int(str(st.get("length") or 0))
+            end = start + timedelta(minutes=max(minutes, 0))
+            s["startTime"] = start.strftime("%Y-%m-%dT%H:%M:%S")
+            s["endTime"] = end.strftime("%Y-%m-%dT%H:%M:%S")
+        except (ValueError, TypeError):
+            pass
+    return s
+
+
+def normalize_sessions(sessions: list) -> list:
+    return [normalize_session(s) if isinstance(s, dict) else s
+            for s in sessions]
+
+
 def _text_fields(s: dict) -> str:
-    parts = [s.get("title", "")]
+    parts = [s.get("title", ""), s.get("code", ""), s.get("abbreviation", "")]
     for key in ("tracks", "topics", "services", "level", "sessionType"):
         v = s.get(key)
         if isinstance(v, list):
@@ -80,6 +126,86 @@ def match_topics(sessions: list, keywords: list, exclude=None) -> list:
             ranked.append((hits, s))
     ranked.sort(key=lambda t: -t[0])
     return [s for _, s in ranked]
+
+
+def _hhmm(value: str) -> time:
+    """Parse HH:MM (24h). Raises ValueError on bad input."""
+    parts = value.strip().split(":")
+    if len(parts) != 2:
+        raise ValueError(f"expected HH:MM, got {value!r}")
+    hour, minute = int(parts[0]), int(parts[1])
+    return time(hour, minute)
+
+
+def _overlaps(a_start: time, a_end: time, b_start: time, b_end: time) -> bool:
+    return max(a_start, b_start) < min(a_end, b_end)
+
+
+def filter_by_time(
+    sessions: list,
+    not_before: str | None = None,
+    not_after: str | None = None,
+    lunch: str | None = None,
+) -> list:
+    """Drop sessions outside a daily time-of-day window.
+
+    not_before/not_after are HH:MM bounds applied to the session start.
+    lunch is HH:MM-HH:MM; sessions overlapping it are blocked out.
+    Sessions without timestamps are kept (they cannot be judged).
+    """
+    lo = _hhmm(not_before) if not_before else None
+    hi = _hhmm(not_after) if not_after else None
+    lunch_range = None
+    if lunch:
+        bounds = lunch.split("-")
+        if len(bounds) != 2:
+            raise ValueError(f"expected HH:MM-HH:MM, got {lunch!r}")
+        lunch_range = (_hhmm(bounds[0]), _hhmm(bounds[1]))
+    out = []
+    for s in sessions:
+        if not s.get("startTime"):
+            out.append(s)
+            continue
+        try:
+            start = _parse(s["startTime"]).time()
+            end = _parse(s["endTime"]).time() if s.get("endTime") else start
+        except ValueError:
+            out.append(s)
+            continue
+        if lo is not None and start < lo:
+            continue
+        if hi is not None and start > hi:
+            continue
+        if lunch_range is not None and _overlaps(start, end, *lunch_range):
+            continue
+        out.append(s)
+    return out
+
+
+def filter_by_day(sessions: list, day: str | None) -> list:
+    """Keep sessions starting on day (YYYY-MM-DD). None/empty day is a no-op."""
+    if not day:
+        return sessions
+    return [s for s in sessions if (s.get("startTime") or "").startswith(day)]
+
+
+def find_offbeat(sessions: list, keywords: list, exclude=None) -> dict | None:
+    """Pick one session with nothing to do with the given keywords.
+
+    Returns the earliest-starting zero-hit session, or None when every
+    session matches. Deterministic for stable shortlists.
+    """
+    exclude = {e.lower() for e in (exclude or [])}
+    keys = [k.lower() for k in keywords]
+    outsiders = []
+    for s in sessions:
+        text = _text_fields(s)
+        if any(e in text for e in exclude):
+            continue
+        if not any(k in text for k in keys):
+            outsiders.append(s)
+    outsiders.sort(key=lambda s: (s.get("startTime") or "", s.get("sessionId") or ""))
+    return outsiders[0] if outsiders else None
 
 
 def stack_keywords(resources: list) -> list:
@@ -111,10 +237,44 @@ def stack_keywords(resources: list) -> list:
     return sorted(out)
 
 
+PERSONAL_TIME_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$")
+
+
+def validate_personal_time(title: str, start: str, end: str) -> tuple:
+    """Validate a personal-time block. Returns (start_dt, end_dt).
+
+    Rules: title 1-128 chars; UTC YYYY-MM-DDTHH:mm:ss with no Z;
+    seconds 00; end after start; whole 5-minute duration.
+    Raises ValueError describing the first violation.
+    """
+    if not (1 <= len(title) <= 128):
+        raise ValueError("title must be 1-128 chars")
+    for label, ts in (("start", start), ("end", end)):
+        if not PERSONAL_TIME_RE.match(ts):
+            raise ValueError(
+                f"{label} must be UTC YYYY-MM-DDTHH:mm:ss with no Z, got {ts!r}")
+        try:
+            parsed = datetime.strptime(ts, "%Y-%m-%dT%H:%M:%S")
+        except ValueError:
+            raise ValueError(f"{label} is not a real timestamp: {ts!r}")
+        if parsed.second != 0:
+            raise ValueError(f"{label} seconds must be 00: {ts!r}")
+    start_dt = datetime.strptime(start, "%Y-%m-%dT%H:%M:%S")
+    end_dt = datetime.strptime(end, "%Y-%m-%dT%H:%M:%S")
+    if not end_dt > start_dt:
+        raise ValueError("end must be after start")
+    if int((end_dt - start_dt).total_seconds()) % 300 != 0:
+        raise ValueError("duration must be a whole number of 5-minute blocks")
+    return start_dt, end_dt
+
+
 def summarize(s: dict) -> str:
-    code = s.get("code") or s.get("sessionId", "?")
+    code = (s.get("code") or s.get("sessionId") or s.get("id")
+            or s.get("blockId", "?"))
+    start = s.get("startTime") or s.get("start", "?")
+    end = s.get("endTime") or s.get("end", "?")
     return (
         f"{code} | {s.get('title', '?')} | {s.get('level', '?')} | "
-        f"{s.get('startTime', '?')}->{s.get('endTime', '?')} | "
+        f"{start}->{end} | "
         f"{s.get('room', '?')}"
     )

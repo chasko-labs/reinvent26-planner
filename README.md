@@ -20,6 +20,26 @@ Three ideas in one small repo:
 Plus a Muse Code skill (`skills/awsevents-muse/SKILL.md`) and an optional
 rust pre-filter (`rust/catalog-filter`) for large cached catalogs.
 
+## article and live page
+
+- Builder Center post: TODO-builder-aws-post-url (draft: `docs/article-draft.md`)
+- live page: bryanchasko.com/reinvent26 (draft source: `docs/reinvent26-page.md`)
+
+## demo (no token, no network)
+
+Judges with no registration can run the cached demo from a clean checkout:
+
+```
+python demo/demo_public.py
+```
+
+Uses only the standard library plus `demo/sessions-sample.json` and
+`demo/schedule-sample.json`. Expected output is checked in at
+`demo/sample-output.txt`. It shows a 300/400 shortlist, a schedule with a
+clash (`ANT301 x CON401`), open slots in an afternoon window, and a
+stack-aware pick. Authenticated writes (`favorite`, `reserve`, `schedule`
+confirm) still need `reinvent26 login` plus event registration.
+
 ## how it uses the API
 
 - REST (`cli/`): ListEvents (public), ListSessions with pagination until
@@ -40,10 +60,17 @@ needs: python 3.11+, rust toolchain only for the optional filter.
 
 ```
 cd cli
+python -m reinvent26 login
 python -m reinvent26 events
-export EVENTS_ACCESS_TOKEN=<builder-id-access-token>
 python -m reinvent26 sessions <eventId> | head
 ```
+
+`login` runs the Builder ID OAuth flow with PKCE S256 in your browser
+(loopback `http://localhost:8484-8489/callback`, exact match) and stores
+tokens in the OS keychain or a 0600 file. Other commands use the stored
+token automatically: expiry refreshes silently, and one 401 refreshes
+once and retries. `EVENTS_ACCESS_TOKEN` (or `--token`) still overrides
+for manual tokens; public reads work with no token at all.
 
 ## run
 
@@ -54,12 +81,75 @@ python -m reinvent26 shortlist <eventId> --topics agents,mcp,bedrock --level 3 -
 # schedule plus double bookings
 python -m reinvent26 schedule <eventId>
 
+# sessions fitting free windows (room plus venue shown for back-to-back)
+python -m reinvent26 slots <eventId> \
+  --window 2026-12-01T13:00:00,2026-12-01T16:00:00 \
+  --window 2026-12-02T09:00:00,2026-12-02T12:00:00
+
+# stack-aware pick: keywords from live resources, then shortlist
+python -m reinvent26 stack-pick <eventId> --profile my-readonly-profile --top 10
+python -m reinvent26 stack-pick <eventId> --resources-json /tmp/resources.json
+
+# shortlist with preferences: daytime bounds, lunch block, one outsider pick
+python -m reinvent26 shortlist <eventId> --topics agents,mcp \
+  --not-before 09:00 --not-after 17:00 --lunch 12:00-13:00
+python -m reinvent26 shortlist <eventId> --topics agents --offbeat
+
+# bare shortlist uses blog-aware seed topics (cli/reinvent26/seeds.json);
+# --reseed regenerates them from ~/writing, --topics always overrides
+python -m reinvent26 shortlist <eventId>
+python -m reinvent26 shortlist <eventId> --reseed
+
+# local-model ranking over the cached catalog (model ranks, API stays truth)
+python -m reinvent26 rank --cache .cache/<eventId>/sessions.json \
+  --query "agents for a python dev, nothing before 9am"
+
 # favorite (works now, 10 per call)
 python -m reinvent26 favorite <eventId> <id1,id2>
+
+# remove a favorite / cancel a reservation (404 means already absent: complete)
+python -m reinvent26 remove-favorite <eventId> <sessionId>
+python -m reinvent26 cancel-reservation <eventId> <sessionId>
+
+# personal time: block lunch, reblock it, delete it (new id read back from schedule)
+python -m reinvent26 block <eventId> --title Lunch \
+  --start 2026-12-01T12:00:00 --end 2026-12-01T13:00:00
+python -m reinvent26 reblock <eventId> <blockId> --title Lunch \
+  --start 2026-12-01T12:00:00 --end 2026-12-01T13:30:00
+python -m reinvent26 unblock <eventId> <blockId>
 
 # reserve (api opens 8 Oct 2026; 409 before then)
 python -m reinvent26 reserve <eventId> <id1,id2>
 ```
+
+## catalog cache plus rust pre-filter
+
+`shortlist` and `sessions` save the fetched catalog to
+`.cache/<eventId>/sessions.json` (gitignored). Repeat with `--cached` for no
+network; `--refresh` refetches and overwrites. With `--cached`, shortlist
+pipes through the rust helper when built, else python filters directly:
+
+```
+cargo build --release --manifest-path rust/catalog-filter/Cargo.toml
+python -m reinvent26 shortlist <eventId> --topics agents --cached
+python -m reinvent26 shortlist <eventId> --topics agents --cached --day 2026-12-01
+```
+
+## error paths
+
+- 401: sign in first (`reinvent26 login` or `EVENTS_ACCESS_TOKEN`); one
+  401 refreshes the stored token once and retries.
+- 403 with a body: valid token but not registered for the event. register
+  on the reinvent site first; the cli never retries 403.
+- 429: Retry-After seconds are honored (reads retry, writes retry once).
+  batch writes count every named session toward quota: shrink batches on
+  repeat 429s.
+- 500/503: reads back off (1s, 2s) and retry; writes never blind-retry.
+  reconcile with the schedule command and submit only what remains.
+  cancel/remove are exempt: one idempotent retry, since 404 on retry
+  means already-complete.
+- 404 on cancel/remove/unblock: already absent, treated as complete.
+- 409 on reserve/cancel: seating opens 8 Oct 2026; retry after reopen.
 
 ## tests
 
@@ -82,6 +172,8 @@ expecting catalog access; a valid token without registration returns 403.
 ## docs
 
 - skill: `skills/awsevents-muse/SKILL.md`
+- Builder Center article draft: `docs/article-draft.md`
+- public demo: `demo/demo_public.py` with samples and `demo/sample-output.txt`
 - local models and caching: `docs/local-models.md`
 - draft copy for bryanchasko.com/reinvent26: `docs/reinvent26-page.md`
 - canonical Events API docs: https://docs.aws.amazon.com/events/latest/devguide/what-is-events-api.html

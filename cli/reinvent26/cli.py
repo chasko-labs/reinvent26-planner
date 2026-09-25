@@ -306,6 +306,52 @@ def cmd_stack_pick(args):
               "(GetSchedule is source of truth)")
 
 
+def _reconcile_delete(kind: str, event_id: str, token: str,
+                      session_id: str, err: api.EventsError) -> None:
+    """After an unknown delete outcome, check GetSchedule before deciding.
+
+    Raises the original error when the session is still present; otherwise
+    reports the absent state as complete.
+    """
+    try:
+        items = _confirmed_items(api.get_schedule(event_id, token),
+                                 _catalog_for_confirm(event_id, token))
+    except api.EventsError:
+        raise err
+    ids = set()
+    for i in items:
+        if not isinstance(i, dict):
+            continue
+        ids.add(i.get("sessionId") or i.get("code") or i.get("id")
+                or i.get("blockId"))
+    if session_id in ids:
+        raise err
+    print(f"# GetSchedule shows {session_id} absent after '{err}'; "
+          f"{kind} treated as complete", file=sys.stderr)
+
+
+def _cmd_delete_one(kind: str, fn, args) -> None:
+    try:
+        removed = fn(args.event_id, _token(args), args.session_id)
+    except api.EventsError as e:
+        _reconcile_delete(kind, args.event_id, _token(args),
+                          args.session_id, e)
+        return
+    if removed:
+        print(f"# {kind} {args.session_id} removed; confirm with: "
+              "schedule command (GetSchedule is source of truth)")
+    else:
+        print(f"# {kind} {args.session_id} already absent: complete")
+
+
+def cmd_cancel_reservation(args):
+    _cmd_delete_one("reservation", api.cancel_reservation, args)
+
+
+def cmd_remove_favorite(args):
+    _cmd_delete_one("favorite", api.remove_favorite, args)
+
+
 def cmd_favorite(args):
     ids = [i.strip() for i in args.session_ids.split(",") if i.strip()]
     resps = api.favorite_sessions(args.event_id, _token(args), ids)
@@ -420,6 +466,16 @@ def build_parser() -> argparse.ArgumentParser:
     sp.add_argument("--favorite", action="store_true",
                     help="favorite picks, then confirm with GetSchedule")
     sp.set_defaults(fn=cmd_stack_pick)
+
+    rf = sub.add_parser("remove-favorite", help="remove one favorite (404 means already absent)")
+    rf.add_argument("event_id")
+    rf.add_argument("session_id")
+    rf.set_defaults(fn=cmd_remove_favorite)
+
+    cr = sub.add_parser("cancel-reservation", help="cancel one reservation (404 means already absent)")
+    cr.add_argument("event_id")
+    cr.add_argument("session_id")
+    cr.set_defaults(fn=cmd_cancel_reservation)
 
     return p
 

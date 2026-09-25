@@ -59,6 +59,11 @@ python -m reinvent26 shortlist <eventId> --topics agents,mcp \
   --not-before 09:00 --not-after 17:00 --lunch 12:00-13:00
 python -m reinvent26 shortlist <eventId> --topics agents --offbeat
 
+# bare shortlist uses blog-aware seed topics (cli/reinvent26/seeds.json);
+# --reseed regenerates them from ~/writing, --topics always overrides
+python -m reinvent26 shortlist <eventId>
+python -m reinvent26 shortlist <eventId> --reseed
+
 # favorite (works now, 10 per call)
 python -m reinvent26 favorite <eventId> <id1,id2>
 

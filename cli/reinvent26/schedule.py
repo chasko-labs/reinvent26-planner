@@ -101,7 +101,7 @@ def normalize_sessions(sessions: list) -> list:
 
 
 def _text_fields(s: dict) -> str:
-    parts = [s.get("title", "")]
+    parts = [s.get("title", ""), s.get("code", ""), s.get("abbreviation", "")]
     for key in ("tracks", "topics", "services", "level", "sessionType"):
         v = s.get(key)
         if isinstance(v, list):
@@ -237,9 +237,12 @@ def stack_keywords(resources: list) -> list:
 
 
 def summarize(s: dict) -> str:
-    code = s.get("code") or s.get("sessionId", "?")
+    code = (s.get("code") or s.get("sessionId") or s.get("id")
+            or s.get("blockId", "?"))
+    start = s.get("startTime") or s.get("start", "?")
+    end = s.get("endTime") or s.get("end", "?")
     return (
         f"{code} | {s.get('title', '?')} | {s.get('level', '?')} | "
-        f"{s.get('startTime', '?')}->{s.get('endTime', '?')} | "
+        f"{start}->{end} | "
         f"{s.get('room', '?')}"
     )

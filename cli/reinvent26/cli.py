@@ -9,7 +9,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from reinvent26 import api, schedule, cache, seeds
+from reinvent26 import api, schedule, cache, seeds, inventory
 
 
 def _token(args) -> str | None:
@@ -260,6 +260,52 @@ def _confirmed_items(sched, catalog: list) -> list:
     return schedule.normalize_sessions(_schedule_items(sched))
 
 
+def cmd_stack_pick(args):
+    """Stack-aware picker end to end: live resources map to catalog keywords."""
+    if args.resources_json:
+        resources = inventory.load_resources_file(args.resources_json)
+        source = f"file:{args.resources_json}"
+    else:
+        resources = inventory.fetch_via_aws_cli(args.profile, args.region)
+        source = f"aws_cli:profile={args.profile}"
+    keywords = schedule.stack_keywords(resources)
+    print(f"# stack source: {source} ({len(resources)} resources)",
+          file=sys.stderr)
+    print(f"# keywords: {', '.join(keywords) if keywords else '(none mapped)'}",
+          file=sys.stderr)
+    for rtype, count in inventory.summarize_inventory(resources)[:10]:
+        print(f"# inventory: {rtype} x{count}", file=sys.stderr)
+    if not keywords:
+        print("# no keywords mapped from live stack; aborting", file=sys.stderr)
+        raise SystemExit(2)
+    sessions = _fetch_sessions(args)
+    ranked = schedule.match_topics(
+        sessions, keywords, exclude=args.exclude.split(",") if args.exclude else None
+    )
+    if args.level:
+        ranked = [s for s in ranked if str(s.get("level", "")).startswith(args.level)]
+    picks = ranked[: args.top]
+    for s in picks:
+        print(schedule.summarize(s))
+    if args.favorite and picks:
+        ids = [s.get("sessionId", "") for s in picks if s.get("sessionId")]
+        resps = api.favorite_sessions(args.event_id, _token(args), ids)
+        print(json.dumps(resps, indent=2))
+        have = {i.get("sessionId") for i in
+                _confirmed_items(api.get_schedule(args.event_id, _token(args)),
+                                 sessions)
+                if isinstance(i, dict)}
+        missing = [i for i in ids if i not in have]
+        print(f"# event {args.event_id}: favorited "
+              f"{len(ids) - len(missing)}/{len(ids)} confirmed by GetSchedule",
+              file=sys.stderr)
+        if missing:
+            print(f"# unconfirmed: {', '.join(missing)}", file=sys.stderr)
+    else:
+        print("# confirm writes with: schedule command "
+              "(GetSchedule is source of truth)")
+
+
 def cmd_favorite(args):
     ids = [i.strip() for i in args.session_ids.split(",") if i.strip()]
     resps = api.favorite_sessions(args.event_id, _token(args), ids)
@@ -360,6 +406,20 @@ def build_parser() -> argparse.ArgumentParser:
     r.add_argument("event_id")
     r.add_argument("session_ids", help="comma separated session ids")
     r.set_defaults(fn=cmd_reserve)
+
+    sp = sub.add_parser("stack-pick", help="stack-aware shortlist from live resources")
+    sp.add_argument("event_id")
+    sp.add_argument("--profile", default="",
+                    help="explicit aws cli profile for read-only inventory")
+    sp.add_argument("--resources-json", default="",
+                    help="cached get-resources json (offline alternative)")
+    sp.add_argument("--region", default=None)
+    sp.add_argument("--exclude", default="")
+    sp.add_argument("--level", default="")
+    sp.add_argument("--top", type=int, default=20)
+    sp.add_argument("--favorite", action="store_true",
+                    help="favorite picks, then confirm with GetSchedule")
+    sp.set_defaults(fn=cmd_stack_pick)
 
     return p
 

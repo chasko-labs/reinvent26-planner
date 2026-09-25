@@ -80,6 +80,13 @@ python -m reinvent26 favorite <eventId> <id1,id2>
 python -m reinvent26 remove-favorite <eventId> <sessionId>
 python -m reinvent26 cancel-reservation <eventId> <sessionId>
 
+# personal time: block lunch, reblock it, delete it (new id read back from schedule)
+python -m reinvent26 block <eventId> --title Lunch \
+  --start 2026-12-01T12:00:00 --end 2026-12-01T13:00:00
+python -m reinvent26 reblock <eventId> <blockId> --title Lunch \
+  --start 2026-12-01T12:00:00 --end 2026-12-01T13:30:00
+python -m reinvent26 unblock <eventId> <blockId>
+
 # reserve (api opens 8 Oct 2026; 409 before then)
 python -m reinvent26 reserve <eventId> <id1,id2>
 ```

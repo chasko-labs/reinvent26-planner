@@ -7,6 +7,7 @@ tracks, topics, services, startTime/endTime (ISO strings).
 
 from __future__ import annotations
 
+import re
 from datetime import datetime, time, timedelta
 
 
@@ -234,6 +235,37 @@ def stack_keywords(resources: list) -> list:
             if key in blob:
                 out.update(words)
     return sorted(out)
+
+
+PERSONAL_TIME_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$")
+
+
+def validate_personal_time(title: str, start: str, end: str) -> tuple:
+    """Validate a personal-time block. Returns (start_dt, end_dt).
+
+    Rules: title 1-128 chars; UTC YYYY-MM-DDTHH:mm:ss with no Z;
+    seconds 00; end after start; whole 5-minute duration.
+    Raises ValueError describing the first violation.
+    """
+    if not (1 <= len(title) <= 128):
+        raise ValueError("title must be 1-128 chars")
+    for label, ts in (("start", start), ("end", end)):
+        if not PERSONAL_TIME_RE.match(ts):
+            raise ValueError(
+                f"{label} must be UTC YYYY-MM-DDTHH:mm:ss with no Z, got {ts!r}")
+        try:
+            parsed = datetime.strptime(ts, "%Y-%m-%dT%H:%M:%S")
+        except ValueError:
+            raise ValueError(f"{label} is not a real timestamp: {ts!r}")
+        if parsed.second != 0:
+            raise ValueError(f"{label} seconds must be 00: {ts!r}")
+    start_dt = datetime.strptime(start, "%Y-%m-%dT%H:%M:%S")
+    end_dt = datetime.strptime(end, "%Y-%m-%dT%H:%M:%S")
+    if not end_dt > start_dt:
+        raise ValueError("end must be after start")
+    if int((end_dt - start_dt).total_seconds()) % 300 != 0:
+        raise ValueError("duration must be a whole number of 5-minute blocks")
+    return start_dt, end_dt
 
 
 def summarize(s: dict) -> str:

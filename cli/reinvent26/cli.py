@@ -9,7 +9,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from reinvent26 import api, schedule, cache, seeds, inventory, rank, auth
+from reinvent26 import api, auth, cache, inventory, rank, schedule, seeds
 
 
 api.set_unauthorized_handler(auth.handle_401)

@@ -35,14 +35,42 @@ def cmd_sessions(args):
     print(f"# {count} sessions listed (paginated until no nextToken)", file=sys.stderr)
 
 
+def _apply_time_filters(items: list, args) -> list:
+    if args.not_before or args.not_after or args.lunch:
+        try:
+            return schedule.filter_by_time(
+                items,
+                not_before=args.not_before,
+                not_after=args.not_after,
+                lunch=args.lunch,
+            )
+        except ValueError as e:
+            print(f"error: {e}", file=sys.stderr)
+            raise SystemExit(2)
+    return items
+
+
 def cmd_shortlist(args):
     keywords = [k.strip() for k in args.topics.split(",") if k.strip()]
+    exclude = args.exclude.split(",") if args.exclude else None
     sessions = list(
         api.iter_sessions(args.event_id, token=_token(args), include_abstracts=False)
     )
-    ranked = schedule.match_topics(
-        sessions, keywords, exclude=args.exclude.split(",") if args.exclude else None
-    )
+    sessions = _apply_time_filters(sessions, args)
+    if args.offbeat:
+        pick = schedule.find_offbeat(sessions, keywords, exclude=exclude)
+        if pick is None:
+            print("# offbeat: every session matches your topics", file=sys.stderr)
+            return
+        if args.abstracts:
+            full = api.get_session(
+                args.event_id, pick.get("sessionId", ""), token=_token(args)
+            )
+            print(json.dumps(full, indent=2))
+        else:
+            print(schedule.summarize(pick))
+        return
+    ranked = schedule.match_topics(sessions, keywords, exclude=exclude)
     if args.level:
         ranked = [s for s in ranked if str(s.get("level", "")).startswith(args.level)]
     for s in ranked[: args.top]:
@@ -124,6 +152,14 @@ def build_parser() -> argparse.ArgumentParser:
     sl.add_argument("--level", default="", help="e.g. 300 or 400")
     sl.add_argument("--top", type=int, default=20)
     sl.add_argument("--abstracts", action="store_true")
+    sl.add_argument("--not-before", default="", metavar="HH:MM",
+                    help="drop sessions starting before this daily time")
+    sl.add_argument("--not-after", default="", metavar="HH:MM",
+                    help="drop sessions starting after this daily time")
+    sl.add_argument("--lunch", default="", metavar="HH:MM-HH:MM",
+                    help="block out lunch, e.g. --lunch 12:00-13:00")
+    sl.add_argument("--offbeat", action="store_true",
+                    help="pick exactly one session unrelated to --topics")
     sl.set_defaults(fn=cmd_shortlist)
 
     sc = sub.add_parser("schedule", help="show schedule plus double bookings")

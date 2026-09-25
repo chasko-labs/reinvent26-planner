@@ -54,6 +54,11 @@ python -m reinvent26 shortlist <eventId> --topics agents,mcp,bedrock --level 3 -
 # schedule plus double bookings
 python -m reinvent26 schedule <eventId>
 
+# shortlist with preferences: daytime bounds, lunch block, one outsider pick
+python -m reinvent26 shortlist <eventId> --topics agents,mcp \
+  --not-before 09:00 --not-after 17:00 --lunch 12:00-13:00
+python -m reinvent26 shortlist <eventId> --topics agents --offbeat
+
 # favorite (works now, 10 per call)
 python -m reinvent26 favorite <eventId> <id1,id2>
 

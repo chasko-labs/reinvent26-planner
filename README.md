@@ -40,10 +40,17 @@ needs: python 3.11+, rust toolchain only for the optional filter.
 
 ```
 cd cli
+python -m reinvent26 login
 python -m reinvent26 events
-export EVENTS_ACCESS_TOKEN=<builder-id-access-token>
 python -m reinvent26 sessions <eventId> | head
 ```
+
+`login` runs the Builder ID OAuth flow with PKCE S256 in your browser
+(loopback `http://localhost:8484-8489/callback`, exact match) and stores
+tokens in the OS keychain or a 0600 file. Other commands use the stored
+token automatically: expiry refreshes silently, and one 401 refreshes
+once and retries. `EVENTS_ACCESS_TOKEN` (or `--token`) still overrides
+for manual tokens; public reads work with no token at all.
 
 ## run
 

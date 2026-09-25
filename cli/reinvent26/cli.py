@@ -9,11 +9,28 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from reinvent26 import api, schedule, cache, seeds, inventory, rank
+from reinvent26 import api, schedule, cache, seeds, inventory, rank, auth
+
+
+api.set_unauthorized_handler(auth.handle_401)
 
 
 def _token(args) -> str | None:
-    return args.token or os.environ.get("EVENTS_ACCESS_TOKEN")
+    return (
+        args.token
+        or os.environ.get("EVENTS_ACCESS_TOKEN")
+        or auth.stored_access_token()
+    )
+
+
+def cmd_login(args):
+    try:
+        auth.login()
+    except auth.AuthError as e:
+        print(f"error: {e}", file=sys.stderr)
+        raise SystemExit(1)
+    print("# signed in with Builder ID; access token good for ~60 minutes, "
+          "refresh for 30 days")
 
 
 def cmd_events(args):
@@ -487,6 +504,9 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--token", default=None, help="access token (or EVENTS_ACCESS_TOKEN)")
     sub = p.add_subparsers(dest="cmd", required=True)
 
+    lg = sub.add_parser("login", help="sign in with Builder ID (PKCE, loopback callback)")
+    lg.set_defaults(fn=cmd_login)
+
     e = sub.add_parser("events", help="list current/upcoming events")
     e.add_argument("--include-past", action="store_true")
     e.set_defaults(fn=cmd_events)
@@ -631,7 +651,11 @@ def main(argv=None):
         raise SystemExit(2)
     except api.EventsError as e:
         print(f"error: {e}", file=sys.stderr)
-        if e.status == 403:
+        if e.status == 401:
+            print("# 401: sign in first: run `reinvent26 login` or set "
+                  "EVENTS_ACCESS_TOKEN (public reads need no token)",
+                  file=sys.stderr)
+        elif e.status == 403:
             print("# 403 with body: valid token but not registered for this "
                   "event; register on the reinvent site first (never retried)",
                   file=sys.stderr)

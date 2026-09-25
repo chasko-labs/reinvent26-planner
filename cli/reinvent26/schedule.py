@@ -136,6 +136,13 @@ def filter_by_time(
     return out
 
 
+def filter_by_day(sessions: list, day: str | None) -> list:
+    """Keep sessions starting on day (YYYY-MM-DD). None/empty day is a no-op."""
+    if not day:
+        return sessions
+    return [s for s in sessions if (s.get("startTime") or "").startswith(day)]
+
+
 def find_offbeat(sessions: list, keywords: list, exclude=None) -> dict | None:
     """Pick one session with nothing to do with the given keywords.
 

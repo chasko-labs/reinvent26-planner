@@ -9,7 +9,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from reinvent26 import api, schedule, cache
+from reinvent26 import api, schedule, cache, seeds
 
 
 def _token(args) -> str | None:
@@ -84,8 +84,26 @@ def _apply_time_filters(items: list, args) -> list:
     return items
 
 
+def _resolve_topics(args) -> list:
+    """Explicit --topics wins; otherwise blog-aware seeds; --reseed regenerates."""
+    if args.topics:
+        return [k.strip() for k in args.topics.split(",") if k.strip()]
+    if args.reseed:
+        topics = seeds.reseed()
+        print(f"# reseeded {len(topics)} topics from {seeds.posts_root()}",
+              file=sys.stderr)
+        return topics
+    topics = seeds.load_seeds()
+    if topics:
+        print(f"# using seed topics from {seeds.seed_path()}", file=sys.stderr)
+        return topics
+    print("error: no --topics given and no seed file; run with --reseed to "
+          f"derive seeds from {seeds.posts_root()}", file=sys.stderr)
+    raise SystemExit(2)
+
+
 def cmd_shortlist(args):
-    keywords = [k.strip() for k in args.topics.split(",") if k.strip()]
+    keywords = _resolve_topics(args)
     exclude = args.exclude.split(",") if args.exclude else None
     if args.cached and args.refresh:
         print("error: --cached and --refresh conflict", file=sys.stderr)
@@ -200,7 +218,10 @@ def build_parser() -> argparse.ArgumentParser:
 
     sl = sub.add_parser("shortlist", help="rank sessions by topic keywords")
     sl.add_argument("event_id")
-    sl.add_argument("--topics", required=True, help="comma list, e.g. agents,mcp,bedrock")
+    sl.add_argument("--topics", default="",
+                    help="comma list, e.g. agents,mcp,bedrock (default: seed file)")
+    sl.add_argument("--reseed", action="store_true",
+                    help="regenerate seed topics from ~/writing and save")
     sl.add_argument("--exclude", default="")
     sl.add_argument("--level", default="", help="e.g. 300 or 400")
     sl.add_argument("--top", type=int, default=20)

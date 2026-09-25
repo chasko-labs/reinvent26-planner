@@ -25,12 +25,26 @@ class EventsError(Exception):
         self.retry_after = retry_after
 
 
+_on_401 = None
+
+
+def set_unauthorized_handler(fn) -> None:
+    """Register fn(old_token) -> new_token | None for one silent refresh.
+
+    The cli wires this to the stored login token: on 401 the failing
+    request retries once with the refreshed token. A second 401 raises.
+    """
+    global _on_401
+    _on_401 = fn
+
+
 def _request(
     method: str,
     path: str,
     token: str | None = None,
     params: dict | None = None,
     body: dict | None = None,
+    _retried: bool = False,
 ) -> dict | list:
     url = BASE_URL + path
     if params:
@@ -50,6 +64,13 @@ def _request(
             raw = resp.read().decode()
             return json.loads(raw) if raw else {}
     except urllib.error.HTTPError as e:
+        if e.code == 401 and not _retried and _on_401 is not None:
+            try:
+                new_token = _on_401(token)
+            except Exception:
+                new_token = None
+            if new_token:
+                return _request(method, path, new_token, params, body, True)
         try:
             detail = e.read().decode()[:500]
         except Exception:

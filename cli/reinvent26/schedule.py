@@ -7,7 +7,7 @@ tracks, topics, services, startTime/endTime (ISO strings).
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+from datetime import datetime, time, timedelta
 
 
 def _parse(ts: str) -> datetime:
@@ -80,6 +80,79 @@ def match_topics(sessions: list, keywords: list, exclude=None) -> list:
             ranked.append((hits, s))
     ranked.sort(key=lambda t: -t[0])
     return [s for _, s in ranked]
+
+
+def _hhmm(value: str) -> time:
+    """Parse HH:MM (24h). Raises ValueError on bad input."""
+    parts = value.strip().split(":")
+    if len(parts) != 2:
+        raise ValueError(f"expected HH:MM, got {value!r}")
+    hour, minute = int(parts[0]), int(parts[1])
+    return time(hour, minute)
+
+
+def _overlaps(a_start: time, a_end: time, b_start: time, b_end: time) -> bool:
+    return max(a_start, b_start) < min(a_end, b_end)
+
+
+def filter_by_time(
+    sessions: list,
+    not_before: str | None = None,
+    not_after: str | None = None,
+    lunch: str | None = None,
+) -> list:
+    """Drop sessions outside a daily time-of-day window.
+
+    not_before/not_after are HH:MM bounds applied to the session start.
+    lunch is HH:MM-HH:MM; sessions overlapping it are blocked out.
+    Sessions without timestamps are kept (they cannot be judged).
+    """
+    lo = _hhmm(not_before) if not_before else None
+    hi = _hhmm(not_after) if not_after else None
+    lunch_range = None
+    if lunch:
+        bounds = lunch.split("-")
+        if len(bounds) != 2:
+            raise ValueError(f"expected HH:MM-HH:MM, got {lunch!r}")
+        lunch_range = (_hhmm(bounds[0]), _hhmm(bounds[1]))
+    out = []
+    for s in sessions:
+        if not s.get("startTime"):
+            out.append(s)
+            continue
+        try:
+            start = _parse(s["startTime"]).time()
+            end = _parse(s["endTime"]).time() if s.get("endTime") else start
+        except ValueError:
+            out.append(s)
+            continue
+        if lo is not None and start < lo:
+            continue
+        if hi is not None and start > hi:
+            continue
+        if lunch_range is not None and _overlaps(start, end, *lunch_range):
+            continue
+        out.append(s)
+    return out
+
+
+def find_offbeat(sessions: list, keywords: list, exclude=None) -> dict | None:
+    """Pick one session with nothing to do with the given keywords.
+
+    Returns the earliest-starting zero-hit session, or None when every
+    session matches. Deterministic for stable shortlists.
+    """
+    exclude = {e.lower() for e in (exclude or [])}
+    keys = [k.lower() for k in keywords]
+    outsiders = []
+    for s in sessions:
+        text = _text_fields(s)
+        if any(e in text for e in exclude):
+            continue
+        if not any(k in text for k in keys):
+            outsiders.append(s)
+    outsiders.sort(key=lambda s: (s.get("startTime") or "", s.get("sessionId") or ""))
+    return outsiders[0] if outsiders else None
 
 
 def stack_keywords(resources: list) -> list:

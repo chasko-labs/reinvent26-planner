@@ -55,6 +55,51 @@ def find_open_slots(
     return out
 
 
+def normalize_session(s: dict) -> dict:
+    """Map a live catalog item onto canonical schedule fields.
+
+    The live API carries the session code in `abbreviation` (not `code`)
+    and the time in `sessionTime: {date, time, length}` (24h, minutes)
+    instead of ISO startTime/endTime. This fills in the canonical fields
+    and leaves everything else untouched; items without usable times
+    stay timeless (kept by filters, skipped by clash/slot logic).
+    Idempotent: already-canonical items pass through unchanged.
+    """
+    s = dict(s)
+    if not s.get("code") and s.get("abbreviation"):
+        s["code"] = s["abbreviation"]
+    if not s.get("id") and s.get("personalTimeId"):
+        s["id"] = s["personalTimeId"]
+    for iso_key, alt_key in (("startTime", "startDateTime"),
+                             ("endTime", "endDateTime")):
+        if not s.get(iso_key) and s.get(alt_key):
+            try:
+                _parse(str(s[alt_key]))
+                s[iso_key] = s[alt_key]
+            except ValueError:
+                pass
+    st = s.get("sessionTime") or {}
+    if not s.get("startTime") and st.get("date") and st.get("time"):
+        try:
+            hh, mm = str(st["time"]).split(":")
+            start = datetime.strptime(
+                f"{st['date']}T{int(hh):02d}:{int(mm):02d}:00",
+                "%Y-%m-%dT%H:%M:%S",
+            )
+            minutes = int(str(st.get("length") or 0))
+            end = start + timedelta(minutes=max(minutes, 0))
+            s["startTime"] = start.strftime("%Y-%m-%dT%H:%M:%S")
+            s["endTime"] = end.strftime("%Y-%m-%dT%H:%M:%S")
+        except (ValueError, TypeError):
+            pass
+    return s
+
+
+def normalize_sessions(sessions: list) -> list:
+    return [normalize_session(s) if isinstance(s, dict) else s
+            for s in sessions]
+
+
 def _text_fields(s: dict) -> str:
     parts = [s.get("title", "")]
     for key in ("tracks", "topics", "services", "level", "sessionType"):

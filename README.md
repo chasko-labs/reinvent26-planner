@@ -66,6 +66,19 @@ python -m reinvent26 favorite <eventId> <id1,id2>
 python -m reinvent26 reserve <eventId> <id1,id2>
 ```
 
+## catalog cache plus rust pre-filter
+
+`shortlist` and `sessions` save the fetched catalog to
+`.cache/<eventId>/sessions.json` (gitignored). Repeat with `--cached` for no
+network; `--refresh` refetches and overwrites. With `--cached`, shortlist
+pipes through the rust helper when built, else python filters directly:
+
+```
+cargo build --release --manifest-path rust/catalog-filter/Cargo.toml
+python -m reinvent26 shortlist <eventId> --topics agents --cached
+python -m reinvent26 shortlist <eventId> --topics agents --cached --day 2026-12-01
+```
+
 ## tests
 
 ```

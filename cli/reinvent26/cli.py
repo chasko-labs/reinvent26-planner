@@ -9,7 +9,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from reinvent26 import api, schedule
+from reinvent26 import api, schedule, cache
 
 
 def _token(args) -> str | None:
@@ -21,13 +21,47 @@ def cmd_events(args):
     print(json.dumps(events, indent=2))
 
 
+def _fetch_sessions(args, include_abstracts: bool = False) -> list:
+    """Full catalog fetch, saving to cache unless --cached was given."""
+    sessions = schedule.normalize_sessions(
+        list(
+            api.iter_sessions(
+                args.event_id, token=_token(args),
+                include_abstracts=include_abstracts,
+            )
+        )
+    )
+    if not getattr(args, "cached", False):
+        path = cache.save_cached_sessions(args.event_id, sessions)
+        print(f"# cached {len(sessions)} sessions to {path}", file=sys.stderr)
+    return sessions
+
+
+def _cached_sessions(args) -> list:
+    sessions = cache.load_cached_sessions(args.event_id)
+    if sessions is None:
+        print(
+            f"error: no cache for {args.event_id} at "
+            f"{cache.cache_file(args.event_id)}; run without --cached "
+            "or with --refresh first",
+            file=sys.stderr,
+        )
+        raise SystemExit(2)
+    print(f"# using cached catalog ({len(sessions)} sessions, no network)",
+          file=sys.stderr)
+    return schedule.normalize_sessions(sessions)
+
+
 def cmd_sessions(args):
+    if args.cached and args.refresh:
+        print("error: --cached and --refresh conflict", file=sys.stderr)
+        raise SystemExit(2)
+    if args.cached:
+        sessions = _cached_sessions(args)
+    else:
+        sessions = _fetch_sessions(args, include_abstracts=args.abstracts)
     count = 0
-    for s in api.iter_sessions(
-        args.event_id,
-        token=_token(args),
-        include_abstracts=args.abstracts,
-    ):
+    for s in sessions:
         print(schedule.summarize(s))
         count += 1
         if args.limit and count >= args.limit:
@@ -53,9 +87,24 @@ def _apply_time_filters(items: list, args) -> list:
 def cmd_shortlist(args):
     keywords = [k.strip() for k in args.topics.split(",") if k.strip()]
     exclude = args.exclude.split(",") if args.exclude else None
-    sessions = list(
-        api.iter_sessions(args.event_id, token=_token(args), include_abstracts=False)
-    )
+    if args.cached and args.refresh:
+        print("error: --cached and --refresh conflict", file=sys.stderr)
+        raise SystemExit(2)
+    if args.cached:
+        sessions = _cached_sessions(args)
+        with open(cache.cache_file(args.event_id), "rb") as fh:
+            raw = fh.read()
+        levels = [args.level] if args.level and len(args.level) >= 3 else []
+        pre = cache.rust_prefilter(raw, topics=keywords, levels=levels, day=args.day)
+        if pre is not None:
+            print(f"# rust pre-filter: {len(pre)} of {len(sessions)} kept",
+                  file=sys.stderr)
+            sessions = pre
+        else:
+            print("# rust filter binary absent: python fallback", file=sys.stderr)
+    else:
+        sessions = _fetch_sessions(args)
+    sessions = schedule.filter_by_day(sessions, args.day)
     sessions = _apply_time_filters(sessions, args)
     if args.offbeat:
         pick = schedule.find_offbeat(sessions, keywords, exclude=exclude)
@@ -143,6 +192,10 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("event_id")
     s.add_argument("--abstracts", action="store_true")
     s.add_argument("--limit", type=int, default=0)
+    s.add_argument("--cached", action="store_true",
+                   help="read .cache/<eventId>/sessions.json, no network")
+    s.add_argument("--refresh", action="store_true",
+                   help="fetch live and overwrite the cache")
     s.set_defaults(fn=cmd_sessions)
 
     sl = sub.add_parser("shortlist", help="rank sessions by topic keywords")
@@ -160,6 +213,13 @@ def build_parser() -> argparse.ArgumentParser:
                     help="block out lunch, e.g. --lunch 12:00-13:00")
     sl.add_argument("--offbeat", action="store_true",
                     help="pick exactly one session unrelated to --topics")
+    sl.add_argument("--day", default="", metavar="YYYY-MM-DD",
+                    help="only sessions starting that day")
+    sl.add_argument("--cached", action="store_true",
+                    help="filter .cache/<eventId>/sessions.json via rust "
+                    "pre-filter when built, no network")
+    sl.add_argument("--refresh", action="store_true",
+                    help="fetch live and overwrite the cache")
     sl.set_defaults(fn=cmd_shortlist)
 
     sc = sub.add_parser("schedule", help="show schedule plus double bookings")

@@ -1,0 +1,9 @@
+[package]
+name = "catalog-filter"
+version = "0.1.0"
+edition = "2021"
+description = "fast local filter for cached Events API session lists (stdin json -> stdout json)"
+
+[[bin]]
+name = "catalog-filter"
+path = "src/main.rs"

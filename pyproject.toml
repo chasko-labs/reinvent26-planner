@@ -1,0 +1,15 @@
+[project]
+name = "reinvent26-planner"
+version = "0.1.0"
+description = "reinvent 2026 catalog planner: shortlist, clash check, open slots, favorites plus reservations"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["cli"]

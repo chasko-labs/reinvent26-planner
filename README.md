@@ -54,6 +54,11 @@ python -m reinvent26 shortlist <eventId> --topics agents,mcp,bedrock --level 3 -
 # schedule plus double bookings
 python -m reinvent26 schedule <eventId>
 
+# sessions fitting free windows (room plus venue shown for back-to-back)
+python -m reinvent26 slots <eventId> \
+  --window 2026-12-01T13:00:00,2026-12-01T16:00:00 \
+  --window 2026-12-02T09:00:00,2026-12-02T12:00:00
+
 # shortlist with preferences: daytime bounds, lunch block, one outsider pick
 python -m reinvent26 shortlist <eventId> --topics agents,mcp \
   --not-before 09:00 --not-after 17:00 --lunch 12:00-13:00

@@ -151,16 +151,12 @@ def cmd_shortlist(args):
 
 
 def cmd_schedule(args):
-    sched = api.get_schedule(args.event_id, _token(args))
-    items = (
-        sched.get("items")
-        or sched.get("sessions")
-        or sched.get("schedule")
-        or (sched if isinstance(sched, list) else [])
-    )
+    token = _token(args)
+    sched = api.get_schedule(args.event_id, token)
+    items = _confirmed_items(sched, _catalog_for_confirm(args.event_id, token))
     for i in items:
         print(schedule.summarize(i))
-    clashes = schedule.find_clashes(items if isinstance(items, list) else [])
+    clashes = schedule.find_clashes(items)
     if clashes:
         print("# double bookings:", file=sys.stderr)
         for a, b in clashes:
@@ -171,6 +167,97 @@ def cmd_schedule(args):
             )
     else:
         print("# no double bookings", file=sys.stderr)
+
+
+def _schedule_items(sched) -> list:
+    if isinstance(sched, list):
+        return sched
+    if not isinstance(sched, dict):
+        return []
+    items = sched.get("items") or sched.get("sessions") or []
+    if items:
+        return items if isinstance(items, list) else []
+    node = sched.get("schedule")
+    if isinstance(node, list):
+        return node
+    return []
+
+
+def _parse_window(spec: str) -> dict:
+    parts = [p.strip() for p in spec.split(",")]
+    if len(parts) != 2 or not all(parts):
+        raise ValueError(f"window must be 'START,END': {spec!r}")
+    start, end = parts
+    try:
+        if not schedule._parse(start) < schedule._parse(end):
+            raise ValueError("window start must be before window end")
+    except ValueError:
+        raise ValueError(f"window must use ISO timestamps 'START,END': {spec!r}")
+    return {"start": start, "end": end}
+
+
+def cmd_slots(args):
+    windows = [_parse_window(w) for w in args.window]
+    sessions = schedule.normalize_sessions(
+        list(
+            api.iter_sessions(args.event_id, token=_token(args),
+                              include_abstracts=False)
+        )
+    )
+    sessions = _apply_time_filters(sessions, args)
+    scheduled: list = []
+    if _token(args):
+        try:
+            scheduled = _confirmed_items(
+                api.get_schedule(args.event_id, _token(args)), sessions)
+        except api.EventsError as e:
+            print(f"# schedule read failed ({e}); clash check skipped", file=sys.stderr)
+    else:
+        print("# no token: clash check against live schedule skipped", file=sys.stderr)
+    fitting = schedule.find_open_slots(sessions, windows, scheduled)
+    for s in fitting:
+        line = schedule.summarize(s)
+        if s.get("venue"):
+            line += f" | {s.get('venue')}"
+        print(line)
+    print(
+        f"# {len(fitting)} sessions fit fully inside the given windows "
+        "with no clash",
+        file=sys.stderr,
+    )
+
+
+def _catalog_for_confirm(event_id: str, token: str | None) -> list:
+    cached = cache.load_cached_sessions(event_id)
+    if cached is not None:
+        return schedule.normalize_sessions(cached)
+    return schedule.normalize_sessions(
+        list(api.iter_sessions(event_id, token=token, include_abstracts=False)))
+
+
+def _confirmed_items(sched, catalog: list) -> list:
+    """Resolve a GetSchedule payload to normalized session dicts.
+
+    The live shape nests id strings under schedule.favorites/reserved
+    plus personal-time objects under schedule.personalTime; ids resolve
+    against the catalog, unknown ids stay as bare timeless entries.
+    """
+    node = sched.get("schedule") if isinstance(sched, dict) else None
+    if isinstance(node, dict):
+        by_id = {s.get("sessionId"): s for s in catalog
+                 if isinstance(s, dict) and s.get("sessionId")}
+        items = []
+        for sid in list(node.get("favorites") or []) + \
+                list(node.get("reserved") or []):
+            if isinstance(sid, dict):
+                items.append(sid)
+            else:
+                items.append(by_id.get(sid) or {"sessionId": sid})
+        for entry in node.get("personalTime") or []:
+            if isinstance(entry, dict):
+                items.append(entry)
+        return schedule.normalize_sessions(items)
+    return schedule.normalize_sessions(_schedule_items(sched))
 
 
 def cmd_favorite(args):
@@ -246,6 +333,23 @@ def build_parser() -> argparse.ArgumentParser:
     sc = sub.add_parser("schedule", help="show schedule plus double bookings")
     sc.add_argument("event_id")
     sc.set_defaults(fn=cmd_schedule)
+
+    slt = sub.add_parser("slots", help="list sessions fitting free windows with no clash")
+    slt.add_argument("event_id")
+    slt.add_argument(
+        "--window",
+        action="append",
+        required=True,
+        metavar="START,END",
+        help="free window as ISO timestamps, e.g. --window 2026-12-01T13:00:00,2026-12-01T16:00:00 (repeatable)",
+    )
+    slt.add_argument("--not-before", default="", metavar="HH:MM",
+                     help="drop sessions starting before this daily time")
+    slt.add_argument("--not-after", default="", metavar="HH:MM",
+                     help="drop sessions starting after this daily time")
+    slt.add_argument("--lunch", default="", metavar="HH:MM-HH:MM",
+                     help="block out lunch, e.g. --lunch 12:00-13:00")
+    slt.set_defaults(fn=cmd_slots)
 
     f = sub.add_parser("favorite", help="favorite up to 10 session ids per call")
     f.add_argument("event_id")

@@ -9,7 +9,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from reinvent26 import api, schedule, cache, seeds, inventory
+from reinvent26 import api, schedule, cache, seeds, inventory, rank
 
 
 def _token(args) -> str | None:
@@ -431,6 +431,33 @@ def cmd_unblock(args):
         print(f"# personal-time {args.block_id} already absent: complete")
 
 
+def cmd_rank(args):
+    """Local-model ranking over a cached catalog; model only ranks."""
+    with open(args.cache, encoding="utf-8") as fh:
+        raw = json.load(fh)
+    sessions = raw if isinstance(raw, list) else raw.get("sessions",
+                                                         raw.get("items", []))
+    if args.not_before:
+        try:
+            parsed = schedule._hhmm(args.not_before)
+        except ValueError:
+            print(f"error: --not-before must be HH:MM, got {args.not_before!r}",
+                  file=sys.stderr)
+            raise SystemExit(2)
+        floor = parsed
+    else:
+        floor = rank.parse_not_before(args.query)
+    if floor:
+        print(f"# time floor: nothing before {floor:%H:%M}", file=sys.stderr)
+    eligible = rank.filter_not_before(sessions, floor)
+    picks = rank.rank_via_model(
+        args.query, eligible, endpoint=args.endpoint, model=args.model,
+        top=args.top, timeout=args.timeout,
+    )
+    for s in picks:
+        print(schedule.summarize(s))
+
+
 def cmd_favorite(args):
     ids = [i.strip() for i in args.session_ids.split(",") if i.strip()]
     resps = api.favorite_sessions(args.event_id, _token(args), ids)
@@ -580,6 +607,17 @@ def build_parser() -> argparse.ArgumentParser:
     ub.add_argument("event_id")
     ub.add_argument("block_id")
     ub.set_defaults(fn=cmd_unblock)
+
+    rk = sub.add_parser("rank", help="rank cached catalog via local model")
+    rk.add_argument("--cache", required=True, help=".cache/<eventId>/sessions.json")
+    rk.add_argument("--query", required=True, help="natural language request")
+    rk.add_argument("--endpoint", default=rank.DEFAULT_ENDPOINT)
+    rk.add_argument("--model", default="local")
+    rk.add_argument("--top", type=int, default=10)
+    rk.add_argument("--not-before", default="",
+                    help="explicit HH:MM floor (else parsed from query)")
+    rk.add_argument("--timeout", type=int, default=120)
+    rk.set_defaults(fn=cmd_rank)
 
     return p
 

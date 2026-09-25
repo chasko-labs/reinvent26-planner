@@ -1,0 +1,25 @@
+# loaded 6 cached sessions, 3 scheduled items (no token, no network)
+
+## shortlist: topics=agents,mcp,bedrock level=300/400 top=3
+CON401 | MCP servers in production: auth and tool design | 400 | 2026-12-01T09:30:00->2026-12-01T10:30:00 | Venetian L3
+ANT301 | Agent orchestration with Bedrock Agents | 300 | 2026-12-01T09:00:00->2026-12-01T10:00:00 | Venetian L2
+DAT402 | Data modeling with DynamoDB for agent memory | 400 | 2026-12-01T13:00:00->2026-12-01T14:00:00 | Venetian L2
+
+## schedule with clash check
+ANT301 | Agent orchestration with Bedrock Agents | 300 | 2026-12-01T09:00:00->2026-12-01T10:00:00 | Venetian L2
+CON401 | MCP servers in production: auth and tool design | 400 | 2026-12-01T09:30:00->2026-12-01T10:30:00 | Venetian L3
+SRV301 | Event-driven serverless with Lambda and EventBridge | 300 | 2026-12-01T11:00:00->2026-12-01T12:00:00 | MGM Grand
+# clash: ANT301 x CON401
+
+## open slots: window 2026-12-01T13:00:00 to 2026-12-01T16:00:00
+# baseline is clash-free (ANT301 + SRV301); CON401 excluded because it clashes above
+DAT402 | Data modeling with DynamoDB for agent memory | 400 | 2026-12-01T13:00:00->2026-12-01T14:00:00 | Venetian L2
+STG301 | S3 Vectors for retrieval at re:Invent scale | 300 | 2026-12-01T14:00:00->2026-12-01T15:00:00 | Caesars Forum
+OBS301 | Observability for agent fleets with CloudWatch | 300 | 2026-12-01T15:00:00->2026-12-01T16:00:00 | Mandalay Bay
+
+## stack-aware pick: Lambda + DynamoDB footprint
+# keywords: data modeling, dynamodb, event-driven, lambda, nosql, serverless
+SRV301 | Event-driven serverless with Lambda and EventBridge | 300 | 2026-12-01T11:00:00->2026-12-01T12:00:00 | MGM Grand
+DAT402 | Data modeling with DynamoDB for agent memory | 400 | 2026-12-01T13:00:00->2026-12-01T14:00:00 | Venetian L2
+
+# demo complete: favorite now, reserve after 8 Oct 2026, confirm every write with GetSchedule

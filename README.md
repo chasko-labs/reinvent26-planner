@@ -20,6 +20,26 @@ Three ideas in one small repo:
 Plus a Muse Code skill (`skills/awsevents-muse/SKILL.md`) and an optional
 rust pre-filter (`rust/catalog-filter`) for large cached catalogs.
 
+## article and live page
+
+- Builder Center post: TODO-builder-aws-post-url (draft: `docs/article-draft.md`)
+- live page: bryanchasko.com/reinvent26 (draft source: `docs/reinvent26-page.md`)
+
+## demo (no token, no network)
+
+Judges with no registration can run the cached demo from a clean checkout:
+
+```
+python demo/demo_public.py
+```
+
+Uses only the standard library plus `demo/sessions-sample.json` and
+`demo/schedule-sample.json`. Expected output is checked in at
+`demo/sample-output.txt`. It shows a 300/400 shortlist, a schedule with a
+clash (`ANT301 x CON401`), open slots in an afternoon window, and a
+stack-aware pick. Authenticated writes (`favorite`, `reserve`, `schedule`
+confirm) still need `reinvent26 login` plus event registration.
+
 ## how it uses the API
 
 - REST (`cli/`): ListEvents (public), ListSessions with pagination until
@@ -152,6 +172,8 @@ expecting catalog access; a valid token without registration returns 403.
 ## docs
 
 - skill: `skills/awsevents-muse/SKILL.md`
+- Builder Center article draft: `docs/article-draft.md`
+- public demo: `demo/demo_public.py` with samples and `demo/sample-output.txt`
 - local models and caching: `docs/local-models.md`
 - draft copy for bryanchasko.com/reinvent26: `docs/reinvent26-page.md`
 - canonical Events API docs: https://docs.aws.amazon.com/events/latest/devguide/what-is-events-api.html

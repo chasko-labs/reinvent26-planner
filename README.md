@@ -59,6 +59,10 @@ python -m reinvent26 slots <eventId> \
   --window 2026-12-01T13:00:00,2026-12-01T16:00:00 \
   --window 2026-12-02T09:00:00,2026-12-02T12:00:00
 
+# stack-aware pick: keywords from live resources, then shortlist
+python -m reinvent26 stack-pick <eventId> --profile my-readonly-profile --top 10
+python -m reinvent26 stack-pick <eventId> --resources-json /tmp/resources.json
+
 # shortlist with preferences: daytime bounds, lunch block, one outsider pick
 python -m reinvent26 shortlist <eventId> --topics agents,mcp \
   --not-before 09:00 --not-after 17:00 --lunch 12:00-13:00

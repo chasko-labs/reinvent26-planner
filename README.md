@@ -108,6 +108,22 @@ python -m reinvent26 shortlist <eventId> --topics agents --cached
 python -m reinvent26 shortlist <eventId> --topics agents --cached --day 2026-12-01
 ```
 
+## error paths
+
+- 401: sign in first (`reinvent26 login` or `EVENTS_ACCESS_TOKEN`); one
+  401 refreshes the stored token once and retries.
+- 403 with a body: valid token but not registered for the event. register
+  on the reinvent site first; the cli never retries 403.
+- 429: Retry-After seconds are honored (reads retry, writes retry once).
+  batch writes count every named session toward quota: shrink batches on
+  repeat 429s.
+- 500/503: reads back off (1s, 2s) and retry; writes never blind-retry.
+  reconcile with the schedule command and submit only what remains.
+  cancel/remove are exempt: one idempotent retry, since 404 on retry
+  means already-complete.
+- 404 on cancel/remove/unblock: already absent, treated as complete.
+- 409 on reserve/cancel: seating opens 8 Oct 2026; retry after reopen.
+
 ## tests
 
 ```

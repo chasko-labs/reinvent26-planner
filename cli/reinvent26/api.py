@@ -96,6 +96,28 @@ def delete_with_retry(fn, *args, **kwargs):
         raise
 
 
+def read_with_retry(fn, *args, **kwargs):
+    """Reads: honor Retry-After on 429, back off on 500/503.
+
+    Retries 429 twice (sleeping each Retry-After) and 500/503 twice
+    (sleeping 1s then 2s). Never retries 403/404/409: 403 with a body
+    means not registered, and retrying will not fix it.
+    """
+    delay = 1.0
+    for attempt in range(3):
+        try:
+            return fn(*args, **kwargs)
+        except EventsError as e:
+            if e.status == 429 and attempt < 2:
+                _sleep(e.retry_after or 5.0)
+                continue
+            if e.status in (500, 503) and attempt < 2:
+                _sleep(delay)
+                delay *= 2
+                continue
+            raise
+
+
 def list_events(include_past: bool = False) -> list:
     params = {"includePast": "true"} if include_past else None
     out = _request("GET", "/v1/events", params=params)
@@ -128,8 +150,12 @@ def iter_sessions(
             "maxResults": page_size,
             "nextToken": next_token,
         }
-        page = _request(
-            "GET", f"/v1/events/{event_id}/sessions", token=token, params=params
+        page = read_with_retry(
+            _request,
+            "GET",
+            f"/v1/events/{event_id}/sessions",
+            token=token,
+            params=params,
         )
         if isinstance(page, dict):
             sessions = page.get("sessions") or page.get("items") or []
@@ -147,14 +173,19 @@ def iter_sessions(
 
 
 def get_session(event_id: str, session_id: str, token: str | None = None) -> dict:
-    return _request(
-        "GET", f"/v1/events/{event_id}/sessions/{session_id}", token=token
+    return read_with_retry(
+        _request,
+        "GET",
+        f"/v1/events/{event_id}/sessions/{session_id}",
+        token=token,
     )
 
 
 def get_schedule(event_id: str, token: str) -> dict:
     """Source of truth for the attendee schedule. Use to confirm writes."""
-    return _request("GET", f"/v1/events/{event_id}/schedule", token=token)
+    return read_with_retry(
+        _request, "GET", f"/v1/events/{event_id}/schedule", token=token
+    )
 
 
 def _batched(ids: list, size: int = 10):
@@ -173,7 +204,8 @@ def favorite_sessions(event_id: str, token: str, session_ids: list) -> list:
     out = []
     for batch in _batched(list(dict.fromkeys(session_ids))):
         out.append(
-            _request(
+            write_with_retry_429(
+                _request,
                 "POST",
                 f"/v1/events/{event_id}/favorites",
                 token=token,
@@ -192,7 +224,8 @@ def reserve_sessions(event_id: str, token: str, session_ids: list) -> list:
     out = []
     for batch in _batched(list(dict.fromkeys(session_ids))):
         out.append(
-            _request(
+            write_with_retry_429(
+                _request,
                 "POST",
                 f"/v1/events/{event_id}/reservations",
                 token=token,
@@ -305,13 +338,3 @@ def delete_personal_time(event_id: str, token: str, block_id: str) -> bool:
     )
 
 
-def with_retry_429(fn, *args, **kwargs):
-    """One retry honoring Retry-After for reads. Writes reconcile via
-    get_schedule instead of blind retry."""
-    try:
-        return fn(*args, **kwargs)
-    except EventsError as e:
-        if e.status == 429:
-            time.sleep(e.retry_after or 5.0)
-            return fn(*args, **kwargs)
-        raise

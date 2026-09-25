@@ -626,10 +626,28 @@ def main(argv=None):
     args = build_parser().parse_args(argv)
     try:
         args.fn(args)
+    except (ValueError, FileNotFoundError, RuntimeError) as e:
+        print(f"error: {e}", file=sys.stderr)
+        raise SystemExit(2)
     except api.EventsError as e:
         print(f"error: {e}", file=sys.stderr)
         if e.status == 403:
-            print("# 403 with body: not registered for this event; register on the reinvent site first", file=sys.stderr)
+            print("# 403 with body: valid token but not registered for this "
+                  "event; register on the reinvent site first (never retried)",
+                  file=sys.stderr)
+        elif e.status == 429:
+            print("# 429: quota exceeded; Retry-After was honored once; wait "
+                  "before retrying. batch writes count every named session "
+                  "toward quota, so shrink batches on repeat 429s",
+                  file=sys.stderr)
+        elif e.status in (500, 503):
+            print("# server error on a write: reconcile with the schedule "
+                  "command and submit only what remains; never blind-retry "
+                  "(cancel/remove already retried once)",
+                  file=sys.stderr)
+        elif e.status == 409:
+            print("# 409: operation closed (reserve/cancel opens 8 Oct 2026); "
+                  "retry after reopen, not a bad request", file=sys.stderr)
         raise SystemExit(1)
 
 

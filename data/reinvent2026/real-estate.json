@@ -1,104 +1,250 @@
 [
   {
-    "sessionId": "ind329-r1-a",
-    "code": "IND329-R1",
-    "title": "Build a multi-agent system for hyper-personalized customer journeys",
-    "level": "300",
-    "sessionType": "workshop",
-    "topics": ["agents", "agentic", "agentcore", "strands", "mcp", "personalization", "shared-memory"],
-    "services": ["Amazon Bedrock AgentCore"],
-    "tracks": [],
-    "lenses": ["real-estate", "next-gen-stats"],
-    "startTime": "2026-11-30T08:30:00",
-    "endTime": "2026-11-30T10:30:00",
-    "venue": "Wynn/Encore",
-    "sponsored": false,
     "abstract": "Delivering personalized experiences across complex customer journeys requires agents that understand intent, maintain context, and coordinate across systems. Build a multi-agent AI personal banker using a home buying scenario as the example. Agents extract intent from natural conversation, build dynamic customer profiles, and orchestrate workflows across internal systems and external ecosystem APIs. Implement multi-agent patterns for shared memory, readiness signals, and coordinated decisioning using Amazon Bedrock AgentCore, Strands Agents Framework, and MCP. Real-estate lens: the home-buying journey is the worked example; reusable orchestration patterns for any personalized experience.",
-    "source": "paste-2026-real-estate"
-  },
-  {
-    "sessionId": "ind344-a",
-    "code": "IND344",
-    "title": "How Chamberlain and Daikin power smart product innovation with AWS",
+    "code": "IND329-R1",
+    "endTime": "2026-11-30T10:30:00",
+    "lenses": [
+      "real-estate",
+      "next-gen-stats"
+    ],
     "level": "300",
-    "sessionType": "breakout",
-    "topics": ["iot", "smart-home", "video-intelligence", "predictive", "telemetry", "connected-products"],
-    "services": [],
-    "tracks": [],
-    "lenses": ["real-estate", "next-gen-stats"],
-    "startTime": "2026-12-04T09:00:00",
-    "endTime": "2026-12-04T10:00:00",
-    "venue": "Wynn/Encore",
-    "sponsored": false,
-    "abstract": "Manufacturers are transforming products into connected, intelligent offerings that deliver proactive, personalized customer experiences. How AWS helps build, connect, and monetize smart products at global scale. Chamberlain Group migrated its myQ smart home platform, 15M+ devices and 12M+ users, to AWS, eliminating multi-cloud complexity and furthering AI and video intelligence offerings. Daikin uses AWS for 24/7 remote monitoring and predictive control across HVAC systems. Real-estate lens: smart-home telemetry as a property-truth and valuation signal, the enterprise-scale version of a utility-truth scorecard.",
-    "source": "paste-2026-real-estate"
-  },
-  {
-    "sessionId": "dat318-s-a",
-    "code": "DAT318-S",
-    "title": "10x Faster Vector Indexes: GPU Acceleration in Amazon OpenSearch with NVIDIA cuVS (sponsored by NVIDIA)",
-    "level": "300",
-    "sessionType": "breakout",
-    "topics": ["vector", "opensearch", "gpu", "cuvs", "rag", "retrieval", "cost-optimization", "next-gen-stats"],
-    "services": ["Amazon OpenSearch Serverless", "Amazon OpenSearch Service"],
-    "tracks": ["AWS Partners", "Cloud Operations", "Databases", "Serverless"],
-    "lenses": ["nvidia", "next-gen-stats", "real-estate"],
-    "startTime": "2026-11-30T15:00:00",
-    "endTime": "2026-11-30T16:00:00",
-    "venue": "Caesars Palace",
-    "sponsored": true,
-    "abstract": "At billion-vector scale, vector index construction becomes a performance and cost bottleneck for retrieval, RAG, and AI workloads. Amazon OpenSearch Service Vector Acceleration uses NVIDIA cuVS to accelerate index construction, up to 10x faster builds at a quarter of the indexing cost while preserving the OpenSearch experience. Goes under the hood: how eligible builds offload to managed GPU workers, how cuVS and CAGRA accelerate graph construction through the Faiss backend, how the graph converts into an HNSW index for CPU-based search. How segment size, quantization, and ingestion patterns affect GPU utilization, build speed, efficiency. Guidance for identifying good-fit workloads. Real-estate lens: property/listing vector search at marketplace scale.",
-    "source": "paste-2026-nvidia"
-  },
-  {
-    "sessionId": "aim247-s-a",
-    "code": "AIM247-S",
-    "title": "AI at Lennar: Driving 80,000 Home Deliveries with Bedrock & Coralogix (sponsored by Coralogix)",
-    "level": "200",
-    "sessionType": "breakout",
-    "topics": ["agents", "agentic", "bedrock", "inference", "open-source-models", "observability", "cost-optimization"],
-    "services": ["Amazon Bedrock"],
-    "tracks": ["AWS Partners"],
-    "lenses": ["real-estate", "next-gen-stats"],
-    "startTime": "2026-12-02T16:30:00",
-    "endTime": "2026-12-02T17:30:00",
-    "venue": "Venetian",
-    "sponsored": true,
-    "abstract": "Lennar is bringing AI into the everyday work behind more than 80,000 home deliveries a year, from land research and acquisition to construction, customer engagement, and sales. Ralph Gootee, CTO of Lennar, and Ariel Assaraf, CEO of Coralogix, give a practical look at moving AI from experimentation into production. How Lennar builds and scales AI agents on Amazon Bedrock, using AWS inference services and open-source models, and how Coralogix helps teams understand adoption, performance, cost, and business impact. Real-estate lens: the clearest production-scale homebuilder AI story in the catalog, spanning the full lifecycle land-to-sale.",
-    "source": "paste-2026-real-estate"
-  },
-  {
-    "sessionId": "com305-a",
-    "code": "COM305",
-    "title": "Why Enterprise RAG Fails: Document AI and Ontology Patterns on AWS",
-    "level": "300",
-    "sessionType": "breakout",
-    "topics": ["rag", "document-ai", "ontology", "knowledge-graph", "semantic-chunking", "extraction", "retrieval", "metadata"],
-    "services": [],
-    "tracks": [],
-    "lenses": ["real-estate", "next-gen-stats", "ai"],
-    "startTime": "2026-12-03T09:00:00",
-    "endTime": "2026-12-03T10:00:00",
-    "venue": "Wynn/Encore",
-    "sponsored": false,
-    "abstract": "Most teams blame embeddings, vector databases, or foundation models when RAG underperforms. In practice, failures often originate earlier, where business meaning is lost during document ingestion. Production Document AI patterns on AWS: layout-aware extraction, ontology-driven classification, semantic chunking, metadata enrichment, retrieval optimization. Using financial services examples, shows how domain ontologies improve extraction accuracy, retrieval relevance, and explainability. Practical architecture patterns, implementation tradeoffs, a framework for scalable trustworthy RAG. Real-estate lens: the knowledge-layer move applied to listing/property document ingestion; ontology-driven classification is exactly what a listings graph needs.",
-    "source": "paste-2026-real-estate"
-  },
-  {
-    "sessionId": "tnc334-a",
-    "code": "TNC334",
-    "title": "Streamline Claims Processing with Amazon Quick",
-    "level": "300",
+    "services": [
+      "Amazon Bedrock AgentCore"
+    ],
+    "sessionId": "ind329-r1-a",
     "sessionType": "workshop",
-    "topics": ["document-processing", "quick-automate", "mcp", "agents", "workflow", "rules-validation", "s3"],
-    "services": ["Amazon S3"],
-    "tracks": [],
-    "lenses": ["real-estate", "next-gen-stats"],
-    "startTime": "2026-11-30T13:00:00",
-    "endTime": "2026-11-30T15:00:00",
-    "venue": "Caesars Palace",
+    "source": "paste-2026-real-estate",
     "sponsored": false,
+    "startTime": "2026-11-30T08:30:00",
+    "title": "Build a multi-agent system for hyper-personalized customer journeys",
+    "topics": [
+      "agents",
+      "agentic",
+      "agentcore",
+      "strands",
+      "mcp",
+      "personalization",
+      "shared-memory"
+    ],
+    "tracks": [],
+    "venue": "Wynn/Encore"
+  },
+  {
+    "abstract": "Manufacturers are transforming products into connected, intelligent offerings that deliver proactive, personalized customer experiences. How AWS helps build, connect, and monetize smart products at global scale. Chamberlain Group migrated its myQ smart home platform, 15M+ devices and 12M+ users, to AWS, eliminating multi-cloud complexity and furthering AI and video intelligence offerings. Daikin uses AWS for 24/7 remote monitoring and predictive control across HVAC systems. Real-estate lens: smart-home telemetry as a property-truth and valuation signal, the enterprise-scale version of a utility-truth scorecard.",
+    "code": "IND344",
+    "endTime": "2026-12-04T10:00:00",
+    "lenses": [
+      "real-estate",
+      "next-gen-stats"
+    ],
+    "level": "300",
+    "services": [],
+    "sessionId": "ind344-a",
+    "sessionType": "breakout",
+    "source": "paste-2026-real-estate",
+    "sponsored": false,
+    "startTime": "2026-12-04T09:00:00",
+    "title": "How Chamberlain and Daikin power smart product innovation with AWS",
+    "topics": [
+      "iot",
+      "smart-home",
+      "video-intelligence",
+      "predictive",
+      "telemetry",
+      "connected-products"
+    ],
+    "tracks": [],
+    "venue": "Wynn/Encore"
+  },
+  {
+    "abstract": "At billion-vector scale, vector index construction becomes a performance and cost bottleneck for retrieval, RAG, and AI workloads. Amazon OpenSearch Service Vector Acceleration uses NVIDIA cuVS to accelerate index construction, up to 10x faster builds at a quarter of the indexing cost while preserving the OpenSearch experience. Goes under the hood: how eligible builds offload to managed GPU workers, how cuVS and CAGRA accelerate graph construction through the Faiss backend, how the graph converts into an HNSW index for CPU-based search. How segment size, quantization, and ingestion patterns affect GPU utilization, build speed, efficiency. Guidance for identifying good-fit workloads. Real-estate lens: property/listing vector search at marketplace scale.",
+    "code": "DAT318-S",
+    "endTime": "2026-11-30T16:00:00",
+    "lenses": [
+      "nvidia",
+      "next-gen-stats",
+      "real-estate"
+    ],
+    "level": "300",
+    "services": [
+      "Amazon OpenSearch Serverless",
+      "Amazon OpenSearch Service"
+    ],
+    "sessionId": "dat318-s-a",
+    "sessionType": "breakout",
+    "source": "paste-2026-nvidia",
+    "sponsored": true,
+    "startTime": "2026-11-30T15:00:00",
+    "title": "10x Faster Vector Indexes: GPU Acceleration in Amazon OpenSearch with NVIDIA cuVS (sponsored by NVIDIA)",
+    "topics": [
+      "vector",
+      "opensearch",
+      "gpu",
+      "cuvs",
+      "rag",
+      "retrieval",
+      "cost-optimization",
+      "next-gen-stats"
+    ],
+    "tracks": [
+      "AWS Partners",
+      "Cloud Operations",
+      "Databases",
+      "Serverless"
+    ],
+    "venue": "Caesars Palace"
+  },
+  {
+    "abstract": "Lennar is bringing AI into the everyday work behind more than 80,000 home deliveries a year, from land research and acquisition to construction, customer engagement, and sales. Ralph Gootee, CTO of Lennar, and Ariel Assaraf, CEO of Coralogix, give a practical look at moving AI from experimentation into production. How Lennar builds and scales AI agents on Amazon Bedrock, using AWS inference services and open-source models, and how Coralogix helps teams understand adoption, performance, cost, and business impact. Real-estate lens: the clearest production-scale homebuilder AI story in the catalog, spanning the full lifecycle land-to-sale.",
+    "code": "AIM247-S",
+    "endTime": "2026-12-02T17:30:00",
+    "lenses": [
+      "real-estate",
+      "next-gen-stats"
+    ],
+    "level": "200",
+    "services": [
+      "Amazon Bedrock"
+    ],
+    "sessionId": "aim247-s-a",
+    "sessionType": "breakout",
+    "source": "paste-2026-real-estate",
+    "sponsored": true,
+    "startTime": "2026-12-02T16:30:00",
+    "title": "AI at Lennar: Driving 80,000 Home Deliveries with Bedrock & Coralogix (sponsored by Coralogix)",
+    "topics": [
+      "agents",
+      "agentic",
+      "bedrock",
+      "inference",
+      "open-source-models",
+      "observability",
+      "cost-optimization"
+    ],
+    "tracks": [
+      "AWS Partners"
+    ],
+    "venue": "Venetian"
+  },
+  {
+    "abstract": "Most teams blame embeddings, vector databases, or foundation models when RAG underperforms. In practice, failures often originate earlier, where business meaning is lost during document ingestion. Production Document AI patterns on AWS: layout-aware extraction, ontology-driven classification, semantic chunking, metadata enrichment, retrieval optimization. Using financial services examples, shows how domain ontologies improve extraction accuracy, retrieval relevance, and explainability. Practical architecture patterns, implementation tradeoffs, a framework for scalable trustworthy RAG. Real-estate lens: the knowledge-layer move applied to listing/property document ingestion; ontology-driven classification is exactly what a listings graph needs.",
+    "code": "COM305",
+    "endTime": "2026-12-03T10:00:00",
+    "lenses": [
+      "real-estate",
+      "next-gen-stats",
+      "ai"
+    ],
+    "level": "300",
+    "services": [],
+    "sessionId": "com305-a",
+    "sessionType": "breakout",
+    "source": "paste-2026-real-estate",
+    "sponsored": false,
+    "startTime": "2026-12-03T09:00:00",
+    "title": "Why Enterprise RAG Fails: Document AI and Ontology Patterns on AWS",
+    "topics": [
+      "rag",
+      "document-ai",
+      "ontology",
+      "knowledge-graph",
+      "semantic-chunking",
+      "extraction",
+      "retrieval",
+      "metadata"
+    ],
+    "tracks": [],
+    "venue": "Wynn/Encore"
+  },
+  {
     "abstract": "Claims adjusters spend hours retrieving policy data, applying business rules, and drafting decision letters manually. In this SimuLearn session, use Amazon Quick Automate to orchestrate the entire claims process. Configure REST API and MCP connectors, build a multi-step workflow with Custom Agent steps, chain policy retrieval, rules validation, and AI-powered letter generation. The workflow handles missing data gracefully and stores audit-ready decision letters in S3. Real-estate lens: the same document-plus-rules-plus-generated-letter shape as lease/disclosure/tenancy-agreement generation (the LockHouse statutory agreement idea).",
-    "source": "paste-2026-real-estate"
+    "code": "TNC334",
+    "endTime": "2026-11-30T15:00:00",
+    "lenses": [
+      "real-estate",
+      "next-gen-stats"
+    ],
+    "level": "300",
+    "services": [
+      "Amazon S3"
+    ],
+    "sessionId": "tnc334-a",
+    "sessionType": "workshop",
+    "source": "paste-2026-real-estate",
+    "sponsored": false,
+    "startTime": "2026-11-30T13:00:00",
+    "title": "Streamline Claims Processing with Amazon Quick",
+    "topics": [
+      "document-processing",
+      "quick-automate",
+      "mcp",
+      "agents",
+      "workflow",
+      "rules-validation",
+      "s3"
+    ],
+    "tracks": [],
+    "venue": "Caesars Palace"
+  },
+  {
+    "abstract": "Mortgage lending still runs on handoffs, exceptions, and manual review. How a leading US mortgage lender is rebuilding origination and servicing with agentic AI on AWS, cutting cycle times while keeping controls and auditability intact. The same agent patterns reach IT operations, resolving incidents before customers feel them. Tata Consultancy Services shares the reference architecture, guardrails, and adoption model. A practical path from pilots to production at enterprise scale. Real-estate lens: the clearest mortgage-operations agentic story in the catalog, origination-through-servicing.",
+    "code": "AIM108-S",
+    "endTime": "2026-12-01T16:00:00",
+    "lenses": [
+      "real-estate",
+      "next-gen-stats"
+    ],
+    "level": "100",
+    "services": [],
+    "sessionId": "aim108-s-a",
+    "sessionType": "breakout",
+    "source": "paste-2026-real-estate",
+    "sponsored": true,
+    "startTime": "2026-12-01T15:00:00",
+    "title": "Beyond pilots: agentic AI transforming mortgage operations and IT at scale (sponsored by Tata Consultancy Services)",
+    "topics": [
+      "agents",
+      "agentic",
+      "mortgage",
+      "origination",
+      "servicing",
+      "auditability",
+      "guardrails",
+      "financial-services"
+    ],
+    "tracks": [
+      "AWS Partners"
+    ],
+    "venue": "MGM Grand"
+  },
+  {
+    "abstract": "Legacy applications across mainframe, midrange, and distributed platforms have long resisted modernization. Combining deterministic methods with agentic AI delivers speed and accuracy. United Airlines modernized crew operations while maintaining FAR compliance; Bank Hapoalim analyzed a 3.2-million-line mortgage application and delivered an insurance module to production under a board-mandated deadline while reducing operational risk. The end-to-end journey, from automated discovery and business rule extraction with AWS Transform through microservices engineering with Kiro to production deployment. Real-estate lens: the Bank Hapoalim mortgage-application modernization. favorites lens: AWS Transform business-rule extraction into Kiro microservices, the modernization-via-agents pattern.",
+    "code": "MAM206",
+    "endTime": "2026-11-30T17:30:00",
+    "lenses": [
+      "real-estate",
+      "favorites"
+    ],
+    "level": "200",
+    "services": [],
+    "sessionId": "mam206-a",
+    "sessionType": "breakout",
+    "source": "paste-2026-real-estate",
+    "sponsored": false,
+    "startTime": "2026-11-30T16:30:00",
+    "title": "End-to-end agentic modernization with United Airlines & Bank Hapoalim",
+    "topics": [
+      "agents",
+      "agentic",
+      "modernization",
+      "mortgage",
+      "mainframe",
+      "aws-transform",
+      "kiro",
+      "business-rule-extraction",
+      "microservices"
+    ],
+    "tracks": [],
+    "venue": "Caesars Palace"
   }
 ]

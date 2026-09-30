@@ -66,5 +66,39 @@
     "sponsored": true,
     "abstract": "Lennar is bringing AI into the everyday work behind more than 80,000 home deliveries a year, from land research and acquisition to construction, customer engagement, and sales. Ralph Gootee, CTO of Lennar, and Ariel Assaraf, CEO of Coralogix, give a practical look at moving AI from experimentation into production. How Lennar builds and scales AI agents on Amazon Bedrock, using AWS inference services and open-source models, and how Coralogix helps teams understand adoption, performance, cost, and business impact. Real-estate lens: the clearest production-scale homebuilder AI story in the catalog, spanning the full lifecycle land-to-sale.",
     "source": "paste-2026-real-estate"
+  },
+  {
+    "sessionId": "com305-a",
+    "code": "COM305",
+    "title": "Why Enterprise RAG Fails: Document AI and Ontology Patterns on AWS",
+    "level": "300",
+    "sessionType": "breakout",
+    "topics": ["rag", "document-ai", "ontology", "knowledge-graph", "semantic-chunking", "extraction", "retrieval", "metadata"],
+    "services": [],
+    "tracks": [],
+    "lenses": ["real-estate", "next-gen-stats", "ai"],
+    "startTime": "2026-12-03T09:00:00",
+    "endTime": "2026-12-03T10:00:00",
+    "venue": "Wynn/Encore",
+    "sponsored": false,
+    "abstract": "Most teams blame embeddings, vector databases, or foundation models when RAG underperforms. In practice, failures often originate earlier, where business meaning is lost during document ingestion. Production Document AI patterns on AWS: layout-aware extraction, ontology-driven classification, semantic chunking, metadata enrichment, retrieval optimization. Using financial services examples, shows how domain ontologies improve extraction accuracy, retrieval relevance, and explainability. Practical architecture patterns, implementation tradeoffs, a framework for scalable trustworthy RAG. Real-estate lens: the knowledge-layer move applied to listing/property document ingestion; ontology-driven classification is exactly what a listings graph needs.",
+    "source": "paste-2026-real-estate"
+  },
+  {
+    "sessionId": "tnc334-a",
+    "code": "TNC334",
+    "title": "Streamline Claims Processing with Amazon Quick",
+    "level": "300",
+    "sessionType": "workshop",
+    "topics": ["document-processing", "quick-automate", "mcp", "agents", "workflow", "rules-validation", "s3"],
+    "services": ["Amazon S3"],
+    "tracks": [],
+    "lenses": ["real-estate", "next-gen-stats"],
+    "startTime": "2026-11-30T13:00:00",
+    "endTime": "2026-11-30T15:00:00",
+    "venue": "Caesars Palace",
+    "sponsored": false,
+    "abstract": "Claims adjusters spend hours retrieving policy data, applying business rules, and drafting decision letters manually. In this SimuLearn session, use Amazon Quick Automate to orchestrate the entire claims process. Configure REST API and MCP connectors, build a multi-step workflow with Custom Agent steps, chain policy retrieval, rules validation, and AI-powered letter generation. The workflow handles missing data gracefully and stores audit-ready decision letters in S3. Real-estate lens: the same document-plus-rules-plus-generated-letter shape as lease/disclosure/tenancy-agreement generation (the LockHouse statutory agreement idea).",
+    "source": "paste-2026-real-estate"
   }
 ]

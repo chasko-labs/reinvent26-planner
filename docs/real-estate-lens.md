@@ -85,16 +85,16 @@ ranked by signal for a marketplace/proptech platform team:
 - NET334-R (identify/rate-limit/monetize AI crawlers) — how a listings site
   treats the new agent-visitor traffic. Thu Dec 3, 10:30 AM, MGM Grand.
 
-## watch-list gaps to fill as more sessions come in
+## watch-list gaps: tracked entries
 
-- computer vision for listings: room detection, condition scoring, photo
-  quality, virtual staging. nothing strong captured yet — feed me a CV /
-  Rekognition / image-understanding session and it slots straight into the
-  cv move above.
-- geospatial / Amazon Location Service: location intelligence for
-  neighborhood scoring, commute, flood/utility overlays.
-- fraud detection deep-dive beyond crawler traffic: duplicate-listing and
-  synthetic-identity detection.
+watchlist gaps live as rows in `data/reinvent2026/watchlist.json`, not as
+prose to re-flag. each carries `source: watchlist-gap`, `sessionType:
+watchlist`, null times (timeless, skipped by clash/slot), and an abstract
+that states what to look for plus the search leads.
+
+see `data/reinvent2026/watchlist.json` for current entries (WATCH-CV,
+WATCH-GEO). when a real 2026 session surfaces, the watch row is replaced
+with the real code/title/time and moved into the matching lens file.
 
 ## honest note on the aws angle
 

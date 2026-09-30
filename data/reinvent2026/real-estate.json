@@ -246,5 +246,22 @@
     ],
     "tracks": [],
     "venue": "Caesars Palace"
+  },
+  {
+    "sessionId": "dat424-a",
+    "code": "DAT424",
+    "title": "Advanced data modeling for Amazon ElastiCache",
+    "level": "400",
+    "sessionType": "breakout",
+    "topics": ["elasticache", "valkey", "geospatial", "data-modeling", "caching", "session-store", "feature-store", "real-time-analytics", "rate-limiter", "sorted-sets", "bitmaps"],
+    "services": ["Amazon ElastiCache"],
+    "tracks": ["Databases", "Open Source"],
+    "lenses": ["real-estate", "next-gen-stats", "favorites"],
+    "startTime": "2026-11-30T12:00:00",
+    "endTime": "2026-11-30T13:00:00",
+    "venue": "Caesars Palace",
+    "sponsored": false,
+    "abstract": "Amazon ElastiCache data modeling using purpose-built Valkey data types to optimize application performance and scalability. Strings, sets, sorted sets, hashes, bitmaps, and geospatial indexes to model complex relationships and solve caching, session store, feature store, real-time analytics, geospatial applications, and rate limiters. Real-estate lens: geospatial indexes for property radius/near-me queries; feature store for valuation signals. favorites lens: Valkey data-type modeling is directly the haunting's valkey usage.",
+    "source": "paste-2026-real-estate"
   }
 ]

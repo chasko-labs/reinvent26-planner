@@ -1,0 +1,36 @@
+[
+  {
+    "sessionId": "watch-cv",
+    "code": "WATCH-CV",
+    "title": "computer vision for listing photos",
+    "level": "0",
+    "sessionType": "watchlist",
+    "topics": ["computer-vision", "listings", "room-detection", "condition-scoring", "visual-search"],
+    "services": ["Amazon Rekognition", "Amazon Bedrock"],
+    "tracks": [],
+    "lenses": ["real-estate"],
+    "startTime": null,
+    "endTime": null,
+    "venue": null,
+    "sponsored": false,
+    "abstract": "computer vision for listing photos: room detection, condition scoring, visual similarity, image quality assessment. closest sessions: AIM360, AIM216, AIM449. when found, replace this row and move into real-estate.json",
+    "source": "watchlist-gap"
+  },
+  {
+    "sessionId": "watch-geo",
+    "code": "WATCH-GEO",
+    "title": "Amazon Location Service and geospatial",
+    "level": "0",
+    "sessionType": "watchlist",
+    "topics": ["location", "geospatial", "amazon-location-service", "radius-search", "neighborhood-scoring"],
+    "services": ["Amazon Location Service"],
+    "tracks": [],
+    "lenses": ["real-estate", "next-gen-stats"],
+    "startTime": null,
+    "endTime": null,
+    "venue": null,
+    "sponsored": false,
+    "abstract": "Amazon Location Service / geospatial: neighborhood scoring, radius search, flood/utility/POI overlays, walk-score. closest real: DAT424 (ElastiCache Valkey geospatial indexes). 2025 reference: felt.com geo-week guide. when found, replace this row and move into real-estate.json",
+    "source": "watchlist-gap"
+  }
+]

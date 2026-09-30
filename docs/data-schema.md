@@ -119,6 +119,17 @@ a session lands in a lens when the abstract or services clearly serve that
 interest, not on a single incidental keyword. the tagging is editorial and
 lives in the curated `data/` files, reviewed like any other content.
 
+## watchlist entries
+
+`data/reinvent2026/watchlist.json` holds tracked-but-unfilled gaps: topics
+worth a session that has not been found in the catalog yet. these rows use
+`sessionType: watchlist`, `source: watchlist-gap`, `level: "0"`, and null
+start/end times so they surface under their lens but are skipped by clash
+and slot logic (timeless). the abstract states what to look for and the
+search leads. when a real session surfaces, the watch row is replaced with
+the real code/title/time and moved into the matching lens file. this keeps
+gaps as visible catalog items instead of prose that has to be re-flagged.
+
 ## how curated data reaches the planner
 
 the loader resolves a catalog for an event id by, in order: an explicit

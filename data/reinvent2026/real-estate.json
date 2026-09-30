@@ -263,5 +263,22 @@
     "sponsored": false,
     "abstract": "Amazon ElastiCache data modeling using purpose-built Valkey data types to optimize application performance and scalability. Strings, sets, sorted sets, hashes, bitmaps, and geospatial indexes to model complex relationships and solve caching, session store, feature store, real-time analytics, geospatial applications, and rate limiters. Real-estate lens: geospatial indexes for property radius/near-me queries; feature store for valuation signals. favorites lens: Valkey data-type modeling is directly the haunting's valkey usage.",
     "source": "paste-2026-real-estate"
+  },
+  {
+    "sessionId": "ind393-a",
+    "code": "IND393",
+    "title": "Real-world AI: How a state agency transformed its contact center",
+    "level": "400",
+    "sessionType": "breakout",
+    "topics": ["amazon-connect", "contact-center", "call-analysis", "transcription", "agent-assistance", "case-notes"],
+    "services": ["Amazon Connect", "Amazon Bedrock"],
+    "tracks": [],
+    "lenses": ["real-estate", "ai", "next-gen-stats"],
+    "startTime": "2026-12-04T10:00:00",
+    "endTime": "2026-12-04T11:00:00",
+    "venue": "Wynn/Encore",
+    "sponsored": false,
+    "abstract": "When the Georgia Department of Community Supervision needed to modernize their contact center, they turned to Amazon Connect and AI. Firsthand how AI-powered call analysis, real-time transcription, automated case notes, and intelligent agent assistance are transforming how state agencies serve constituents. Lessons from discovery through implementation: prioritizing high-impact AI use cases, building stakeholder alignment, delivering measurable outcomes. Real-estate lens: the same AI-contact-center modernization pattern a listings marketplace or property-management operation runs for customer/tenant service.",
+    "source": "paste-2026-real-estate"
   }
 ]

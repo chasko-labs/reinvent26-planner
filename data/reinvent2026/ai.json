@@ -117,5 +117,39 @@
     "sponsored": true,
     "abstract": "Customize NVIDIA Nemotron 3 using Amazon SageMaker Serverless Fine-tuning without managing training infrastructure. Walks through preparing a dataset, fine-tuning the model, and evaluating the customized model against the base model to measure quality improvements. Attendees leave with a practical workflow for adapting Nemotron to domain-specific use cases on AWS. Hands-on, laptop required. ai + nvidia lens: pairs directly with the QLoRA/fine-tuning + evaluation-gate pipeline work.",
     "source": "paste-2026-nvidia"
+  },
+  {
+    "sessionId": "aim312-r-a",
+    "code": "AIM312-R",
+    "title": "Beyond fine-tuning: RL for reasoning agents with AWS Trainium",
+    "level": "300",
+    "sessionType": "chalk talk",
+    "topics": ["rlhf", "grpo", "trainium", "neuron", "reasoning", "agents", "fine-tuning", "reinforcement-learning"],
+    "services": ["AWS Trainium"],
+    "tracks": ["Artificial Intelligence"],
+    "lenses": ["ai", "nvidia"],
+    "startTime": "2026-11-30T13:00:00",
+    "endTime": "2026-11-30T14:00:00",
+    "venue": "MGM Grand",
+    "sponsored": false,
+    "abstract": "Supervised fine-tuning enables your model to follow instructions, but teaching it to reason requires reinforcement learning. RL workflows demand iterative loops that multiply compute costs — making AWS Trainium's purpose-built price performance critical. Explores what techniques like RLHF and GRPO bring to the table and how to run them on Trainium with the AWS Neuron software stack, Torchtitan, HuggingFace TRL, vLLM, and native PyTorch. Compares co-located vs. disaggregated RL architectures. You'll leave ready to implement cost-effective RL loops that train agents to reason.",
+    "source": "paste-2026-ai"
+  },
+  {
+    "sessionId": "aim312-r1-a",
+    "code": "AIM312-R1",
+    "title": "Beyond fine-tuning: RL for reasoning agents with AWS Trainium [REPEAT]",
+    "level": "300",
+    "sessionType": "chalk talk",
+    "topics": ["rlhf", "grpo", "trainium", "neuron", "reasoning", "agents", "fine-tuning", "reinforcement-learning"],
+    "services": ["AWS Trainium"],
+    "tracks": ["Artificial Intelligence"],
+    "lenses": ["ai", "nvidia"],
+    "startTime": "2026-12-03T15:00:00",
+    "endTime": "2026-12-03T16:00:00",
+    "venue": "Wynn/Encore",
+    "sponsored": false,
+    "abstract": "Repeat of AIM312-R. RL workflows demand iterative loops that multiply compute costs — making Trainium's price performance critical. Covers RLHF, GRPO, Neuron software stack, Torchtitan, HuggingFace TRL, vLLM, and co-located vs. disaggregated RL architectures.",
+    "source": "paste-2026-ai"
   }
 ]

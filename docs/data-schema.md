@@ -109,6 +109,7 @@ technology query stay independent. a session may carry more than one lens.
 | ---------------- | ---------------------------------------------------------------------- |
 | `favorites`      | bryan's personal favorites, hand-picked regardless of other lens        |
 | `ai`             | core AI/ML: models, inference, agents, kernels, neurosymbolic, voice     |
+| `self-managed-agents` | run your own models/agents/MCP on infra you control: VM isolation, self-hosted inference, open weights, sovereignty, hybrid edge |
 | `real-estate`    | property, listings, valuation, rental, proptech, the realtor.com lens  |
 | `space-satellite`| Amazon Leo, low-earth-orbit connectivity, aerospace, HPC for space      |
 | `next-gen-stats` | analytics, business/operational intelligence, telemetry, location data  |

@@ -1,0 +1,508 @@
+[
+  {
+    "sessionId": "con335-r-a",
+    "code": "CON335-R",
+    "title": "Architect production MCP servers on Amazon ECS",
+    "level": "300",
+    "sessionType": "chalk talk",
+    "topics": [
+      "mcp",
+      "ecs",
+      "scaling",
+      "session-state",
+      "routing",
+      "authentication",
+      "autoscaling",
+      "multi-service"
+    ],
+    "services": [
+      "Amazon ECS"
+    ],
+    "tracks": [],
+    "lenses": [
+      "favorites",
+      "ai",
+      "self-managed-agents"
+    ],
+    "startTime": "2026-12-03T12:00:00",
+    "endTime": "2026-12-03T13:00:00",
+    "venue": "Caesars Forum",
+    "sponsored": false,
+    "abstract": "Your MCP server works perfectly on a single Amazon ECS task. Then agents multiply, sessions collide, and scaling breaks everything. Whiteboard the infrastructure patterns that make MCP servers production-ready on Amazon ECS: horizontal scaling with externalized session state, request routing, fine-grained authentication, autoscaling based on agent request patterns, and multi-service topologies where different tool categories run as independent ECS services behind a shared ingress. favorites lens: production MCP-server fleet on ECS, directly the haunting's MCP-on-containers concern.",
+    "source": "paste-2026-containers"
+  },
+  {
+    "sessionId": "con335-r1-a",
+    "code": "CON335-R1",
+    "title": "Architect production MCP servers on Amazon ECS [REPEAT]",
+    "level": "300",
+    "sessionType": "chalk talk",
+    "topics": [
+      "mcp",
+      "ecs",
+      "scaling",
+      "session-state",
+      "routing",
+      "authentication",
+      "autoscaling",
+      "multi-service"
+    ],
+    "services": [
+      "Amazon ECS"
+    ],
+    "tracks": [],
+    "lenses": [
+      "favorites",
+      "ai",
+      "self-managed-agents"
+    ],
+    "startTime": "2026-12-02T16:00:00",
+    "endTime": "2026-12-02T17:00:00",
+    "venue": "Caesars Forum",
+    "sponsored": false,
+    "abstract": "Repeat of CON335-R. Production MCP-server patterns on Amazon ECS: horizontal scaling with externalized session state, routing, fine-grained auth, autoscaling on agent request patterns, multi-service tool topologies behind a shared ingress.",
+    "source": "paste-2026-containers"
+  },
+  {
+    "sessionId": "aim349-r-a",
+    "code": "AIM349-R",
+    "title": "Build production AI assistant with Hugging Face Libraries and models",
+    "level": "300",
+    "sessionType": "chalk talk",
+    "topics": [
+      "hugging-face",
+      "open-models",
+      "retrieval",
+      "reranking",
+      "fine-tuning",
+      "multi-model",
+      "trainium",
+      "self-hosted"
+    ],
+    "services": [
+      "AWS Trainium"
+    ],
+    "tracks": [],
+    "lenses": [
+      "favorites",
+      "ai"
+    ],
+    "startTime": "2026-12-02T13:30:00",
+    "endTime": "2026-12-02T14:30:00",
+    "venue": "MGM Grand",
+    "sponsored": false,
+    "abstract": "Every product team wants an embedded AI assistant, but closed APIs erode margins and limit customization. Architect a production-ready solution using open building blocks: retrieval, reranking, and generation models working together in real time. Fine-tune for your domain, orchestrate multi-model pipelines, serve thousands of concurrent users cost-efficiently. How native Hugging Face models and libraries on AWS Trainium let you own your AI stack and scale. favorites lens: self-owned open-model stack, the on-host-inference territory.",
+    "source": "paste-2026-containers"
+  },
+  {
+    "sessionId": "con317-r-a",
+    "code": "CON317-R",
+    "title": "Productionize, secure, and scale agentic applications on Amazon ECS",
+    "level": "300",
+    "sessionType": "builders",
+    "topics": [
+      "agents",
+      "ecs",
+      "fargate",
+      "isolation",
+      "vpc",
+      "service-connect",
+      "multi-agent",
+      "long-running"
+    ],
+    "services": [
+      "Amazon ECS",
+      "AWS Fargate"
+    ],
+    "tracks": [],
+    "lenses": [
+      "favorites",
+      "ai"
+    ],
+    "startTime": "2026-12-02T13:30:00",
+    "endTime": "2026-12-02T14:30:00",
+    "venue": "Caesars Forum",
+    "sponsored": false,
+    "abstract": "AI agents are easy to prototype but hard to run in production: unique compute requirements, tenant isolation, networking to tools and APIs, infrastructure that scales with unpredictable workloads. Deploy an agentic AI application on Amazon ECS with AWS Fargate: hardware-level task isolation, unlimited runtime for long-running agent conversations, VPC networking for secure tool access, Service Connect for multi-agent communication. favorites lens: agent isolation + long-running sessions + multi-agent networking on containers.",
+    "source": "paste-2026-containers"
+  },
+  {
+    "sessionId": "con328-a",
+    "code": "CON328",
+    "title": "Secure agents at scale on Amazon ECS with VM-level isolation",
+    "level": "300",
+    "sessionType": "breakout",
+    "topics": [
+      "agents",
+      "ecs",
+      "vm-isolation",
+      "multi-tenant",
+      "least-privilege",
+      "security"
+    ],
+    "services": [
+      "Amazon ECS"
+    ],
+    "tracks": [],
+    "lenses": [
+      "favorites",
+      "ai",
+      "self-managed-agents"
+    ],
+    "startTime": "2026-12-03T16:00:00",
+    "endTime": "2026-12-03T17:00:00",
+    "venue": "Caesars Palace",
+    "sponsored": false,
+    "abstract": "If you run agents, multi-tenant services, or regulated workloads on shared infrastructure, the isolation boundary is a key security consideration. Design that boundary using VM-level isolation on Amazon ECS: isolate tenants and untrusted agent workloads from one another, apply least-privilege execution toward compliance, run it efficiently at scale. favorites lens: VM-level isolation for untrusted agent code, the microvm/firecracker concern on ECS.",
+    "source": "paste-2026-containers"
+  },
+  {
+    "sessionId": "con325-a",
+    "code": "CON325",
+    "title": "Running AI agents you can trust on Amazon EKS",
+    "level": "300",
+    "sessionType": "breakout",
+    "topics": [
+      "agents",
+      "eks",
+      "vm-isolation",
+      "tools",
+      "memory",
+      "orchestration",
+      "untrusted-code"
+    ],
+    "services": [
+      "Amazon EKS"
+    ],
+    "tracks": [],
+    "lenses": [
+      "favorites",
+      "ai",
+      "self-managed-agents"
+    ],
+    "startTime": "2026-12-02T15:00:00",
+    "endTime": "2026-12-02T16:00:00",
+    "venue": "Caesars Forum",
+    "sponsored": false,
+    "abstract": "AI agents are moving from prototype to production, and running them at scale presents new challenges: untrusted AI-generated code executes in your environment, many agents share infrastructure, workloads spin up/act/tear down constantly. Run agents securely on Amazon EKS with VM-level isolation, wire up the primitives agents need for tools, memory, and orchestration, manage fleets of short-lived bursty workloads. favorites lens: trusted-agent execution with VM isolation + tool/memory primitives.",
+    "source": "paste-2026-containers"
+  },
+  {
+    "sessionId": "con320-r-a",
+    "code": "CON320-R",
+    "title": "Building and securing AI agents on Amazon EKS",
+    "level": "300",
+    "sessionType": "workshop",
+    "topics": [
+      "agents",
+      "eks",
+      "strands",
+      "mcp",
+      "bedrock",
+      "isolation",
+      "scoped-identity",
+      "lifecycle"
+    ],
+    "services": [
+      "Amazon EKS",
+      "Amazon Bedrock"
+    ],
+    "tracks": [],
+    "lenses": [
+      "favorites",
+      "ai",
+      "self-managed-agents"
+    ],
+    "startTime": "2026-12-02T15:30:00",
+    "endTime": "2026-12-02T17:30:00",
+    "venue": "Caesars Forum",
+    "sponsored": false,
+    "abstract": "AI agents now generate and run their own code at runtime, turning secure agent execution into a platform engineering problem. Build an agent on Amazon EKS using the Strands Agent SDK, MCP, and Amazon Bedrock, then progressively harden and operate it: stronger workload isolation, controls over what it can access, scoped identity for secure communication, lifecycle management in production. favorites lens: Strands + MCP + Bedrock agent hardening, the haunting agent stack.",
+    "source": "paste-2026-containers"
+  },
+  {
+    "sessionId": "con338-a",
+    "code": "CON338",
+    "title": "The golden path for agentic workloads: safe by default on Amazon EKS",
+    "level": "300",
+    "sessionType": "code talk",
+    "topics": [
+      "agents",
+      "eks",
+      "vm-isolation",
+      "policy",
+      "egress",
+      "guardrails",
+      "platform"
+    ],
+    "services": [
+      "Amazon EKS"
+    ],
+    "tracks": [],
+    "lenses": [
+      "favorites",
+      "ai",
+      "self-managed-agents"
+    ],
+    "startTime": "2026-11-30T15:00:00",
+    "endTime": "2026-11-30T16:00:00",
+    "venue": "MGM Grand",
+    "sponsored": false,
+    "abstract": "Every team is shipping agentic apps, landing on your platform faster than you can review them. As the platform team you own the blast radius: untrusted code, over-broad permissions, unbounded egress. The controls that let you say yes safely: VM-level isolation for untrusted or AI-generated code, scoped identity and network egress so an agent reaches only what it should, codified as policy so every new agent inherits guardrails by default. favorites lens: policy-default agent guardrails, the governance-gate pattern.",
+    "source": "paste-2026-containers"
+  },
+  {
+    "sessionId": "aim419-r-a",
+    "code": "AIM419-R",
+    "title": "Build and deploy agents to Lambda and EKS with Amazon Bedrock",
+    "level": "400",
+    "sessionType": "workshop",
+    "topics": [
+      "agents",
+      "strands",
+      "bedrock",
+      "lambda",
+      "eks",
+      "agentcore",
+      "microvm",
+      "guardrails",
+      "observability"
+    ],
+    "services": [
+      "Amazon Bedrock",
+      "AWS Lambda",
+      "Amazon EKS"
+    ],
+    "tracks": [],
+    "lenses": [
+      "favorites",
+      "ai",
+      "self-managed-agents"
+    ],
+    "startTime": "2026-12-03T12:30:00",
+    "endTime": "2026-12-03T14:30:00",
+    "venue": "MGM Grand",
+    "sponsored": false,
+    "abstract": "Bring an agent idea and leave with it deployed. Use the Strands Agents SDK and Amazon Bedrock to build an agent from scratch, give it tools and memory, add guardrails, permissions, observability. Multiple production deploy paths: Amazon Bedrock AgentCore, AWS Lambda MicroVMs, Amazon EKS. Deploy to Lambda and EKS. favorites lens: Strands agent build + Lambda-microvm/EKS deploy, the haunting deployment shapes.",
+    "source": "paste-2026-containers"
+  },
+  {
+    "sessionId": "opn407-r-a",
+    "code": "OPN407-R",
+    "title": "Kubernetes-native agentic AI on Amazon EKS with open source primitives",
+    "level": "400",
+    "sessionType": "workshop",
+    "topics": [
+      "agents",
+      "eks",
+      "litellm",
+      "mem0",
+      "langfuse",
+      "mcp-registry",
+      "sandbox",
+      "observability",
+      "open-source"
+    ],
+    "services": [
+      "Amazon EKS"
+    ],
+    "tracks": [],
+    "lenses": [
+      "favorites",
+      "ai",
+      "self-managed-agents"
+    ],
+    "startTime": "2026-12-02T12:00:00",
+    "endTime": "2026-12-02T14:00:00",
+    "venue": "Wynn/Encore",
+    "sponsored": false,
+    "abstract": "Production agentic AI needs a scalable runtime, governed LLM access, persistent memory, observability, tool discovery, and secure code isolation. Build all six on Amazon EKS using native Kubernetes primitives and open source: LiteLLM multi-model gateway, Mem0 user-scoped memory, Langfuse observability into reasoning and tool calls, an MCP registry for tool discovery, sandboxes for hardware-level code isolation. favorites lens: open-source agentic stack with MCP registry + memory + sandbox, the self-hosted haunting analogue.",
+    "source": "paste-2026-containers"
+  },
+  {
+    "sessionId": "con344-a",
+    "code": "CON344",
+    "title": "Multi-tenant SaaS and agentic apps on Amazon EKS",
+    "level": "300",
+    "sessionType": "workshop",
+    "topics": [
+      "agents",
+      "eks",
+      "multi-tenant",
+      "isolation",
+      "irsa",
+      "observability",
+      "opentelemetry"
+    ],
+    "services": [
+      "Amazon EKS"
+    ],
+    "tracks": [],
+    "lenses": [
+      "ai"
+    ],
+    "startTime": "2026-12-01T12:00:00",
+    "endTime": "2026-12-01T14:00:00",
+    "venue": "Caesars Forum",
+    "sponsored": false,
+    "abstract": "EKS has become the runtime of choice for ISVs building agentic SaaS. The challenge is multi-tenancy: run agent workloads for hundreds of tenants on shared infrastructure without blast radius, cost leakage, or isolation drift. Build a multi-tenant agent deployment on EKS with tenant isolation across namespaces and network policies, IRSA-backed credentials per agent workload, per-tenant observability via OpenTelemetry. Each lab ends with an isolation proof.",
+    "source": "paste-2026-containers"
+  },
+  {
+    "sessionId": "arc303-a",
+    "code": "ARC303",
+    "title": "One agent to thousands: Building for scale with Newforma",
+    "level": "300",
+    "sessionType": "breakout",
+    "topics": [
+      "agents",
+      "governance",
+      "orchestration",
+      "policy",
+      "platform",
+      "scale"
+    ],
+    "services": [],
+    "tracks": [],
+    "lenses": [
+      "favorites",
+      "ai"
+    ],
+    "startTime": "2026-12-03T15:00:00",
+    "endTime": "2026-12-03T16:00:00",
+    "venue": "MGM Grand",
+    "sponsored": false,
+    "abstract": "When every team builds agents independently, you get the same ungovernable sprawl that drove the shift from artisanal EC2 to container platforms. Agents are non-deterministic workloads that require deterministic governance: dual orchestration for known vs emergent topologies, policy-based boundaries around soft reasoning, defense layers that compose without coupling. How Newforma operationalized this on AWS. favorites lens: governing agent sprawl, the haunting-scale governance concern.",
+    "source": "paste-2026-containers"
+  },
+  {
+    "sessionId": "cmp321-r-a",
+    "code": "CMP321-R",
+    "title": "Build an agentic AI system on Amazon EKS with CPU-only inference",
+    "level": "300",
+    "sessionType": "workshop",
+    "topics": [
+      "agents",
+      "eks",
+      "cpu-inference",
+      "onnx",
+      "llama-cpp",
+      "rag",
+      "opensearch",
+      "fine-tuning",
+      "quantized"
+    ],
+    "services": [
+      "Amazon EKS",
+      "Amazon Bedrock",
+      "Amazon OpenSearch Service"
+    ],
+    "tracks": [],
+    "lenses": [
+      "favorites",
+      "ai",
+      "self-managed-agents"
+    ],
+    "startTime": "2026-11-30T08:30:00",
+    "endTime": "2026-11-30T10:30:00",
+    "venue": "MGM Grand",
+    "sponsored": false,
+    "abstract": "Build a multi-agent AI system on Amazon EKS with EKS Auto Mode serving every model on CPU instances. Four inference components: a fine-tuned intent router and embedding model for vector search (ONNX, trained on CPU), a cross-encoder re-ranker, and a quantized generative analyst served with llama.cpp grounded by RAG from OpenSearch. Bedrock generates synthetic training data, judges answers through a faithfulness gate, and answers edge cases. Run the control test putting a frontier LLM in the same seat. favorites lens: CPU-only quantized local inference with llama.cpp + faithfulness gate, directly the on-host-model territory.",
+    "source": "paste-2026-containers"
+  },
+  {
+    "sessionId": "ind383-a",
+    "code": "IND383",
+    "title": "An Epic Tale: Hyperscale Storage & Compute for the Fortnite Ecosystem",
+    "level": "300",
+    "sessionType": "breakout",
+    "topics": [
+      "gaming",
+      "storage",
+      "compute",
+      "version-control",
+      "multi-region",
+      "ec2",
+      "eks",
+      "msk"
+    ],
+    "services": [
+      "Amazon EC2",
+      "Amazon S3",
+      "Amazon DynamoDB",
+      "Amazon EKS"
+    ],
+    "tracks": [],
+    "lenses": [
+      "video-games"
+    ],
+    "startTime": "2026-12-02T10:00:00",
+    "endTime": "2026-12-02T11:00:00",
+    "venue": "Caesars Forum",
+    "sponsored": false,
+    "abstract": "The metaverse will be built by thousands of teams shipping petabytes of content, running millions of build and render jobs across regions daily. The engineers behind Lore (Epic's distributed version control for massive binary repos) and Overmind (a multi-region ephemeral compute orchestrator) reveal the AWS architecture: self-managed scheduling on EC2, S3/DynamoDB/Keyspaces/Aurora for the data plane, EKS-hosted control planes running durable workflows, MSK for replayable event streams. video-games lens: Fortnite-scale platform architecture.",
+    "source": "paste-2026-containers"
+  },
+  {
+    "sessionId": "ind392-a",
+    "code": "IND392",
+    "title": "From Millions of Gamers to AI at Scale: Roblox's Hybrid AWS Architecture",
+    "level": "300",
+    "sessionType": "breakout",
+    "topics": [
+      "gaming",
+      "hybrid",
+      "gpu",
+      "multi-region",
+      "inference",
+      "bedrock",
+      "graviton",
+      "trainium",
+      "inferentia"
+    ],
+    "services": [
+      "Amazon EC2",
+      "Amazon Bedrock"
+    ],
+    "tracks": [],
+    "lenses": [
+      "video-games",
+      "ai"
+    ],
+    "startTime": "2026-12-03T16:00:00",
+    "endTime": "2026-12-03T17:00:00",
+    "venue": "Caesars Forum",
+    "sponsored": false,
+    "abstract": "Roblox combines AWS with on-premises infrastructure to dynamically place workloads across regions, architectures, and AI providers. Using EC2 Capacity Health Visualizer, hybrid scheduling, multi-region load balancing, self-hosted AI inference alongside Amazon Bedrock, and heterogeneous compute (x86, Graviton, Inferentia, Trainium, GPUs), Roblox keeps gaming and AI services responsive under record-breaking load. video-games lens: hybrid gaming+AI at massive scale.",
+    "source": "paste-2026-containers"
+  },
+  {
+    "sessionId": "cmp337-a",
+    "code": "CMP337",
+    "title": "Choosing a game server instance without guessing",
+    "level": "300",
+    "sessionType": "chalk talk",
+    "topics": [
+      "gaming",
+      "game-server",
+      "ec2",
+      "tick-rate",
+      "load-test",
+      "graviton",
+      "instance-selection"
+    ],
+    "services": [
+      "Amazon EC2"
+    ],
+    "tracks": [],
+    "lenses": [
+      "video-games"
+    ],
+    "startTime": "2026-12-02T14:30:00",
+    "endTime": "2026-12-02T15:30:00",
+    "venue": "MGM Grand",
+    "sponsored": false,
+    "abstract": "Most game studios pick server instances based on vibes. This replaces that with numbers: tick-rate budgets by genre (128-tick shooters need max frequency; 30-tick survival and 10-tick MMOs don't), how to instrument Unreal, Unity, and Godot game loops, how to build bot-driven load tests that tell you exactly how many players fit on an instance. Same open-source game deployed on M8azn and Graviton, player count ramped until it falls over. video-games lens: game-server instance selection by measurement.",
+    "source": "paste-2026-containers"
+  }
+]

@@ -280,5 +280,22 @@
     "sponsored": false,
     "abstract": "When the Georgia Department of Community Supervision needed to modernize their contact center, they turned to Amazon Connect and AI. Firsthand how AI-powered call analysis, real-time transcription, automated case notes, and intelligent agent assistance are transforming how state agencies serve constituents. Lessons from discovery through implementation: prioritizing high-impact AI use cases, building stakeholder alignment, delivering measurable outcomes. Real-estate lens: the same AI-contact-center modernization pattern a listings marketplace or property-management operation runs for customer/tenant service.",
     "source": "paste-2026-real-estate"
+  },
+  {
+    "sessionId": "stg347-a",
+    "code": "STG347",
+    "title": "Know your data: discovery, context, and AI agents in Amazon S3",
+    "level": "300",
+    "sessionType": "breakout",
+    "topics": ["s3", "metadata", "annotations", "iceberg", "data-discovery", "governance", "mcp", "aws-context", "agents", "next-gen-stats"],
+    "services": ["Amazon S3"],
+    "tracks": [],
+    "lenses": ["real-estate", "next-gen-stats", "ai"],
+    "startTime": "2026-11-30T13:30:00",
+    "endTime": "2026-11-30T14:30:00",
+    "venue": "Caesars Palace",
+    "sponsored": false,
+    "abstract": "Organizations store billions of objects in Amazon S3 but struggle to answer basic questions: what do I have, where did it come from, is it still relevant. S3 Metadata and annotations turn storage into a searchable, context-rich data estate: attach business meaning directly to objects, query metadata at petabyte scale through managed Apache Iceberg tables, drive governance from metadata signals. The AWS MCP Server and Agent Toolkit give AI agents governed access, and AWS Context lets them reason over relationships across S3 data. Real-estate lens: knowing your listing/media data estate at scale, discovery and provenance for millions of listing objects.",
+    "source": "paste-2026-real-estate"
   }
 ]

@@ -59,12 +59,12 @@
     "topics": ["modernization", "aws-transform", "agents", "dotnet", "migration", "aurora", "schema-conversion", "wave-planning"],
     "services": ["Amazon Aurora"],
     "tracks": [],
-    "lenses": ["favorites", "ai"],
+    "lenses": ["favorites", "ai", "real-estate"],
     "startTime": "2026-11-30T08:30:00",
     "endTime": "2026-11-30T12:30:00",
     "venue": "Caesars Palace",
     "sponsored": false,
-    "abstract": "AWS Transform orchestrates AI agents that analyze, refactor, and convert legacy applications without manual line-by-line rewrites. Set modernization objectives, let AI agents decompose and transform .NET Framework code to cross-platform .NET on Linux, migrate a SQL Server database to Amazon Aurora PostgreSQL. Practice agentic assessment, wave planning, code transformation, schema conversion end to end. favorites lens: the same AWS Transform agentic-modernization pattern seen in MAM206.",
+    "abstract": "AWS Transform orchestrates AI agents that analyze, refactor, and convert legacy applications without manual line-by-line rewrites. Set modernization objectives, let AI agents decompose and transform .NET Framework code to cross-platform .NET on Linux, migrate a SQL Server database to Amazon Aurora PostgreSQL. Practice agentic assessment, wave planning, code transformation, schema conversion end to end. favorites lens: the same AWS Transform agentic-modernization pattern seen in MAM206. real-estate lens: modernizing legacy MLS-era systems and aging property-platform monoliths, the hands-on version of the MAM206 mortgage-app story.",
     "source": "paste-2026-bootcamps"
   },
   {
@@ -195,12 +195,12 @@
     "topics": ["amazon-connect", "agents", "copilot", "self-service", "mcp", "knowledge-base", "escalation"],
     "services": ["Amazon Connect"],
     "tracks": [],
-    "lenses": ["ai"],
+    "lenses": ["ai", "real-estate"],
     "startTime": "2026-11-30T13:00:00",
     "endTime": "2026-11-30T17:00:00",
     "venue": "Caesars Palace",
     "sponsored": false,
-    "abstract": "Customer-facing AI Agents can resolve issues end-to-end. Build two complementary AI agents on Amazon Connect AI Customer: an agent-assistance copilot that watches live chats and surfaces real-time knowledge base answers and customer data, and a self-service AI agent that handles routine requests autonomously using MCP tools for Cases and Customer Profiles, with structured escalation preserving conversation context.",
+    "abstract": "Customer-facing AI Agents can resolve issues end-to-end. Build two complementary AI agents on Amazon Connect AI Customer: an agent-assistance copilot that watches live chats and surfaces real-time knowledge base answers and customer data, and a self-service AI agent that handles routine requests autonomously using MCP tools for Cases and Customer Profiles, with structured escalation preserving conversation context. real-estate lens: buyer/seller/tenant support at marketplace scale, the hands-on build behind IND393 and the servicing side of the buyer journey.",
     "source": "paste-2026-bootcamps"
   },
   {
@@ -229,12 +229,12 @@
     "topics": ["multi-agent", "agentcore", "agent-as-tool", "shared-memory", "context-window", "access-control", "tracing", "evaluation"],
     "services": ["Amazon Bedrock AgentCore"],
     "tracks": [],
-    "lenses": ["favorites", "ai"],
+    "lenses": ["favorites", "ai", "real-estate"],
     "startTime": "2026-12-01T08:30:00",
     "endTime": "2026-12-01T12:30:00",
     "venue": "Caesars Palace",
     "sponsored": false,
-    "abstract": "Multi-agent systems unlock powerful workflows, but production demands more than chaining agents. Advanced patterns using Amazon Bedrock AgentCore: agent-as-tool communication, shared memory across agents, context-window optimization for cost and performance, policy-based access control, VPC integration, distributed tracing, evaluation frameworks, deployment strategies from prototype to production. favorites lens: agent-as-tool + shared memory + context-window optimization is the exact haunting dispatch architecture.",
+    "abstract": "Multi-agent systems unlock powerful workflows, but production demands more than chaining agents. Advanced patterns using Amazon Bedrock AgentCore: agent-as-tool communication, shared memory across agents, context-window optimization for cost and performance, policy-based access control, VPC integration, distributed tracing, evaluation frameworks, deployment strategies from prototype to production. favorites lens: agent-as-tool + shared memory + context-window optimization is the exact haunting dispatch architecture. real-estate lens: the multi-agent engine under the home-buying journey (IND329-R1) and the property/listing knowledge layer (IND367).",
     "source": "paste-2026-bootcamps"
   },
   {

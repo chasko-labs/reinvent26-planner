@@ -1,0 +1,245 @@
+[
+  {
+    "sessionId": "opn314-r-a",
+    "code": "OPN314-R",
+    "title": "Kiro Crew: Architecture of an open source AI coding agent built on Kiro",
+    "level": "300",
+    "sessionType": "chalk talk",
+    "topics": [
+      "kiro",
+      "kiro-crew",
+      "multi-agent",
+      "orchestration",
+      "tool-use",
+      "shared-context",
+      "execution-state",
+      "open-source"
+    ],
+    "services": [],
+    "tracks": [],
+    "lenses": [
+      "favorites",
+      "self-managed-agents",
+      "ai"
+    ],
+    "startTime": "2026-12-03T13:30:00",
+    "endTime": "2026-12-03T14:30:00",
+    "venue": "Caesars Forum",
+    "sponsored": false,
+    "abstract": "Kiro Crew is an open source AI coding workspace built on Kiro CLI that grew from a side project to 39,000 users and nearly 500 contributors inside Amazon. Unlike single-session assistants, it combines multi-step task orchestration, tool-use planning, and a shared context layer for real engineering workflows. How Kiro Crew decomposes complex tasks, selects and chains tools, manages execution state, integrates with existing developer environments, and the design trade-offs behind rapid adoption and open sourcing. favorites lens: an open-source multi-agent workspace on Kiro CLI, the closest thing in the catalog to the haunting itself.",
+    "source": "paste-2026-kiro-crew"
+  },
+  {
+    "sessionId": "opn314-r1-a",
+    "code": "OPN314-R1",
+    "title": "Kiro Crew: Architecture of an open source AI coding agent built on Kiro [REPEAT]",
+    "level": "300",
+    "sessionType": "chalk talk",
+    "topics": [
+      "kiro",
+      "kiro-crew",
+      "multi-agent",
+      "orchestration",
+      "tool-use",
+      "shared-context",
+      "open-source"
+    ],
+    "services": [],
+    "tracks": [],
+    "lenses": [
+      "favorites",
+      "self-managed-agents",
+      "ai"
+    ],
+    "startTime": "2026-12-02T10:30:00",
+    "endTime": "2026-12-02T11:30:00",
+    "venue": "Caesars Palace",
+    "sponsored": false,
+    "abstract": "Repeat of OPN314-R. Kiro Crew architecture: multi-step task orchestration, tool-use planning, shared context layer, execution state, developer-environment integration, and the journey to open source.",
+    "source": "paste-2026-kiro-crew"
+  },
+  {
+    "sessionId": "dvt332-r-a",
+    "code": "DVT332-R",
+    "title": "Under the hood of Kiro Crew: orchestration, memory, and safe autonomy",
+    "level": "300",
+    "sessionType": "chalk talk",
+    "topics": [
+      "kiro",
+      "kiro-crew",
+      "multi-agent",
+      "orchestration",
+      "memory",
+      "acp",
+      "skills",
+      "scheduled-jobs",
+      "webhooks",
+      "sandboxing",
+      "audit-logs"
+    ],
+    "services": [],
+    "tracks": [],
+    "lenses": [
+      "favorites",
+      "self-managed-agents",
+      "ai"
+    ],
+    "startTime": "2026-12-03T10:30:00",
+    "endTime": "2026-12-03T11:30:00",
+    "venue": "Caesars Forum",
+    "sponsored": false,
+    "abstract": "Handing real work to a crew of agents raises real questions: how does it coordinate parallel subagents without losing the thread, how does memory save across sessions so agents don't start cold, how do you give agents access to code and CI while staying safe. How Kiro Crew works: observable multi-agent orchestration over Agent Client Protocol, self-evolving memory and skills you can inspect and edit, scheduled and webhook-triggered jobs, defense-in-depth security with sandboxing, denied-by-default commands, and signed audit logs. favorites lens: parallel subagent orchestration + memory + denied-by-default + signed audit logs, the haunting's exact concerns described back.",
+    "source": "paste-2026-kiro-crew"
+  },
+  {
+    "sessionId": "dvt332-r1-a",
+    "code": "DVT332-R1",
+    "title": "Under the hood of Kiro Crew: orchestration, memory, and safe autonomy [REPEAT]",
+    "level": "300",
+    "sessionType": "chalk talk",
+    "topics": [
+      "kiro",
+      "kiro-crew",
+      "orchestration",
+      "memory",
+      "acp",
+      "skills",
+      "sandboxing",
+      "audit-logs"
+    ],
+    "services": [],
+    "tracks": [],
+    "lenses": [
+      "favorites",
+      "self-managed-agents",
+      "ai"
+    ],
+    "startTime": "2026-12-01T16:00:00",
+    "endTime": "2026-12-01T17:00:00",
+    "venue": "Caesars Palace",
+    "sponsored": false,
+    "abstract": "Repeat of DVT332-R. Kiro Crew internals: multi-agent orchestration over Agent Client Protocol, self-evolving inspectable memory and skills, scheduled/webhook jobs, defense-in-depth with sandboxing, denied-by-default commands, signed audit logs.",
+    "source": "paste-2026-kiro-crew"
+  },
+  {
+    "sessionId": "dvt341-a",
+    "code": "DVT341",
+    "title": "Making Kiro Crew work for your team",
+    "level": "300",
+    "sessionType": "breakout",
+    "topics": [
+      "kiro",
+      "kiro-crew",
+      "mcp",
+      "shared-memory",
+      "reusable-skills",
+      "scheduled-jobs",
+      "webhooks",
+      "team-standards"
+    ],
+    "services": [],
+    "tracks": [],
+    "lenses": [
+      "favorites",
+      "self-managed-agents",
+      "ai"
+    ],
+    "startTime": "2026-12-03T08:30:00",
+    "endTime": "2026-12-03T09:30:00",
+    "venue": "Caesars Forum",
+    "sponsored": false,
+    "abstract": "Kiro Crew is the persistent, open source development workspace that remembers your context, learns how you work, and coordinates across your unique tools and workflows. How to make it work for your team: wire in the tools your team already use over MCP, set up scheduled and webhook-triggered jobs so work keeps moving while you're away, and shape shared memory and reusable skills so agents don't start cold and maintain team standards. favorites lens: MCP tool wiring + shared memory + reusable skills + team standards, the haunting steering/skills model.",
+    "source": "paste-2026-kiro-crew"
+  },
+  {
+    "sessionId": "dvt409-r-a",
+    "code": "DVT409-R",
+    "title": "Build your own crew: hands-on with Kiro Crew",
+    "level": "400",
+    "sessionType": "workshop",
+    "topics": [
+      "kiro",
+      "kiro-crew",
+      "multi-agent",
+      "subagents",
+      "approval-gates",
+      "mcp",
+      "scheduled-jobs",
+      "webhooks",
+      "memory",
+      "skills"
+    ],
+    "services": [],
+    "tracks": [],
+    "lenses": [
+      "favorites",
+      "self-managed-agents",
+      "ai"
+    ],
+    "startTime": "2026-11-30T15:00:00",
+    "endTime": "2026-11-30T17:00:00",
+    "venue": "Caesars Forum",
+    "sponsored": false,
+    "abstract": "Kiro Crew is an open-source multi-agent workspace you can bend to your own workflows. Hand your crew a real task and watch it plan, spawn parallel subagents, and gate each action for your approval. Personalize: wire in the tools you already use over MCP, set up scheduled and webhook-triggered jobs, shape memory and reusable skills so agents don't start cold. Assemble a purpose-built App to run a workflow end-to-end from intake through review. favorites lens: parallel subagents with per-action approval gates + MCP + memory, hands-on version of the haunting dispatch model.",
+    "source": "paste-2026-kiro-crew"
+  },
+  {
+    "sessionId": "dvt409-r1-a",
+    "code": "DVT409-R1",
+    "title": "Build your own crew: hands-on with Kiro Crew [REPEAT]",
+    "level": "400",
+    "sessionType": "workshop",
+    "topics": [
+      "kiro",
+      "kiro-crew",
+      "multi-agent",
+      "subagents",
+      "approval-gates",
+      "mcp",
+      "memory",
+      "skills"
+    ],
+    "services": [],
+    "tracks": [],
+    "lenses": [
+      "favorites",
+      "self-managed-agents",
+      "ai"
+    ],
+    "startTime": "2026-12-01T15:00:00",
+    "endTime": "2026-12-01T17:00:00",
+    "venue": "Wynn/Encore",
+    "sponsored": false,
+    "abstract": "Repeat of DVT409-R. Hands-on Kiro Crew: plan a real task, spawn parallel subagents with per-action approval gates, wire MCP tools, scheduled/webhook jobs, shape memory and reusable skills, assemble a purpose-built App end-to-end.",
+    "source": "paste-2026-kiro-crew"
+  },
+  {
+    "sessionId": "ind410-r-a",
+    "code": "IND410-R",
+    "title": "Build mission-ready software in regulated industries faster with Kiro",
+    "level": "400",
+    "sessionType": "builders",
+    "topics": [
+      "kiro",
+      "agentic-ide",
+      "hooks",
+      "steering",
+      "powers",
+      "compliance",
+      "testing",
+      "docs"
+    ],
+    "services": [],
+    "tracks": [],
+    "lenses": [
+      "favorites",
+      "ai"
+    ],
+    "startTime": "2026-11-30T08:30:00",
+    "endTime": "2026-11-30T09:30:00",
+    "venue": "Wynn/Encore",
+    "sponsored": false,
+    "abstract": "Federal dev teams struggle to ship fast while meeting compliance requirements. Build a real app using Kiro's agentic IDE: automate testing and docs with hooks, enforce AI behavior with steering rules, extend capabilities through powers. Ideal for federal devs and architects. favorites lens: Kiro hooks + steering rules + powers, the exact haunting configuration primitives.",
+    "source": "paste-2026-kiro-crew"
+  }
+]

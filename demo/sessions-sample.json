@@ -1,0 +1,68 @@
+[
+  {
+    "sessionId": "ant301-a",
+    "code": "ANT301",
+    "title": "Agent orchestration with Bedrock Agents",
+    "level": "300",
+    "topics": ["agents", "bedrock"],
+    "services": ["Amazon Bedrock"],
+    "startTime": "2026-12-01T09:00:00",
+    "endTime": "2026-12-01T10:00:00",
+    "room": "Venetian L2"
+  },
+  {
+    "sessionId": "con401-a",
+    "code": "CON401",
+    "title": "MCP servers in production: auth and tool design",
+    "level": "400",
+    "topics": ["mcp", "agents"],
+    "services": ["Amazon Bedrock"],
+    "startTime": "2026-12-01T09:30:00",
+    "endTime": "2026-12-01T10:30:00",
+    "room": "Venetian L3"
+  },
+  {
+    "sessionId": "srv301-a",
+    "code": "SRV301",
+    "title": "Event-driven serverless with Lambda and EventBridge",
+    "level": "300",
+    "topics": ["serverless", "event-driven"],
+    "services": ["AWS Lambda", "Amazon EventBridge"],
+    "startTime": "2026-12-01T11:00:00",
+    "endTime": "2026-12-01T12:00:00",
+    "room": "MGM Grand"
+  },
+  {
+    "sessionId": "dat402-a",
+    "code": "DAT402",
+    "title": "Data modeling with DynamoDB for agent memory",
+    "level": "400",
+    "topics": ["dynamodb", "agents"],
+    "services": ["Amazon DynamoDB"],
+    "startTime": "2026-12-01T13:00:00",
+    "endTime": "2026-12-01T14:00:00",
+    "room": "Venetian L2"
+  },
+  {
+    "sessionId": "stg301-a",
+    "code": "STG301",
+    "title": "S3 Vectors for retrieval at re:Invent scale",
+    "level": "300",
+    "topics": ["s3", "retrieval"],
+    "services": ["Amazon S3"],
+    "startTime": "2026-12-01T14:00:00",
+    "endTime": "2026-12-01T15:00:00",
+    "room": "Caesars Forum"
+  },
+  {
+    "sessionId": "obs301-a",
+    "code": "OBS301",
+    "title": "Observability for agent fleets with CloudWatch",
+    "level": "300",
+    "topics": ["observability", "agents"],
+    "services": ["Amazon CloudWatch"],
+    "startTime": "2026-12-01T15:00:00",
+    "endTime": "2026-12-01T16:00:00",
+    "room": "Mandalay Bay"
+  }
+]

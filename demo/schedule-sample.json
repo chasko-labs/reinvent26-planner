@@ -1,0 +1,29 @@
+[
+  {
+    "sessionId": "ant301-a",
+    "code": "ANT301",
+    "title": "Agent orchestration with Bedrock Agents",
+    "level": "300",
+    "startTime": "2026-12-01T09:00:00",
+    "endTime": "2026-12-01T10:00:00",
+    "room": "Venetian L2"
+  },
+  {
+    "sessionId": "con401-a",
+    "code": "CON401",
+    "title": "MCP servers in production: auth and tool design",
+    "level": "400",
+    "startTime": "2026-12-01T09:30:00",
+    "endTime": "2026-12-01T10:30:00",
+    "room": "Venetian L3"
+  },
+  {
+    "sessionId": "srv301-a",
+    "code": "SRV301",
+    "title": "Event-driven serverless with Lambda and EventBridge",
+    "level": "300",
+    "startTime": "2026-12-01T11:00:00",
+    "endTime": "2026-12-01T12:00:00",
+    "room": "MGM Grand"
+  }
+]

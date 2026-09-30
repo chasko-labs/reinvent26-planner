@@ -1,0 +1,19 @@
+[
+  {
+    "sessionId": "arc324-a",
+    "code": "ARC324",
+    "title": "Ambient accessibility: Architecting real-time ASL on a Wearable",
+    "level": "300",
+    "sessionType": "chalk talk",
+    "topics": ["accessibility", "asl", "transcribe", "avatar", "edge", "iot", "real-time", "bedrock"],
+    "services": ["Amazon Bedrock", "Amazon Transcribe", "AWS Lambda"],
+    "tracks": ["Architecture"],
+    "lenses": ["favorites", "ai", "next-gen-stats"],
+    "startTime": "2026-11-30T15:00:00",
+    "endTime": "2026-11-30T16:00:00",
+    "venue": "MGM Grand",
+    "sponsored": false,
+    "abstract": "What if a DHH person could wear a device and get sign language translation of every conversation around them in under a second? Architects a pipeline that ingests Amazon Bee's ambient audio, transcribes it, transforms English to ASL grammar, generates avatar animations, and streams signed video back. That one-second constraint drives every architectural tradeoff, from whether translation stages run on-device for speed or in the cloud for accuracy, to whether we sign full sentences or start mid-utterance with partial context. Explores the edge-cloud splits and pipeline staging that make sub-second delivery feasible. Bryan favorite: accessibility, ASL, avatar animation, edge-cloud latency splits, the sumerian-hosts / deaf-blind-narrative territory.",
+    "source": "paste-2026-favorites"
+  }
+]

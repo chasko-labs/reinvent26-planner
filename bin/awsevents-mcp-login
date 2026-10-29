@@ -41,8 +41,25 @@ CALLBACK_PATH = "/callback"
 DEFAULT_PORT = 8484
 
 SSM_PREFIX = "/heraldstack/shared/awsevents"
-SSM_PROFILE = os.environ.get("AWS_PROFILE", "ops-reader")
+# dedicated var: the operator shell exports AWS_PROFILE=ops-reader (read-only), which breaks token writes
+SSM_PROFILE = os.environ.get("AWSEVENTS_SSM_PROFILE", "aerospaceug-admin")
 SSM_REGION = os.environ.get("AWS_REGION", "us-west-2")
+
+
+def ssm_preflight_check() -> None:
+    """Prove the profile can write to ssm before the single-use auth code is spent."""
+    full_name = f"{SSM_PREFIX}/ssm-write-probe"
+    base = ["--profile", SSM_PROFILE, "--region", SSM_REGION]
+    put = subprocess.run(
+        ["aws", "ssm", "put-parameter", "--name", full_name, "--value", f"probe-{int(time.time())}",
+         "--type", "SecureString", "--overwrite", *base],
+        capture_output=True, text=True,
+    )
+    if put.returncode != 0:
+        raise RuntimeError(
+            f"ssm preflight failed: profile '{SSM_PROFILE}' cannot write {SSM_PREFIX}/*: {put.stderr.strip()}")
+    subprocess.run(["aws", "ssm", "delete-parameter", "--name", full_name, *base],
+                   capture_output=True, text=True)
 
 
 def ssm_put(name: str, value: str, description: str = "") -> None:
@@ -196,6 +213,13 @@ def _receive_code(port: int, expected_state: str, timeout: int = 180) -> str:
 
 def login(port: int = DEFAULT_PORT) -> None:
     """Interactive Builder ID sign-in; stores tokens to SSM."""
+    print("verifying ssm write permissions...")
+    try:
+        ssm_preflight_check()
+    except RuntimeError as e:
+        print(f"error: {e}", file=sys.stderr)
+        sys.exit(1)
+    print("ssm write check passed")
     verifier = new_verifier()
     state = new_state()
     challenge = challenge_for(verifier)

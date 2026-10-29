@@ -27,7 +27,8 @@ TOKEN_URL = "https://oauth.awsevents.com/oauth2/token"
 CLIENT_ID = "7vmom55m1qstvq8i71ph127bfq"
 
 SSM_PREFIX = "/heraldstack/shared/awsevents"
-SSM_PROFILE = os.environ.get("AWS_PROFILE", "ops-reader")
+# dedicated var: the operator shell exports AWS_PROFILE=ops-reader (read-only), which breaks token writes
+SSM_PROFILE = os.environ.get("AWSEVENTS_SSM_PROFILE", "aerospaceug-admin")
 SSM_REGION = os.environ.get("AWS_REGION", "us-west-2")
 
 

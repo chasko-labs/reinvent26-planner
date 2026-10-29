@@ -188,8 +188,23 @@ def _weight(s: dict, config: dict) -> float:
     level = _lvl(s)
 
     w = (max(topic_weight.get(t, 10.0) for t in core) if core else 3.0) + mins / 60
-    if reservable:
-        w *= 2.0
+    seat = s.get("_seat")
+    if config.get("reserved_only"):
+        # session format leads, topic fit breaks ties, already-held seats are fixed points
+        tw = config.get("type_weight", {})
+        w = tw.get(s.get("type", ""), tw.get("_default", 5.0))
+        w += (max(topic_weight.get(t, 10.0) for t in core) * 0.5) if core else (2.0 if s.get("_rel") else 0.0)
+        w += mins / 120
+        if fav:
+            w *= 1.2
+        if s.get("_reserved"):
+            w += 1e6
+        return w
+    if reservable and seat in OPEN_SEATS:
+        w *= 3.0  # a reservable seat still open is the scarcest thing in the plan
+    elif reservable and seat is None:
+        w *= 2.0  # availability unknown: keep the old reservable preference
+    # reservable but full: walk-up line only, same value as a walk-up session
     if fav:
         w *= 1.5
     if level in ("300", "400"):
@@ -200,9 +215,37 @@ def _weight(s: dict, config: dict) -> float:
     return w
 
 
+OPEN_SEATS = {"available", "limited", "veryLimited"}
+
+
+def _load_seats(repo_root: str) -> dict:
+    """seatAvailability by code; prefers the full sweep, falls back to the topic-pool snapshot."""
+    for name in ("seats-sweep.json", "seats.json"):
+        path = os.path.join(repo_root, ".cache", "reinvent2026", name)
+        try:
+            with open(path, encoding="utf-8") as fh:
+                return json.load(fh).get("seats", {})
+        except (OSError, ValueError):
+            continue
+    return {}
+
+
+def _load_reserved(repo_root: str) -> set:
+    """sessionIds already reserved, from the .cache/reinvent2026/schedule.json snapshot of GET /schedule."""
+    path = os.path.join(repo_root, ".cache", "reinvent2026", "schedule.json")
+    try:
+        with open(path, encoding="utf-8") as fh:
+            return set(json.load(fh).get("schedule", {}).get("reserved", []))
+    except (OSError, ValueError):
+        return set()
+
+
 def _build_map(catalog: list, config: dict, repo_root: str) -> tuple:
     """Build event map: chosen sessions, missed sessions, excluded, TBD."""
     favorites = _load_favorites(repo_root)
+    seats = _load_seats(repo_root)
+    reserved = _load_reserved(repo_root)
+    reserved_only = bool(config.get("reserved_only"))
     topics = config.get("topics", [])
     pinned = set(config.get("pinned", []))
 
@@ -211,10 +254,24 @@ def _build_map(catalog: list, config: dict, repo_root: str) -> tuple:
         code = s.get("abbreviation") or ""
         core, rel = _tag(s, topics)
         fav = code in favorites
+        s["_seat"] = seats.get(code)
         s["_core"] = core
         s["_rel"] = rel
         s["_fav"] = fav
+        s["_reserved"] = s.get("sessionId") in reserved
 
+        if reserved_only:
+            # only seats we hold or can still book; any subject qualifies, topics only break ties
+            if not (s["_reserved"] or (s.get("isReservable") and s["_seat"] in OPEN_SEATS)):
+                continue
+            if not s["_reserved"] and (_is_bedrock_excluded(s, config) or _is_frontier_excluded(s, config)[0]):
+                continue
+            w = _when(s)
+            if w is None or s.get("isAllDaySession") or not s.get("venue"):
+                continue
+            s["_start"], s["_end"] = w
+            pool.append(s)
+            continue
         # off-topic sessions never enter any bucket (pool, watch list, or excluded)
         if not (core or rel or fav or code in pinned):
             continue
@@ -350,6 +407,11 @@ def _row(s: dict, config: dict, extra: str = "", dayname: dict | None = None, sh
     else:
         topics = ""
     seat = "reserve" if s.get("isReservable") else "walk-up"
+    if s.get("_reserved"):
+        seat = "RESERVED"
+    elif s.get("isReservable") and s.get("_seat"):
+        seat = {"available": "reserve (open)", "limited": "reserve (limited)", "veryLimited": "reserve (very limited)",
+                "unavailable": "full, walk-up line", "walkUp": "walk-up"}.get(s["_seat"], seat)
     if st and _is_anchor(s, config):
         seat = "ANCHOR, " + seat
     cols = [
@@ -480,9 +542,6 @@ def _write_event_map(chosen: list, excluded: list, tbd: list, pool: list,
     with open(out_path, "w", encoding="utf-8") as fh:
         fh.write("\n".join(lines))
 
-    with open(out_path, "w", encoding="utf-8") as fh:
-        fh.write("\n".join(lines))
-
 
 def _write_launch_ledger(catalog: list, out_dir: str) -> None:
     """Write docs/launch-ledger.md."""
@@ -583,11 +642,10 @@ def main(argv=None) -> None:
     repo_root = os.path.dirname(os.path.dirname(here))
     config = _load_config()
 
-    # Test guard: force test output dir when running under pytest without explicit --out-dir
+    # Test guard: require explicit --out-dir under pytest to prevent writes to repo
     if os.environ.get("PYTEST_CURRENT_TEST") and args.out_dir is None:
-        args.out_dir = os.path.join(repo_root, ".pytest-out")
-        os.makedirs(args.out_dir, exist_ok=True)
-        print(f"# pytest guard: using test out-dir {args.out_dir}", file=sys.stderr)
+        print("error: --out-dir is required when running under pytest", file=sys.stderr)
+        raise SystemExit(2)
 
     # Default catalog path
     if args.catalog is None:

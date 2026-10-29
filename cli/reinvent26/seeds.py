@@ -36,7 +36,7 @@ STOPWORDS = frozenset(
     every everything everyone someone something anything nothing missing
     ever never much many lot lots thing well better best good great big
     small large high low long short old young big small own self around
-    another other others else whereas whose whom allow allows called call
+    another others else whereas whose whom allow allows called call
     based upon along done doing done end start started starts sure true
     false yes no ok okay hey hi hello thanks thank please sorry well
     much ones kind sort type types term terms word words line lines page
@@ -46,7 +46,7 @@ STOPWORDS = frozenset(
     said tells told told ask asked answer show shows showed shown shows
     keep keeps kept hold holds held build builds built building makes
     work works worked working works does did done doing try tries tried
-    check checks checked test tests tested real really quite rather almost
+    check checks checked test tests tested really quite rather almost
     nearly enough less least most more much far far away ever
     """.split()
 )

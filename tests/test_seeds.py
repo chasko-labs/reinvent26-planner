@@ -6,6 +6,14 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "cli"))
 
 from reinvent26 import seeds  # noqa: E402
 
+import pytest  # noqa: E402
+
+
+@pytest.fixture(autouse=True)
+def _isolate_notes(tmp_path, monkeypatch):
+    """Point notes_dir at tmp_path/notes so real repo notes never leak into seed counts."""
+    monkeypatch.setattr(seeds, "notes_dir", lambda: str(tmp_path / "notes"))
+
 
 def _write(path, text):
     with open(path, "w", encoding="utf-8") as fh:

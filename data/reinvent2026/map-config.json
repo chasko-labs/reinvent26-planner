@@ -57,16 +57,45 @@
     "amazon.com / amazon retail": 11,
     "open-weight models": 13
   },
-  "cluster_venues": ["Venetian", "Wynn/Encore", "Caesars Palace", "Caesars Forum"],
+  "cluster_venues": [
+    "Venetian",
+    "Wynn/Encore",
+    "Caesars Palace",
+    "Caesars Forum"
+  ],
   "same_venue_gap": 0,
   "near_venue_gap": 30,
   "far_venue_gap": 60,
   "anchors": ["amazon leo"],
+  "reserved_only": true,
+  "type_weight": {
+    "Workshop": 30,
+    "Builders' session": 26,
+    "Lab": 24,
+    "Chalk talk": 20,
+    "Code talk": 18,
+    "Breakout session": 10,
+    "_default": 5
+  },
   "pinned": ["NET335"],
   "bedrock_excluded": true,
   "bedrock_keywords": ["bedrock", "agentcore"],
   "nova_exception": true,
   "frontier_excluded": true,
-  "frontier_title_patterns": ["frontier", "claude", "anthropic", "openai", "chatgpt", "\\bgpt[- ]?\\d", "gemini"],
-  "frontier_abstract_keywords": ["claude", "anthropic", "openai", "gemini", "gpt"]
+  "frontier_title_patterns": [
+    "frontier",
+    "claude",
+    "anthropic",
+    "openai",
+    "chatgpt",
+    "\\bgpt[- ]?\\d",
+    "gemini"
+  ],
+  "frontier_abstract_keywords": [
+    "claude",
+    "anthropic",
+    "openai",
+    "gemini",
+    "gpt"
+  ]
 }

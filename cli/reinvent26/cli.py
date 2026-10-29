@@ -14,6 +14,17 @@ from reinvent26 import api, auth, cache, inventory, rank, schedule, seeds
 api.set_unauthorized_handler(auth.handle_401)
 
 
+def cmd_map(args) -> None:
+    """Run the event map and launch ledger generator."""
+    import reinvent26.mapper as mapper_mod
+    argv = []
+    if args.catalog:
+        argv.extend(["--catalog", args.catalog])
+    if args.out_dir:
+        argv.extend(["--out-dir", args.out_dir])
+    mapper_mod.main(argv)
+
+
 def _token(args) -> str | None:
     return (
         args.token
@@ -532,7 +543,7 @@ def cmd_reserve(args):
     except api.EventsError as e:
         if e.status == 409:
             print(
-                "# 409: reserved seating not open yet (api opens 8 Oct 2026). "
+                "# 409: api opened 8 Oct 2026. a 409 now means retry, not a bad request "
                 "favorites work now; retry after reopen.",
                 file=sys.stderr,
             )
@@ -696,6 +707,11 @@ def build_parser() -> argparse.ArgumentParser:
     r.add_argument("session_ids", help="comma separated session ids")
     r.set_defaults(fn=cmd_reserve)
 
+    mp = sub.add_parser("map", help="build event map and launch ledger from catalog")
+    mp.add_argument("--catalog", default=None, help="catalog JSON path")
+    mp.add_argument("--out-dir", default=None, help="output directory (default: docs)")
+    mp.set_defaults(fn=cmd_map)
+
     return p
 
 
@@ -726,9 +742,7 @@ def main(argv=None):
                   "command and submit only what remains; never blind-retry "
                   "(cancel/remove already retried once)",
                   file=sys.stderr)
-        elif e.status == 409:
-            print("# 409: operation closed (reserve/cancel opens 8 Oct 2026); "
-                  "retry after reopen, not a bad request", file=sys.stderr)
+# - 409 on reserve/cancel: api opened 8 Oct 2026; retry after reopen, not a bad request
         raise SystemExit(1)
 
 

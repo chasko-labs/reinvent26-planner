@@ -1,0 +1,79 @@
+[
+  {
+    "result": {
+      "failed": [
+        {
+          "code": "other",
+          "sessionId": "1780442223920001c4Dh"
+        },
+        {
+          "code": "other",
+          "sessionId": "1780442234745001cUk8"
+        },
+        {
+          "code": "other",
+          "sessionId": "1780441497959001Gnwn"
+        },
+        {
+          "code": "other",
+          "sessionId": "1780442234619001cJC9"
+        },
+        {
+          "code": "other",
+          "sessionId": "1780442248268001cfyc"
+        },
+        {
+          "code": "other",
+          "sessionId": "1780441479724001GxPv"
+        },
+        {
+          "code": "other",
+          "sessionId": "1780442262851001cpai"
+        },
+        {
+          "code": "other",
+          "sessionId": "1780442267724001cd75"
+        },
+        {
+          "code": "other",
+          "sessionId": "1780442273524001cazM"
+        },
+        {
+          "code": "other",
+          "sessionId": "1790358218054001iHcn"
+        }
+      ],
+      "successful": []
+    }
+  },
+  {
+    "result": {
+      "failed": [],
+      "successful": [
+        "1790358238732001idjT",
+        "1780441468068001GdOe",
+        "1780441472341001G9d5",
+        "1780441475313001GY9y",
+        "1780441498719001G3Dy",
+        "1790358228435001iVxp",
+        "1780442261303001cWFw",
+        "1780442259582001cthc",
+        "1780442275335001cqge",
+        "1780441463149001GOfx"
+      ]
+    }
+  },
+  {
+    "result": {
+      "failed": [],
+      "successful": [
+        "1780442234333001cxma",
+        "1790358238638001im0Q",
+        "1780442248579001cm98",
+        "1780442251356001c6Yh",
+        "1790358246739001ipkp",
+        "1790358216277001iq8q"
+      ]
+    }
+  }
+]

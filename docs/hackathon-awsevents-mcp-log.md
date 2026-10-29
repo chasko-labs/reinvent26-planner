@@ -3,9 +3,11 @@
 ## 2026-10-04 session 1
 
 ### goal
+
 wire the aws events mcp server (api.awsevents.com/mcp) into the haunting stack so subagents can plan re:invent 2026 sessions through mcp tools.
 
 ### constraints
+
 - rocm-aibox is headless linux. no browser.
 - device-code grant not supported by the events api oauth endpoint (confirmed from docs).
 - must use authorization code + pkce s256 with ssh tunnel for browser callback.
@@ -14,7 +16,9 @@ wire the aws events mcp server (api.awsevents.com/mcp) into the haunting stack s
 - mcp-transport-discipline: spawned agents only see stdio bindings.
 
 ### reference implementation
+
 auth.py in cli/reinvent26/ has working pkce flow:
+
 - opens browser to authorize url
 - listens on 127.0.0.1:8484..8489/callback
 - exchanges code for tokens
@@ -23,6 +27,7 @@ auth.py in cli/reinvent26/ has working pkce flow:
 ### design decisions
 
 #### token storage: ssm parameter store
+
 - access token: /heraldstack/shared/awsevents/access-token (expires in 60 min)
 - refresh token: /heraldstack/shared/awsevents/refresh-token (expires in 30 days, rotates on refresh)
 - token expiry: /heraldstack/shared/awsevents/token-expires-at (unix timestamp)
@@ -30,6 +35,7 @@ auth.py in cli/reinvent26/ has working pkce flow:
 ssm is the canonical storage per governance/secret-handling. no ~/.secrets, no .env, no local files.
 
 #### login flow: ssh tunnel + browser on mac mini
+
 1. bryan opens ssh tunnel from mac mini: `ssh -L 8484:localhost:8484 rocm-aibox`
 2. on rocm-aibox: `awsevents-mcp-login` prints authorize url and listens on 127.0.0.1:8484
 3. bryan opens url in browser on mac mini, signs in with builder id
@@ -37,12 +43,14 @@ ssm is the canonical storage per governance/secret-handling. no ~/.secrets, no .
 5. login helper exchanges code for tokens, stores to ssm
 
 #### bridge launcher: supergateway + ssm token fetch
+
 - stdio on agent side via supergateway
 - streamable http to https://api.awsevents.com/mcp
 - bearer token fetched from ssm at each invocation (no caching in bridge)
 - silent refresh when access token expired: fetch refresh token from ssm, call token endpoint, store new tokens
 
 #### mcp transport
+
 - settings/mcp.json uses ./mcp-launchers/run.sh (dispatcher pattern)
 - run.sh finds the bridge script in heraldstack-mcp/launchers/bridges/
 - registry.yaml entry documents the server
@@ -58,9 +66,11 @@ ssm is the canonical storage per governance/secret-handling. no ~/.secrets, no .
 7. test: bryan logs in, then call ListEvents through mcp
 
 ### what failed
+
 - device code grant: not supported by the events api oauth endpoint. confirmed from docs at https://docs.aws.amazon.com/events/latest/devguide/mcp-server.html
 
 ### commands run
+
 ```bash
 # checked hs-secret tool
 which hs-secret && hs-secret --help
@@ -77,17 +87,16 @@ cat ~/code/heraldstack/heraldstack-mcp/registry.yaml
 cat ~/code/heraldstack/haunting-kiro-cli/.mcp.json
 ```
 
-
 ### files created
 
-| file | purpose |
-| --- | --- |
-| bin/awsevents-mcp-login | login helper (tunnel-aware, stores tokens to ssm) |
-| bin/awsevents-mcp-refresh | silent token refresh (called by bridge) |
-| ~/code/heraldstack/heraldstack-mcp/launchers/bridges/awsevents-bridge.sh | stdio bridge to streamable http endpoint |
-| ~/code/heraldstack/heraldstack-mcp/docs/runbooks/awsevents-mcp-login.md | runbook for bryan |
-| ~/code/heraldstack/heraldstack-mcp/registry.yaml | added awsevents entry |
-| ~/code/heraldstack/haunting-kiro-cli/.mcp.json | added awsevents server entry |
+| file                                                                     | purpose                                           |
+| ------------------------------------------------------------------------ | ------------------------------------------------- |
+| bin/awsevents-mcp-login                                                  | login helper (tunnel-aware, stores tokens to ssm) |
+| bin/awsevents-mcp-refresh                                                | silent token refresh (called by bridge)           |
+| ~/code/heraldstack/heraldstack-mcp/launchers/bridges/awsevents-bridge.sh | stdio bridge to streamable http endpoint          |
+| ~/code/heraldstack/heraldstack-mcp/docs/runbooks/awsevents-mcp-login.md  | runbook for bryan                                 |
+| ~/code/heraldstack/heraldstack-mcp/registry.yaml                         | added awsevents entry                             |
+| ~/code/heraldstack/haunting-kiro-cli/.mcp.json                           | added awsevents server entry                      |
 
 ### verified
 
@@ -96,12 +105,29 @@ cat ~/code/heraldstack/haunting-kiro-cli/.mcp.json
 - bash syntax: bridge script passes `bash -n`
 - supergateway: v3.4.3 available at ~/.nvm/versions/node/v24.14.0/bin/supergateway
 
-### next step
+### sign-in status
 
-bryan must complete browser sign-in. the session is waiting for him to run the login helper.
+done 2026-10-29 20:25 utc via the ssh tunnel (see entries below). this section originally said "waiting on bryan", written before he signed in
 
+## 2026-10-29 favorites, reservations, seat-aware re-plan
 
-### bryan sign-in required
+- favorited all 26 planned sessions. the first batch of 10 failed with code `other`, and an identical retry succeeded. `GET /schedule` confirms 26 favorites
+- reserve attempt on the 16 reservable planned sessions: all `sessionFull`. seating opened 6 oct
+- `seatAvailability` comes only from GetSession. fetched it for 252 topic sessions (666 s sequential): 171 unavailable, 75 walk-up or unknown, 5 veryLimited, 1 limited
+- mapper is now seat-aware. it reads .cache/reinvent2026/seats.json, weights open seats 3x and unknown reservable 2x, and treats full sessions like walk-ups. the seat column shows "reserve (limited)", "full, walk-up line", and so on
+- reserved CMP340 (amazon braket drug discovery and materials with q-ctrl, mon 13:00 mgm grand). `GET /schedule` shows 1 reserved
+- 401 root cause: the shell exports AWS_PROFILE=ops-reader (read-only). refresh got a new token but could not store it, then returned None, so the next call went out without auth. fixed with AWSEVENTS_SSM_PROFILE (default aerospaceug-admin). the earlier ssm preflight and profile fixes had been lost in a subagent commit run and are re-applied
+- local gate: added .githooks/pre-commit (py_compile helpers + pytest), linked as .git/hooks/pre-commit.local. the global hook chains to it, so every code commit runs the suite
+- field notes with calls, code samples, enums, best practices, and lessons: docs/api-field-notes.md. redacted response samples: docs/samples/
 
-the integration is ready. bryan must complete the browser sign-in to store tokens to ssm.
+## 2026-10-29 reserved-only plan: 15 seats booked
 
+- bryan's rule: only sessions where we can hold a reserved seat. among those, rank workshops > chalk talks > breakouts. builders' sessions, labs, and code talks sit in between (26, 24, 18) by format similarity. topics only break ties
+- pre-flight first: decoded the token (signed in, 37 min left), read the schedule in 3.4 s, then timed a 24-session probe: 13 s at 6 workers, 9 s at 12. only after that, the full sweep
+- full sweep of 1484 reservable sessions in persisted chunks of 150 (.cache/reinvent2026/seats-sweep.json, resumable, hard timeout per chunk). the first 300-chunk took 90 s, the second 155 s, so chunks dropped to 150. no errors
+- result: 1423 unavailable, 34 veryLimited, 20 limited, 7 available. 61 open seats across the conference: 24 workshops, 26 chalk talks, 0 breakouts. venues: mgm grand 28, wynn/encore 12, caesars palace 12, caesars forum 9
+- mapper `reserved_only` mode: pool = held seats + open seats, bedrock/frontier still excluded. weight = format + half the topic weight + duration. held seats are fixed points (+1e6)
+- booked 14 in one call, all successful, plus CMP340 from earlier. `GET /schedule`: 15 reserved
+- the plan: mon mgm chalk talks (STG363, INV530-R1, CMP340, AIM433, STG338-R). tue wynn and caesars forum chalk talks (IND359-R1, IND322-R, IND3304-R1). wed workshops at mgm (ANT402-R, AIM434-R1) around INV537 at caesars forum. thu workshops (STG412 mgm, SEC401 wynn, MAM416 caesars palace). fri BIZ321-R1 workshop at wynn
+- trade-off: none of the amazon leo anchors, open-weight, or self-managed-agent sessions had open seats. those topics now live only in the walk-up and interest lists
+- lesson: the catalog's real constraint four weeks out is seats. venue logistics come second. a planner that ignores seatAvailability builds a schedule you cannot book

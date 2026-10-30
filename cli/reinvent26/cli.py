@@ -25,6 +25,15 @@ def cmd_map(args) -> None:
     mapper_mod.main(argv)
 
 
+def cmd_fill(args) -> None:
+    """Book open seats into free windows of the live schedule."""
+    import reinvent26.fill as fill_mod
+    argv = ["--workers", str(args.workers), "--max-checks", str(args.max_checks)]
+    if args.dry_run:
+        argv.append("--dry-run")
+    raise SystemExit(fill_mod.main(argv))
+
+
 def _token(args) -> str | None:
     return (
         args.token
@@ -706,6 +715,12 @@ def build_parser() -> argparse.ArgumentParser:
     r.add_argument("event_id")
     r.add_argument("session_ids", help="comma separated session ids")
     r.set_defaults(fn=cmd_reserve)
+
+    fl = sub.add_parser("fill", help="book open seats into free windows of the live schedule")
+    fl.add_argument("--dry-run", action="store_true", help="report what would be booked, book nothing")
+    fl.add_argument("--workers", type=int, default=12)
+    fl.add_argument("--max-checks", type=int, default=400)
+    fl.set_defaults(fn=cmd_fill)
 
     mp = sub.add_parser("map", help="build event map and launch ledger from catalog")
     mp.add_argument("--catalog", default=None, help="catalog JSON path")

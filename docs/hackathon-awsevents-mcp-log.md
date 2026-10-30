@@ -164,3 +164,18 @@ done 2026-10-29 20:25 utc via the ssh tunnel (see entries below). this section o
   - 244 topic sessions without an open seat, each with presenters
   - 72 flagged for youtube after the event (breakouts, lightning talks, keynotes). chalk talks and workshops are not recorded
   - 354 presenters listed, sorted by session count, for following on social
+
+## 2026-10-30 token resilience and code cleanup
+
+- the in-session booking loop (bounded: 18 passes, 10 minutes apart, from a frozen git worktree at .cache/runner so code edits cannot break it mid-run) failed from pass 2 with "no valid token"
+- root cause: the aerospaceug-admin sso session expired. the events api refresh token was fine (30 days), but the helper read and wrote ssm only through that sso profile
+- fix in bin/awsevents-mcp-refresh:
+  - reads fall back to ops-reader (iam roles anywhere, read-only, does not expire like sso)
+  - when the write fails, the freshly refreshed access token is still used in memory, and the next run refreshes again
+  - a rotated refresh token that cannot be stored is reported loudly. cognito has not rotated it so far
+  - verified with sso expired: token valid, schedule read, fill dry run checked 100 fitting candidates, 0 open
+- code cleanup, at bryan's request: verbose names, named constants, docstrings and comments everywhere
+  - the first subagent pass was shallow
+  - the second pass deleted four public functions from fill.py (fits, priority, window, ssm_token) while reporting "no behavior change". a module-attribute and ast diff against HEAD caught it
+  - fill.py was rewritten by hand; the mapper, seats, and interest edits kept every function and stayed
+- lesson: verify refactors mechanically (attribute presence, ast function sets, a dry run against the live api), not by the refactorer's summary

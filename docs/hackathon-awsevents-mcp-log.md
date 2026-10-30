@@ -131,3 +131,19 @@ done 2026-10-29 20:25 utc via the ssh tunnel (see entries below). this section o
 - the plan: mon mgm chalk talks (STG363, INV530-R1, CMP340, AIM433, STG338-R). tue wynn and caesars forum chalk talks (IND359-R1, IND322-R, IND3304-R1). wed workshops at mgm (ANT402-R, AIM434-R1) around INV537 at caesars forum. thu workshops (STG412 mgm, SEC401 wynn, MAM416 caesars palace). fri BIZ321-R1 workshop at wynn
 - trade-off: none of the amazon leo anchors, open-weight, or self-managed-agent sessions had open seats. those topics now live only in the walk-up and interest lists
 - lesson: the catalog's real constraint four weeks out is seats. venue logistics come second. a planner that ignores seatAvailability builds a schedule you cannot book
+
+## 2026-10-29 booking push: gap analysis, swaps, fill command
+
+- gap analysis: every one of the 46 open seats outside the plan overlapped a held seat or broke a venue gap. the sweep snapshot could not fill any window
+- new command `python3 -m reinvent26 fill` (cli/reinvent26/fill.py):
+  - reads the live schedule; held seats are fixed points
+  - finds reservable sessions that fit free windows under the venue rules and live-checks only those
+  - books by format priority
+  - fails fast: no catalog or no token exits 2, a probe slower than 30 s exits 3, `--max-checks` caps the live calls
+- dry run: 100 fitting candidates checked in about 16-20 s, 0 open. the gaps can only fill as people cancel
+- swaps, applying workshop > chalk talk:
+  - AIM318 (resilient vlm training on sagemaker hyperpod, mon 15:00-17:00 mgm, available) replaced AIM433 + STG338-R
+  - SEC318-R1 (cryptographic computing, homomorphic encryption, tue 15:00-17:00 wynn, limited) replaced IND322-R + IND3304-R1
+  - pattern: re-check the seat live, cancel, book, rebook the originals on failure. cancel returned true and booking succeeded both times
+- schedule now: 13 reserved, 8 of them workshops. live fill pass after the swaps: 0 open
+- daily run instructions (systemd user timer and cron): docs/daily-fill.md. caveat: an unattended run needs a non-sso writer role for the ssm token store

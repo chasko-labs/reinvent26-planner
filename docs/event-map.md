@@ -57,16 +57,14 @@ self-managed agents, amazon braket, databricks, lambda microvms + web functions,
 | STG363    | mon 11-30 | 08:30-09:30 | MGM Grand | Chalk talk | 300   | RESERVED | (amazon.com / amazon retail) | Modernizing VMware workloads with Amazon FSx for NetApp ONTAP        |
 | INV530-R1 | mon 11-30 | 11:30-12:30 | MGM Grand | Chalk talk | 500   | RESERVED |                              | EC2 at 20: Rebuilding the control plane while it is running          |
 | CMP340    | mon 11-30 | 13:00-14:00 | MGM Grand | Chalk talk | 300   | RESERVED | amazon braket                | Drug discovery and materials use cases with Amazon Braket and Q-CTRL |
-| AIM433    | mon 11-30 | 15:00-16:00 | MGM Grand | Chalk talk | 400   | RESERVED |                              | Maximize GPU utilization across training and inference on HyperPod   |
-| STG338-R  | mon 11-30 | 16:30-17:30 | MGM Grand | Chalk talk | 300   | RESERVED |                              | Simplify secure file sharing with Transfer Family no-code web apps   |
+| AIM318    | mon 11-30 | 15:00-17:00 | MGM Grand | Workshop   | 300   | RESERVED |                              | Resilient VLM Training at Scale on Amazon SageMaker HyperPod         |
 
 ### tue 12-01
 
-| code       | day       | time        | venue         | type       | level | seat     | topics | title                                                        |
-| ---------- | --------- | ----------- | ------------- | ---------- | ----- | -------- | ------ | ------------------------------------------------------------ |
-| IND359-R1  | tue 12-01 | 12:00-13:00 | Wynn/Encore   | Chalk talk | 300   | RESERVED |        | In-Country HPC: How TGS Processes Seismic Data on AWS Brazil |
-| IND322-R   | tue 12-01 | 15:00-16:00 | Caesars Forum | Chalk talk | 300   | RESERVED |        | Physical AI in Telecom: A Framework for Workload Placement   |
-| IND3304-R1 | tue 12-01 | 16:30-17:30 | Caesars Forum | Chalk talk | 300   | RESERVED |        | KNFSD File Cache: Extending Your NFS Storage into the Cloud  |
+| code      | day       | time        | venue       | type       | level | seat     | topics | title                                                              |
+| --------- | --------- | ----------- | ----------- | ---------- | ----- | -------- | ------ | ------------------------------------------------------------------ |
+| IND359-R1 | tue 12-01 | 12:00-13:00 | Wynn/Encore | Chalk talk | 300   | RESERVED |        | In-Country HPC: How TGS Processes Seismic Data on AWS Brazil       |
+| SEC318-R1 | tue 12-01 | 15:00-17:00 | Wynn/Encore | Workshop   | 300   | RESERVED |        | Cryptographic computing on AWS: homomorphic encryption in practice |
 
 ### wed 12-02
 
@@ -90,7 +88,7 @@ self-managed agents, amazon braket, databricks, lambda microvms + web functions,
 | --------- | --------- | ----------- | ----------- | -------- | ----- | -------- | ------ | ------------------------------------------------------------------------------- |
 | BIZ321-R1 | fri 12-04 | 08:00-10:00 | Wynn/Encore | Workshop | 300   | RESERVED |        | Never Start Over: Chat to Co-Browse, Voice and Video on Amazon Connect Customer |
 
-totals: 15 sessions, 21h00 reserved-seat time, 0h00 walk-up time
+totals: 13 sessions, 21h00 reserved-seat time, 0h00 walk-up time
 
 ## would love to attend but not conducive to logistics
 

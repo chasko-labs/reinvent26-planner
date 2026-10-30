@@ -52,3 +52,39 @@ def test_workshop_outranks_chalk_talk():
     c = _s("C", "Venetian", "2026-11-30T10:00", "2026-11-30T11:00", "Chalk talk")
     b = _s("B", "Venetian", "2026-11-30T10:00", "2026-11-30T11:00", "Breakout session")
     assert fill.priority(w, CONFIG) > fill.priority(c, CONFIG) > fill.priority(b, CONFIG)
+
+
+def _p(code, sid, venue, start, end, type_="Chalk talk"):
+    s = _s(code, venue, start, end, type_)
+    s["sessionId"] = sid
+    return s
+
+
+def test_plan_days_prefers_more_sessions_then_minutes():
+    # two 1h chalk talks beat one 2h workshop covering the same window: as many events as possible
+    pool = [_p("C1", "c1", "MGM Grand", "2026-11-30T10:00", "2026-11-30T11:00"),
+            _p("C2", "c2", "MGM Grand", "2026-11-30T11:00", "2026-11-30T12:00"),
+            _p("W", "w", "MGM Grand", "2026-11-30T10:00", "2026-11-30T12:00", "Workshop")]
+    got = [s["abbreviation"] for s in fill.plan_days(pool, set(), CONFIG)]
+    assert got == ["C1", "C2"]
+
+
+def test_plan_days_workshop_wins_same_window():
+    pool = [_p("C", "c", "MGM Grand", "2026-11-30T10:00", "2026-11-30T11:00"),
+            _p("W", "w", "MGM Grand", "2026-11-30T10:00", "2026-11-30T12:00", "Workshop")]
+    got = [s["abbreviation"] for s in fill.plan_days(pool, set(), CONFIG)]
+    assert got == ["W"]
+
+
+def test_plan_days_keeps_held_on_tie():
+    pool = [_p("A", "a", "MGM Grand", "2026-11-30T10:00", "2026-11-30T11:00"),
+            _p("B", "b", "MGM Grand", "2026-11-30T10:00", "2026-11-30T11:00")]
+    got = [s["abbreviation"] for s in fill.plan_days(pool, {"b"}, CONFIG)]
+    assert got == ["B"]
+
+
+def test_plan_days_one_run_per_base():
+    pool = [_p("X1-R", "x1", "MGM Grand", "2026-11-30T10:00", "2026-11-30T11:00"),
+            _p("X1-R1", "x2", "MGM Grand", "2026-12-01T10:00", "2026-12-01T11:00")]
+    got = [s["abbreviation"] for s in fill.plan_days(pool, set(), CONFIG)]
+    assert got == ["X1-R"]

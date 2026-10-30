@@ -31,7 +31,15 @@ def cmd_fill(args) -> None:
     argv = ["--workers", str(args.workers), "--max-checks", str(args.max_checks)]
     if args.dry_run:
         argv.append("--dry-run")
+    if getattr(args, "rebalance", False):
+        argv.append("--rebalance")
     raise SystemExit(fill_mod.main(argv))
+
+
+def cmd_interest(args) -> None:
+    """Write docs/full-but-interesting.md (no seat, presenters to follow, youtube flags)."""
+    import reinvent26.interest as interest_mod
+    interest_mod.main(["--out-dir", args.out_dir] if args.out_dir else [])
 
 
 def _token(args) -> str | None:
@@ -718,9 +726,14 @@ def build_parser() -> argparse.ArgumentParser:
 
     fl = sub.add_parser("fill", help="book open seats into free windows of the live schedule")
     fl.add_argument("--dry-run", action="store_true", help="report what would be booked, book nothing")
+    fl.add_argument("--rebalance", action="store_true", help="re-plan over held + swept open seats, swap toward more reserved time")
     fl.add_argument("--workers", type=int, default=12)
     fl.add_argument("--max-checks", type=int, default=400)
     fl.set_defaults(fn=cmd_fill)
+
+    it = sub.add_parser("interest", help="write the full-but-interesting page with presenters to follow")
+    it.add_argument("--out-dir", default=None)
+    it.set_defaults(fn=cmd_interest)
 
     mp = sub.add_parser("map", help="build event map and launch ledger from catalog")
     mp.add_argument("--catalog", default=None, help="catalog JSON path")

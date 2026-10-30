@@ -27,6 +27,7 @@ LATE = {"sessionId": "late", "title": "quantum at dusk", "topics": ["quantum"],
 TIMELESS = {"sessionId": "tbd", "title": "agents session tbd"}
 
 
+
 def test_cache_roundtrip_in_tmp_cwd(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     assert cache.load_cached_sessions("evt") is None

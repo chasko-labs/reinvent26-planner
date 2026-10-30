@@ -9,9 +9,11 @@ python ranking. When the binary is absent, python filters directly.
 
 from __future__ import annotations
 
+import glob
 import json
 import os
 import subprocess
+import sys
 
 CACHE_DIR = ".cache"
 
@@ -60,6 +62,58 @@ def find_filter_binary() -> str | None:
         if path and os.path.isfile(path) and os.access(path, os.X_OK):
             return path
     return None
+
+
+def curated_dir() -> str:
+    """Return the absolute path to data/reinvent2026 under repo root."""
+    here = os.path.dirname(os.path.abspath(__file__))
+    repo_root = os.path.dirname(os.path.dirname(here))
+    return os.path.join(repo_root, "data", "reinvent2026")
+
+
+def load_curated_sessions(paths: list | None = None) -> list:
+    """Load curated sessions from json files.
+
+    If paths given, load each json file; else glob curated_dir()/*.json
+    sorted by name. Each file must be a json array; skip (warn to stderr)
+    non-array or unreadable files. Merge into one list, dedup by sessionId
+    with later files winning. Rows without sessionId are kept as-is.
+    Returns [] when curated_dir() is absent.
+    """
+    if paths is None:
+        cdir = curated_dir()
+        if not os.path.isdir(cdir):
+            return []
+        paths = sorted(glob.glob(os.path.join(cdir, "*.json")))
+
+    merged: list = []
+    seen_session_ids: dict = {}
+
+    for path in paths:
+        try:
+            with open(path, encoding="utf-8") as fh:
+                data = json.load(fh)
+        except (OSError, ValueError) as e:
+            print(f"warning: skipping unreadable file {path}: {e}", file=sys.stderr)
+            continue
+        if not isinstance(data, list):
+            print(f"warning: skipping non-array file {path}", file=sys.stderr)
+            continue
+        for row in data:
+            if not isinstance(row, dict):
+                merged.append(row)
+                continue
+            sid = row.get("sessionId")
+            if sid is None:
+                merged.append(row)
+            elif sid in seen_session_ids:
+                idx = seen_session_ids[sid]
+                merged[idx] = row
+            else:
+                seen_session_ids[sid] = len(merged)
+                merged.append(row)
+
+    return merged
 
 
 def rust_prefilter(

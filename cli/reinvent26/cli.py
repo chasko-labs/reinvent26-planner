@@ -11,8 +11,35 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from reinvent26 import api, auth, cache, inventory, rank, schedule, seeds
 
-
 api.set_unauthorized_handler(auth.handle_401)
+
+
+def cmd_map(args) -> None:
+    """Run the event map and launch ledger generator."""
+    import reinvent26.mapper as mapper_mod
+    argv = []
+    if args.catalog:
+        argv.extend(["--catalog", args.catalog])
+    if args.out_dir:
+        argv.extend(["--out-dir", args.out_dir])
+    mapper_mod.main(argv)
+
+
+def cmd_fill(args) -> None:
+    """Book open seats into free windows of the live schedule."""
+    import reinvent26.fill as fill_mod
+    argv = ["--workers", str(args.workers), "--max-checks", str(args.max_checks)]
+    if args.dry_run:
+        argv.append("--dry-run")
+    if getattr(args, "rebalance", False):
+        argv.append("--rebalance")
+    raise SystemExit(fill_mod.main(argv))
+
+
+def cmd_interest(args) -> None:
+    """Write docs/full-but-interesting.md (no seat, presenters to follow, youtube flags)."""
+    import reinvent26.interest as interest_mod
+    interest_mod.main(["--out-dir", args.out_dir] if args.out_dir else [])
 
 
 def _token(args) -> str | None:
@@ -73,7 +100,23 @@ def cmd_sessions(args):
     if args.cached and args.refresh:
         print("error: --cached and --refresh conflict", file=sys.stderr)
         raise SystemExit(2)
-    if args.cached:
+    if args.data and (args.curated or args.cached or args.refresh):
+        print("error: --data conflicts with --curated, --cached, or --refresh",
+              file=sys.stderr)
+        raise SystemExit(2)
+    if args.curated and (args.cached or args.refresh):
+        print("error: --curated conflicts with --cached or --refresh",
+              file=sys.stderr)
+        raise SystemExit(2)
+    if args.data:
+        sessions = cache.load_curated_sessions(paths=args.data)
+        print(f"# using {len(sessions)} curated sessions from --data",
+              file=sys.stderr)
+    elif getattr(args, 'curated', False):
+        sessions = cache.load_curated_sessions()
+        print(f"# using {len(sessions)} curated sessions from data/reinvent2026",
+              file=sys.stderr)
+    elif args.cached:
         sessions = _cached_sessions(args)
     else:
         sessions = _fetch_sessions(args, include_abstracts=args.abstracts)
@@ -125,7 +168,25 @@ def cmd_shortlist(args):
     if args.cached and args.refresh:
         print("error: --cached and --refresh conflict", file=sys.stderr)
         raise SystemExit(2)
-    if args.cached:
+    if args.data and (args.curated or args.cached or args.refresh):
+        print("error: --data conflicts with --curated, --cached, or --refresh",
+              file=sys.stderr)
+        raise SystemExit(2)
+    if args.curated and (args.cached or args.refresh):
+        print("error: --curated conflicts with --cached or --refresh",
+              file=sys.stderr)
+        raise SystemExit(2)
+    if args.data:
+        sessions = cache.load_curated_sessions(paths=args.data)
+        print(f"# using {len(sessions)} curated sessions from --data",
+              file=sys.stderr)
+        sessions = schedule.normalize_sessions(sessions)
+    elif getattr(args, 'curated', False):
+        sessions = cache.load_curated_sessions()
+        print(f"# using {len(sessions)} curated sessions from data/reinvent2026",
+              file=sys.stderr)
+        sessions = schedule.normalize_sessions(sessions)
+    elif args.cached:
         sessions = _cached_sessions(args)
         with open(cache.cache_file(args.event_id), "rb") as fh:
             raw = fh.read()
@@ -200,6 +261,39 @@ def _schedule_items(sched) -> list:
     return []
 
 
+def _catalog_for_confirm(event_id: str, token: str | None) -> list:
+    cached = cache.load_cached_sessions(event_id)
+    if cached is not None:
+        return schedule.normalize_sessions(cached)
+    return schedule.normalize_sessions(
+        list(api.iter_sessions(event_id, token=token, include_abstracts=False)))
+
+
+def _confirmed_items(sched, catalog: list) -> list:
+    """Resolve a GetSchedule payload to normalized session dicts.
+
+    The live shape nests id strings under schedule.favorites/reserved
+    plus personal-time objects under schedule.personalTime; ids resolve
+    against the catalog, unknown ids stay as bare timeless entries.
+    """
+    node = sched.get("schedule") if isinstance(sched, dict) else None
+    if isinstance(node, dict):
+        by_id = {s.get("sessionId"): s for s in catalog
+                 if isinstance(s, dict) and s.get("sessionId")}
+        items = []
+        for sid in list(node.get("favorites") or []) + \
+                list(node.get("reserved") or []):
+            if isinstance(sid, dict):
+                items.append(sid)
+            else:
+                items.append(by_id.get(sid) or {"sessionId": sid})
+        for entry in node.get("personalTime") or []:
+            if isinstance(entry, dict):
+                items.append(entry)
+        return schedule.normalize_sessions(items)
+    return schedule.normalize_sessions(_schedule_items(sched))
+
+
 def _parse_window(spec: str) -> dict:
     parts = [p.strip() for p in spec.split(",")]
     if len(parts) != 2 or not all(parts):
@@ -242,85 +336,6 @@ def cmd_slots(args):
         "with no clash",
         file=sys.stderr,
     )
-
-
-def _catalog_for_confirm(event_id: str, token: str | None) -> list:
-    cached = cache.load_cached_sessions(event_id)
-    if cached is not None:
-        return schedule.normalize_sessions(cached)
-    return schedule.normalize_sessions(
-        list(api.iter_sessions(event_id, token=token, include_abstracts=False)))
-
-
-def _confirmed_items(sched, catalog: list) -> list:
-    """Resolve a GetSchedule payload to normalized session dicts.
-
-    The live shape nests id strings under schedule.favorites/reserved
-    plus personal-time objects under schedule.personalTime; ids resolve
-    against the catalog, unknown ids stay as bare timeless entries.
-    """
-    node = sched.get("schedule") if isinstance(sched, dict) else None
-    if isinstance(node, dict):
-        by_id = {s.get("sessionId"): s for s in catalog
-                 if isinstance(s, dict) and s.get("sessionId")}
-        items = []
-        for sid in list(node.get("favorites") or []) + \
-                list(node.get("reserved") or []):
-            if isinstance(sid, dict):
-                items.append(sid)
-            else:
-                items.append(by_id.get(sid) or {"sessionId": sid})
-        for entry in node.get("personalTime") or []:
-            if isinstance(entry, dict):
-                items.append(entry)
-        return schedule.normalize_sessions(items)
-    return schedule.normalize_sessions(_schedule_items(sched))
-
-
-def cmd_stack_pick(args):
-    """Stack-aware picker end to end: live resources map to catalog keywords."""
-    if args.resources_json:
-        resources = inventory.load_resources_file(args.resources_json)
-        source = f"file:{args.resources_json}"
-    else:
-        resources = inventory.fetch_via_aws_cli(args.profile, args.region)
-        source = f"aws_cli:profile={args.profile}"
-    keywords = schedule.stack_keywords(resources)
-    print(f"# stack source: {source} ({len(resources)} resources)",
-          file=sys.stderr)
-    print(f"# keywords: {', '.join(keywords) if keywords else '(none mapped)'}",
-          file=sys.stderr)
-    for rtype, count in inventory.summarize_inventory(resources)[:10]:
-        print(f"# inventory: {rtype} x{count}", file=sys.stderr)
-    if not keywords:
-        print("# no keywords mapped from live stack; aborting", file=sys.stderr)
-        raise SystemExit(2)
-    sessions = _fetch_sessions(args)
-    ranked = schedule.match_topics(
-        sessions, keywords, exclude=args.exclude.split(",") if args.exclude else None
-    )
-    if args.level:
-        ranked = [s for s in ranked if str(s.get("level", "")).startswith(args.level)]
-    picks = ranked[: args.top]
-    for s in picks:
-        print(schedule.summarize(s))
-    if args.favorite and picks:
-        ids = [s.get("sessionId", "") for s in picks if s.get("sessionId")]
-        resps = api.favorite_sessions(args.event_id, _token(args), ids)
-        print(json.dumps(resps, indent=2))
-        have = {i.get("sessionId") for i in
-                _confirmed_items(api.get_schedule(args.event_id, _token(args)),
-                                 sessions)
-                if isinstance(i, dict)}
-        missing = [i for i in ids if i not in have]
-        print(f"# event {args.event_id}: favorited "
-              f"{len(ids) - len(missing)}/{len(ids)} confirmed by GetSchedule",
-              file=sys.stderr)
-        if missing:
-            print(f"# unconfirmed: {', '.join(missing)}", file=sys.stderr)
-    else:
-        print("# confirm writes with: schedule command "
-              "(GetSchedule is source of truth)")
 
 
 def _reconcile_delete(kind: str, event_id: str, token: str,
@@ -448,6 +463,52 @@ def cmd_unblock(args):
         print(f"# personal-time {args.block_id} already absent: complete")
 
 
+def cmd_stack_pick(args):
+    """Stack-aware picker end to end: live resources map to catalog keywords."""
+    if args.resources_json:
+        resources = inventory.load_resources_file(args.resources_json)
+        source = f"file:{args.resources_json}"
+    else:
+        resources = inventory.fetch_via_aws_cli(args.profile, args.region)
+        source = f"aws_cli:profile={args.profile}"
+    keywords = schedule.stack_keywords(resources)
+    print(f"# stack source: {source} ({len(resources)} resources)",
+          file=sys.stderr)
+    print(f"# keywords: {', '.join(keywords) if keywords else '(none mapped)'}",
+          file=sys.stderr)
+    for rtype, count in inventory.summarize_inventory(resources)[:10]:
+        print(f"# inventory: {rtype} x{count}", file=sys.stderr)
+    if not keywords:
+        print("# no keywords mapped from live stack; aborting", file=sys.stderr)
+        raise SystemExit(2)
+    sessions = _fetch_sessions(args)
+    ranked = schedule.match_topics(
+        sessions, keywords, exclude=args.exclude.split(",") if args.exclude else None
+    )
+    if args.level:
+        ranked = [s for s in ranked if str(s.get("level", "")).startswith(args.level)]
+    picks = ranked[: args.top]
+    for s in picks:
+        print(schedule.summarize(s))
+    if args.favorite and picks:
+        ids = [s.get("sessionId", "") for s in picks if s.get("sessionId")]
+        resps = api.favorite_sessions(args.event_id, _token(args), ids)
+        print(json.dumps(resps, indent=2))
+        have = {i.get("sessionId") for i in
+                _confirmed_items(api.get_schedule(args.event_id, _token(args)),
+                                 sessions)
+                if isinstance(i, dict)}
+        missing = [i for i in ids if i not in have]
+        print(f"# event {args.event_id}: favorited "
+              f"{len(ids) - len(missing)}/{len(ids)} confirmed by GetSchedule",
+              file=sys.stderr)
+        if missing:
+            print(f"# unconfirmed: {', '.join(missing)}", file=sys.stderr)
+    else:
+        print("# confirm writes with: schedule command "
+              "(GetSchedule is source of truth)")
+
+
 def cmd_rank(args):
     """Local-model ranking over a cached catalog; model only ranks."""
     with open(args.cache, encoding="utf-8") as fh:
@@ -475,6 +536,16 @@ def cmd_rank(args):
         print(schedule.summarize(s))
 
 
+def cmd_ingest(args):
+    if args.data:
+        sessions = cache.load_curated_sessions(paths=args.data)
+    else:
+        sessions = cache.load_curated_sessions()
+    path = cache.save_cached_sessions(args.event_id, sessions)
+    print(f"# ingested {len(sessions)} curated sessions into {path}",
+          file=sys.stderr)
+
+
 def cmd_favorite(args):
     ids = [i.strip() for i in args.session_ids.split(",") if i.strip()]
     resps = api.favorite_sessions(args.event_id, _token(args), ids)
@@ -489,7 +560,7 @@ def cmd_reserve(args):
     except api.EventsError as e:
         if e.status == 409:
             print(
-                "# 409: reserved seating not open yet (api opens 8 Oct 2026). "
+                "# 409: api opened 8 Oct 2026. a 409 now means retry, not a bad request "
                 "favorites work now; retry after reopen.",
                 file=sys.stderr,
             )
@@ -519,6 +590,10 @@ def build_parser() -> argparse.ArgumentParser:
                    help="read .cache/<eventId>/sessions.json, no network")
     s.add_argument("--refresh", action="store_true",
                    help="fetch live and overwrite the cache")
+    s.add_argument("--data", action="append", default=None, metavar="PATH",
+                   help="load curated sessions from explicit json file(s)")
+    s.add_argument("--curated", action="store_true",
+                   help="load curated sessions from data/reinvent2026")
     s.set_defaults(fn=cmd_sessions)
 
     sl = sub.add_parser("shortlist", help="rank sessions by topic keywords")
@@ -546,6 +621,10 @@ def build_parser() -> argparse.ArgumentParser:
                     "pre-filter when built, no network")
     sl.add_argument("--refresh", action="store_true",
                     help="fetch live and overwrite the cache")
+    sl.add_argument("--data", action="append", default=None, metavar="PATH",
+                    help="load curated sessions from explicit json file(s)")
+    sl.add_argument("--curated", action="store_true",
+                    help="load curated sessions from data/reinvent2026")
     sl.set_defaults(fn=cmd_shortlist)
 
     sc = sub.add_parser("schedule", help="show schedule plus double bookings")
@@ -574,35 +653,6 @@ def build_parser() -> argparse.ArgumentParser:
     f.add_argument("session_ids", help="comma separated session ids")
     f.set_defaults(fn=cmd_favorite)
 
-    r = sub.add_parser("reserve", help="reserve seats (api opens 8 Oct 2026)")
-    r.add_argument("event_id")
-    r.add_argument("session_ids", help="comma separated session ids")
-    r.set_defaults(fn=cmd_reserve)
-
-    sp = sub.add_parser("stack-pick", help="stack-aware shortlist from live resources")
-    sp.add_argument("event_id")
-    sp.add_argument("--profile", default="",
-                    help="explicit aws cli profile for read-only inventory")
-    sp.add_argument("--resources-json", default="",
-                    help="cached get-resources json (offline alternative)")
-    sp.add_argument("--region", default=None)
-    sp.add_argument("--exclude", default="")
-    sp.add_argument("--level", default="")
-    sp.add_argument("--top", type=int, default=20)
-    sp.add_argument("--favorite", action="store_true",
-                    help="favorite picks, then confirm with GetSchedule")
-    sp.set_defaults(fn=cmd_stack_pick)
-
-    rf = sub.add_parser("remove-favorite", help="remove one favorite (404 means already absent)")
-    rf.add_argument("event_id")
-    rf.add_argument("session_id")
-    rf.set_defaults(fn=cmd_remove_favorite)
-
-    cr = sub.add_parser("cancel-reservation", help="cancel one reservation (404 means already absent)")
-    cr.add_argument("event_id")
-    cr.add_argument("session_id")
-    cr.set_defaults(fn=cmd_cancel_reservation)
-
     b = sub.add_parser("block", help="create a personal-time block")
     b.add_argument("event_id")
     b.add_argument("--title", required=True, help="1-128 chars")
@@ -628,6 +678,30 @@ def build_parser() -> argparse.ArgumentParser:
     ub.add_argument("block_id")
     ub.set_defaults(fn=cmd_unblock)
 
+    rf = sub.add_parser("remove-favorite", help="remove one favorite (404 means already absent)")
+    rf.add_argument("event_id")
+    rf.add_argument("session_id")
+    rf.set_defaults(fn=cmd_remove_favorite)
+
+    cr = sub.add_parser("cancel-reservation", help="cancel one reservation (404 means already absent)")
+    cr.add_argument("event_id")
+    cr.add_argument("session_id")
+    cr.set_defaults(fn=cmd_cancel_reservation)
+
+    sp = sub.add_parser("stack-pick", help="stack-aware shortlist from live resources")
+    sp.add_argument("event_id")
+    sp.add_argument("--profile", default="",
+                    help="explicit aws cli profile for read-only inventory")
+    sp.add_argument("--resources-json", default="",
+                    help="cached get-resources json (offline alternative)")
+    sp.add_argument("--region", default=None)
+    sp.add_argument("--exclude", default="")
+    sp.add_argument("--level", default="")
+    sp.add_argument("--top", type=int, default=20)
+    sp.add_argument("--favorite", action="store_true",
+                    help="favorite picks, then confirm with GetSchedule")
+    sp.set_defaults(fn=cmd_stack_pick)
+
     rk = sub.add_parser("rank", help="rank cached catalog via local model")
     rk.add_argument("--cache", required=True, help=".cache/<eventId>/sessions.json")
     rk.add_argument("--query", required=True, help="natural language request")
@@ -638,6 +712,33 @@ def build_parser() -> argparse.ArgumentParser:
                     help="explicit HH:MM floor (else parsed from query)")
     rk.add_argument("--timeout", type=int, default=120)
     rk.set_defaults(fn=cmd_rank)
+
+    i = sub.add_parser("ingest", help="load curated sessions into cache")
+    i.add_argument("event_id")
+    i.add_argument("--data", action="append", default=None, metavar="PATH",
+                   help="load explicit json file(s); else full curated set")
+    i.set_defaults(fn=cmd_ingest)
+
+    r = sub.add_parser("reserve", help="reserve seats (api opens 8 Oct 2026)")
+    r.add_argument("event_id")
+    r.add_argument("session_ids", help="comma separated session ids")
+    r.set_defaults(fn=cmd_reserve)
+
+    fl = sub.add_parser("fill", help="book open seats into free windows of the live schedule")
+    fl.add_argument("--dry-run", action="store_true", help="report what would be booked, book nothing")
+    fl.add_argument("--rebalance", action="store_true", help="re-plan over held + swept open seats, swap toward more reserved time")
+    fl.add_argument("--workers", type=int, default=12)
+    fl.add_argument("--max-checks", type=int, default=400)
+    fl.set_defaults(fn=cmd_fill)
+
+    it = sub.add_parser("interest", help="write the full-but-interesting page with presenters to follow")
+    it.add_argument("--out-dir", default=None)
+    it.set_defaults(fn=cmd_interest)
+
+    mp = sub.add_parser("map", help="build event map and launch ledger from catalog")
+    mp.add_argument("--catalog", default=None, help="catalog JSON path")
+    mp.add_argument("--out-dir", default=None, help="output directory (default: docs)")
+    mp.set_defaults(fn=cmd_map)
 
     return p
 

@@ -1,0 +1,80 @@
+[
+  {
+    "result": {
+      "failed": [
+        {
+          "code": "sessionFull",
+          "sessionId": "1780442223920001c4Dh"
+        },
+        {
+          "code": "sessionFull",
+          "sessionId": "1780442234745001cUk8"
+        },
+        {
+          "code": "sessionFull",
+          "sessionId": "1780441497959001Gnwn"
+        },
+        {
+          "code": "sessionFull",
+          "sessionId": "1780442234619001cJC9"
+        },
+        {
+          "code": "sessionFull",
+          "sessionId": "1780442248268001cfyc"
+        },
+        {
+          "code": "sessionFull",
+          "sessionId": "1790358218054001iHcn"
+        },
+        {
+          "code": "sessionFull",
+          "sessionId": "1790358238732001idjT"
+        },
+        {
+          "code": "sessionFull",
+          "sessionId": "1780441498719001G3Dy"
+        },
+        {
+          "code": "sessionFull",
+          "sessionId": "1790358228435001iVxp"
+        },
+        {
+          "code": "sessionFull",
+          "sessionId": "1780442275335001cqge"
+        }
+      ],
+      "successful": []
+    }
+  },
+  {
+    "result": {
+      "failed": [
+        {
+          "code": "sessionFull",
+          "sessionId": "1780442234333001cxma"
+        },
+        {
+          "code": "sessionFull",
+          "sessionId": "1790358238638001im0Q"
+        },
+        {
+          "code": "sessionFull",
+          "sessionId": "1780442248579001cm98"
+        },
+        {
+          "code": "sessionFull",
+          "sessionId": "1780442251356001c6Yh"
+        },
+        {
+          "code": "sessionFull",
+          "sessionId": "1790358246739001ipkp"
+        },
+        {
+          "code": "sessionFull",
+          "sessionId": "1790358216277001iq8q"
+        }
+      ],
+      "successful": []
+    }
+  }
+]

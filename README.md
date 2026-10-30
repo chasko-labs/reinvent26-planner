@@ -40,6 +40,23 @@ clash (`ANT301 x CON401`), open slots in an afternoon window, and a
 stack-aware pick. Authenticated writes (`favorite`, `reserve`, `schedule`
 confirm) still need `reinvent26 login` plus event registration.
 
+## mock Events API
+
+`mock/events_api.py` is a stdlib mock with the real response shapes for
+offline end-to-end runs (reserve/cancel gate included):
+
+```
+python mock/events_api.py --port 8499 --closed   # 409s like pre-8-Oct
+python mock/events_api.py --port 8499 --open     # gate flipped
+
+EVENTS_API_BASE_URL=http://127.0.0.1:8499 EVENTS_ACCESS_TOKEN=test \
+  python -m reinvent26 reserve reinvent2026 <sessionId>
+```
+
+`tests/test_mock.py` drives favorite/reserve/cancel/personal-time round
+trips plus the 409 gate against it. `EVENTS_API_BASE_URL` overrides the
+endpoint everywhere (default is the live API).
+
 ## how it uses the API
 
 - REST (`cli/`): ListEvents (public), ListSessions with pagination until

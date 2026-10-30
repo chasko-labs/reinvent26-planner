@@ -10,11 +10,12 @@ event registration.
 from __future__ import annotations
 
 import json
+import os
 import time
 import urllib.parse
 import urllib.request
 
-BASE_URL = "https://api.awsevents.com"
+BASE_URL = os.environ.get("EVENTS_API_BASE_URL", "https://api.awsevents.com")
 OPENAPI_URL = "https://api.awsevents.com/v1/openapi.json"
 
 
@@ -89,6 +90,28 @@ def _sleep(seconds: float) -> None:
     time.sleep(seconds)
 
 
+def read_with_retry(fn, *args, **kwargs):
+    """Reads: honor Retry-After on 429, back off on 500/503.
+
+    Retries 429 twice (sleeping each Retry-After) and 500/503 twice
+    (sleeping 1s then 2s). Never retries 403/404/409: 403 with a body
+    means not registered, and retrying will not fix it.
+    """
+    delay = 1.0
+    for attempt in range(3):
+        try:
+            return fn(*args, **kwargs)
+        except EventsError as e:
+            if e.status == 429 and attempt < 2:
+                _sleep(e.retry_after or 5.0)
+                continue
+            if e.status in (500, 503) and attempt < 2:
+                _sleep(delay)
+                delay *= 2
+                continue
+            raise
+
+
 def write_with_retry_429(fn, *args, **kwargs):
     """Writes: one retry honoring Retry-After on 429 only.
 
@@ -117,31 +140,9 @@ def delete_with_retry(fn, *args, **kwargs):
         raise
 
 
-def read_with_retry(fn, *args, **kwargs):
-    """Reads: honor Retry-After on 429, back off on 500/503.
-
-    Retries 429 twice (sleeping each Retry-After) and 500/503 twice
-    (sleeping 1s then 2s). Never retries 403/404/409: 403 with a body
-    means not registered, and retrying will not fix it.
-    """
-    delay = 1.0
-    for attempt in range(3):
-        try:
-            return fn(*args, **kwargs)
-        except EventsError as e:
-            if e.status == 429 and attempt < 2:
-                _sleep(e.retry_after or 5.0)
-                continue
-            if e.status in (500, 503) and attempt < 2:
-                _sleep(delay)
-                delay *= 2
-                continue
-            raise
-
-
 def list_events(include_past: bool = False) -> list:
     params = {"includePast": "true"} if include_past else None
-    out = _request("GET", "/v1/events", params=params)
+    out = read_with_retry(_request, "GET", "/v1/events", params=params)
     if isinstance(out, dict):
         for key in ("events", "items", "data"):
             if isinstance(out.get(key), list):
@@ -357,5 +358,3 @@ def delete_personal_time(event_id: str, token: str, block_id: str) -> bool:
     return _delete_once(
         "DELETE", f"/v1/events/{event_id}/personal-time/{block_id}", token
     )
-
-

@@ -6,6 +6,14 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "cli"))
 
 from reinvent26 import seeds  # noqa: E402
 
+import pytest  # noqa: E402
+
+
+@pytest.fixture(autouse=True)
+def _isolate_notes(tmp_path, monkeypatch):
+    """Point notes_dir at tmp_path/notes so real repo notes never leak into seed counts."""
+    monkeypatch.setattr(seeds, "notes_dir", lambda: str(tmp_path / "notes"))
+
 
 def _write(path, text):
     with open(path, "w", encoding="utf-8") as fh:
@@ -57,3 +65,21 @@ def test_explicit_topics_override_seeds(tmp_path, monkeypatch):
     assert cli_mod._resolve_topics(ns) == ["agents", "bedrock"]
     ns = cli_mod.build_parser().parse_args(["shortlist", "evt"])
     assert cli_mod._resolve_topics(ns) == ["quantum"]
+
+
+def test_derive_seeds_includes_notes_dir(tmp_path, monkeypatch):
+    from reinvent26 import seeds as seeds_mod
+    monkeypatch.setattr(seeds_mod, "posts_root", lambda: str(tmp_path / "writing"))
+    notes = tmp_path / "notes"
+    notes.mkdir()
+    (notes / "reinvent.md").write_text("# real estate bedrock agents\n")
+    blog = tmp_path / "writing" / "blog"
+    blog.mkdir(parents=True)
+    (blog / "post.md").write_text("# other content\n")
+    out = seeds_mod.derive_seeds(str(tmp_path / "writing"), top=10)
+    assert "agents" in out
+    assert "bedrock" in out
+    assert "real" in out
+    assert "estate" in out
+    assert "other" in out
+    assert "content" in out

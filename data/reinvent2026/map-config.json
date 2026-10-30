@@ -1,0 +1,101 @@
+{
+  "topics": [
+    {
+      "name": "self-managed agents",
+      "pattern": "self-managed agent|self-hosted agent|agent sandbox|agent harness|harness you own|go headless|strands|run agents on|agents? on (amazon )?(ec2|eks|ecs|lambda)|untrusted code"
+    },
+    {
+      "name": "amazon braket",
+      "pattern": "braket|quantum (comput|hardware|chem|experiment|error|developer)|quantum-classical|quantum computers"
+    },
+    {
+      "name": "databricks",
+      "pattern": "databricks"
+    },
+    {
+      "name": "lambda microvms + web functions",
+      "pattern": "lambda (microvm|web function|managed instance)|microvm|firecracker|serverless compute built for the web|lambda durable|durable functions"
+    },
+    {
+      "name": "video games",
+      "pattern": "\\bgames?\\b|gaming|gamer|gamelift|fortnite|roblox|multiplayer|twitch|game server|game world|\\briot games"
+    },
+    {
+      "name": "amazon leo",
+      "pattern": "amazon leo|kuiper"
+    },
+    {
+      "name": "nvidia",
+      "pattern": "nvidia|cuda|nemotron|omniverse|run:ai|cuvs"
+    },
+    {
+      "name": "nfl / sports",
+      "pattern": "\\bnfl\\b|next gen stats|football|super bowl|live sports"
+    },
+    {
+      "name": "amazon nova",
+      "pattern": "\\bnova\\b"
+    },
+    {
+      "name": "netflix",
+      "pattern": "netflix"
+    },
+    {
+      "name": "amazon.com / amazon retail",
+      "pattern": "amazon\\.com|amazon stores|amazon retail|amazon fulfillment|amazon robotics|how amazon|amazon's own|prime video|alexa|amazon pharmacy|whole foods"
+    },
+    {
+      "name": "open-weight models",
+      "pattern": "mistral|qwen|llama|gpt-oss|deepseek|gemma|nemotron|\\bphi-?\\d|granite|olmo|open[- ]?weight|open[- ]?source (model|llm|language model)|\\boss models?\\b|hugging ?face|vllm|ollama|sglang|llama\\.cpp|fine-tun|small (language )?models?|\\bslm\\b|distillation|cpu-only inference",
+      "abstract_pattern": "mistral|qwen|llama|gpt-oss|deepseek|gemma|nemotron|open[- ]?weight|hugging ?face|vllm|sglang"
+    }
+  ],
+  "topic_weight": {
+    "self-managed agents": 14,
+    "amazon braket": 12,
+    "netflix": 11,
+    "amazon.com / amazon retail": 11,
+    "open-weight models": 13
+  },
+  "cluster_venues": [
+    "Venetian",
+    "Wynn/Encore",
+    "Caesars Palace",
+    "Caesars Forum"
+  ],
+  "same_venue_gap": 0,
+  "near_venue_gap": 30,
+  "far_venue_gap": 60,
+  "anchors": ["amazon leo"],
+  "reserved_only": true,
+  "type_weight": {
+    "Workshop": 30,
+    "Builders' session": 26,
+    "Lab": 24,
+    "Chalk talk": 20,
+    "Code talk": 18,
+    "Breakout session": 10,
+    "_default": 5
+  },
+  "pinned": ["NET335"],
+  "bedrock_excluded": true,
+  "bedrock_keywords": ["bedrock", "agentcore"],
+  "nova_exception": true,
+  "frontier_excluded": true,
+  "frontier_title_patterns": [
+    "frontier",
+    "claude",
+    "anthropic",
+    "openai",
+    "chatgpt",
+    "\\bgpt[- ]?\\d",
+    "gemini"
+  ],
+  "frontier_abstract_keywords": [
+    "claude",
+    "anthropic",
+    "openai",
+    "gemini",
+    "gpt"
+  ]
+}

@@ -5,7 +5,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "cli"))
 
 import pytest  # noqa: E402
 
-from reinvent26.schedule import filter_by_time, find_offbeat  # noqa: E402
+from reinvent26.schedule import filter_by_day, filter_by_time, find_offbeat  # noqa: E402
 
 EARLY = {"sessionId": "early", "title": "agents at dawn", "topics": ["agents"],
          "startTime": "2026-12-01T08:00:00", "endTime": "2026-12-01T09:00:00"}
@@ -41,6 +41,38 @@ def test_bad_time_format_raises():
         filter_by_time([EARLY], not_before="9am")
     with pytest.raises(ValueError):
         filter_by_time([EARLY], lunch="12:00")
+
+
+def test_normalize_live_shape():
+    from reinvent26.schedule import normalize_session
+    live = {"sessionId": "x", "abbreviation": "ANT301", "title": "t",
+            "sessionTime": {"date": "2026-12-01", "length": "90",
+                            "time": "10:30"}}
+    out = normalize_session(live)
+    assert out["code"] == "ANT301"
+    assert out["startTime"] == "2026-12-01T10:30:00"
+    assert out["endTime"] == "2026-12-01T12:00:00"
+    assert out["title"] == "t" and out["sessionTime"]["length"] == "90"
+
+
+def test_normalize_timeless_and_idempotent():
+    from reinvent26.schedule import normalize_session
+    assert normalize_session({"sessionId": "x"}) == {"sessionId": "x"}
+    bad = {"sessionId": "y",
+           "sessionTime": {"date": "nope", "length": "60", "time": "10:30"}}
+    assert "startTime" not in normalize_session(bad)
+    canon = {"sessionId": "z", "code": "A1",
+             "startTime": "2026-12-01T10:00:00",
+             "endTime": "2026-12-01T11:00:00"}
+    assert normalize_session(canon) == canon
+
+
+def test_day_keeps_only_that_date():
+    sessions = [EARLY, MID, LATE, TIMELESS]
+    out = filter_by_day(sessions, "2026-12-01")
+    assert [s["sessionId"] for s in out] == ["early", "mid", "late"]
+    assert filter_by_day(sessions, "") == sessions
+    assert filter_by_day(sessions, None) == sessions
 
 
 def test_offbeat_returns_exactly_one_outsider():

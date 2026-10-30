@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# repo-local fail-fast gate, chained from the global pre-commit via .git/hooks/pre-commit.local
+# install once per clone: ln -sf ../../.githooks/pre-commit .git/hooks/pre-commit.local
+set -euo pipefail
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+cd "$REPO_ROOT"
+
+# python changes only; docs-only commits stay fast
+if ! git diff --cached --name-only | grep -qE '^(cli/|tests/|bin/|data/reinvent2026/map-config\.json|pyproject\.toml)'; then
+  exit 0
+fi
+
+echo "pre-commit: py_compile on bin helpers"
+python3 -m py_compile bin/awsevents-mcp-login bin/awsevents-mcp-refresh
+
+echo "pre-commit: pytest"
+python3 -m pytest -q -p no:cacheprovider

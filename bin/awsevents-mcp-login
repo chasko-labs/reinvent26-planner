@@ -1,0 +1,269 @@
+#!/usr/bin/env python3
+"""AWS Events MCP login helper — stores tokens to SSM Parameter Store.
+
+This script runs on rocm-aibox (headless linux). Bryan signs in with his
+browser on the mac mini via an ssh tunnel.
+
+Usage:
+  1. On mac mini: ssh -L 8484:localhost:8484 rocm-aibox
+  2. On rocm-aibox: awsevents-mcp-login
+  3. Open the printed URL in browser on mac mini
+  4. Sign in with AWS Builder ID
+  5. Tokens are stored to SSM
+
+SSM paths:
+  /heraldstack/shared/awsevents/access-token
+  /heraldstack/shared/awsevents/refresh-token
+  /heraldstack/shared/awsevents/token-expires-at
+"""
+
+from __future__ import annotations
+
+import base64
+import hashlib
+import json
+import os
+import secrets
+import subprocess
+import sys
+import threading
+import time
+import urllib.parse
+import urllib.request
+from http.server import BaseHTTPRequestHandler, HTTPServer
+
+AUTHORIZE_URL = "https://oauth.awsevents.com/oauth2/authorize"
+TOKEN_URL = "https://oauth.awsevents.com/oauth2/token"
+CLIENT_ID = "7vmom55m1qstvq8i71ph127bfq"
+SCOPE = "openid email events/access"
+IDENTITY_PROVIDER = "AWSBuilderID"
+CALLBACK_PATH = "/callback"
+DEFAULT_PORT = 8484
+
+SSM_PREFIX = "/heraldstack/shared/awsevents"
+# dedicated var: the operator shell exports AWS_PROFILE=ops-reader (read-only), which breaks token writes
+SSM_PROFILE = os.environ.get("AWSEVENTS_SSM_PROFILE", "aerospaceug-admin")
+SSM_REGION = os.environ.get("AWS_REGION", "us-west-2")
+
+
+def ssm_preflight_check() -> None:
+    """Prove the profile can write to ssm before the single-use auth code is spent."""
+    full_name = f"{SSM_PREFIX}/ssm-write-probe"
+    base = ["--profile", SSM_PROFILE, "--region", SSM_REGION]
+    put = subprocess.run(
+        ["aws", "ssm", "put-parameter", "--name", full_name, "--value", f"probe-{int(time.time())}",
+         "--type", "SecureString", "--overwrite", *base],
+        capture_output=True, text=True,
+    )
+    if put.returncode != 0:
+        raise RuntimeError(
+            f"ssm preflight failed: profile '{SSM_PROFILE}' cannot write {SSM_PREFIX}/*: {put.stderr.strip()}")
+    subprocess.run(["aws", "ssm", "delete-parameter", "--name", full_name, *base],
+                   capture_output=True, text=True)
+
+
+def ssm_put(name: str, value: str, description: str = "") -> None:
+    """Store a parameter in SSM Parameter Store (SecureString)."""
+    full_name = f"{SSM_PREFIX}/{name}"
+    cmd = [
+        "aws", "ssm", "put-parameter",
+        "--name", full_name,
+        "--value", value,
+        "--type", "SecureString",
+        "--overwrite",
+        "--profile", SSM_PROFILE,
+        "--region", SSM_REGION,
+    ]
+    if description:
+        cmd.extend(["--description", description])
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    if result.returncode != 0:
+        raise RuntimeError(f"ssm put-parameter failed: {result.stderr}")
+
+
+def ssm_get(name: str) -> str | None:
+    """Get a parameter from SSM Parameter Store."""
+    full_name = f"{SSM_PREFIX}/{name}"
+    cmd = [
+        "aws", "ssm", "get-parameter",
+        "--name", full_name,
+        "--with-decryption",
+        "--profile", SSM_PROFILE,
+        "--region", SSM_REGION,
+    ]
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    if result.returncode != 0:
+        return None
+    data = json.loads(result.stdout)
+    return data["Parameter"]["Value"]
+
+
+def _b64url_nopad(raw: bytes) -> str:
+    return base64.urlsafe_b64encode(raw).rstrip(b"=").decode()
+
+
+def new_verifier() -> str:
+    """Fresh PKCE verifier per attempt: 43-128 chars from a secure source."""
+    return _b64url_nopad(secrets.token_bytes(48))[:128]
+
+
+def challenge_for(verifier: str) -> str:
+    """S256 code challenge: base64url(sha256(verifier)), no padding."""
+    return _b64url_nopad(hashlib.sha256(verifier.encode()).digest())
+
+
+def new_state() -> str:
+    return _b64url_nopad(secrets.token_bytes(16))
+
+
+def authorize_url(redirect_uri: str, challenge: str, state: str) -> str:
+    return AUTHORIZE_URL + "?" + urllib.parse.urlencode({
+        "response_type": "code",
+        "client_id": CLIENT_ID,
+        "redirect_uri": redirect_uri,
+        "scope": SCOPE,
+        "identity_provider": IDENTITY_PROVIDER,
+        "code_challenge": challenge,
+        "code_challenge_method": "S256",
+        "state": state,
+    })
+
+
+def _http_post_form(url: str, fields: dict) -> dict:
+    data = urllib.parse.urlencode(fields).encode()
+    req = urllib.request.Request(url, data=data, headers={
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Accept": "application/json",
+    })
+    with urllib.request.urlopen(req, timeout=30) as resp:
+        return json.loads(resp.read().decode() or "{}")
+
+
+def exchange_code(code: str, redirect_uri: str, verifier: str) -> dict:
+    return _http_post_form(TOKEN_URL, {
+        "grant_type": "authorization_code",
+        "client_id": CLIENT_ID,
+        "redirect_uri": redirect_uri,
+        "code": code,
+        "code_verifier": verifier,
+    })
+
+
+def store_tokens(resp: dict) -> None:
+    """Store tokens to SSM Parameter Store."""
+    access_token = resp.get("access_token", "")
+    refresh_token = resp.get("refresh_token", "")
+    expires_in = int(resp.get("expires_in", 3600))
+    expires_at = int(time.time() + expires_in)
+
+    if not access_token:
+        raise ValueError("no access_token in response")
+
+    ssm_put("access-token", access_token, "AWS Events MCP access token (60 min TTL)")
+    if refresh_token:
+        ssm_put("refresh-token", refresh_token, "AWS Events MCP refresh token (30 day TTL, rotates)")
+    ssm_put("token-expires-at", str(expires_at), "AWS Events MCP access token expiry (unix timestamp)")
+
+    print(f"tokens stored to ssm: {SSM_PREFIX}/{{access-token,refresh-token,token-expires-at}}")
+
+
+def _receive_code(port: int, expected_state: str, timeout: int = 180) -> str:
+    """Serve one /callback request on 127.0.0.1:port; return the auth code."""
+    result: dict = {}
+
+    class Handler(BaseHTTPRequestHandler):
+        def do_GET(self):  # noqa: N802
+            parsed = urllib.parse.urlparse(self.path)
+            if parsed.path != CALLBACK_PATH:
+                self.send_response(404)
+                self.end_headers()
+                return
+            params = urllib.parse.parse_qs(parsed.query)
+            result["code"] = (params.get("code") or [None])[0]
+            result["state"] = (params.get("state") or [None])[0]
+            result["error"] = (params.get("error") or [None])[0]
+            result["error_description"] = (params.get("error_description") or [None])[0]
+
+            self.send_response(200, "OK")
+            self.send_header("Content-Type", "text/plain")
+            self.end_headers()
+            if result.get("error"):
+                self.wfile.write(f"error: {result['error']}: {result.get('error_description', '')}".encode())
+            else:
+                self.wfile.write(b"sign-in successful. you can close this tab and return to the terminal.")
+
+        def log_message(self, *a):
+            pass
+
+    server = HTTPServer(("127.0.0.1", port), Handler)
+    server.timeout = timeout
+    thread = threading.Thread(target=server.handle_request, daemon=True)
+    thread.start()
+    thread.join(timeout + 5)
+    server.server_close()
+
+    if result.get("error"):
+        raise RuntimeError(f"oauth error: {result['error']}: {result.get('error_description', '')}")
+    if not result.get("code"):
+        raise RuntimeError("no authorization code arrived; try login again")
+    if result.get("state") != expected_state:
+        raise RuntimeError("state mismatch; possible CSRF, try login again")
+    return result["code"]
+
+
+def login(port: int = DEFAULT_PORT) -> None:
+    """Interactive Builder ID sign-in; stores tokens to SSM."""
+    print("verifying ssm write permissions...")
+    try:
+        ssm_preflight_check()
+    except RuntimeError as e:
+        print(f"error: {e}", file=sys.stderr)
+        sys.exit(1)
+    print("ssm write check passed")
+    verifier = new_verifier()
+    state = new_state()
+    challenge = challenge_for(verifier)
+
+    redirect_uri = f"http://localhost:{port}{CALLBACK_PATH}"
+    url = authorize_url(redirect_uri, challenge, state)
+
+    print()
+    print("=" * 70)
+    print("AWS Events MCP Login")
+    print("=" * 70)
+    print()
+    print("if you are running this on a headless machine, ensure you have an")
+    print("ssh tunnel from your browser machine:")
+    print()
+    print(f"  ssh -L {port}:localhost:{port} rocm-aibox")
+    print()
+    print("then open this url in your browser on the browser machine:")
+    print()
+    print(f"  {url}")
+    print()
+    print("waiting for callback...")
+    print()
+
+    try:
+        code = _receive_code(port, state)
+        print("received authorization code, exchanging for tokens...")
+        resp = exchange_code(code, redirect_uri, verifier)
+        store_tokens(resp)
+        print()
+        print("login complete. you can now use the awsevents mcp server.")
+    except OSError as e:
+        print(f"error: could not listen on port {port}: {e}", file=sys.stderr)
+        print("ensure no other process is using the port and try again.", file=sys.stderr)
+        sys.exit(1)
+    except Exception as e:
+        print(f"error: {e}", file=sys.stderr)
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description="AWS Events MCP login helper")
+    parser.add_argument("--port", type=int, default=DEFAULT_PORT,
+                        help=f"callback port (default {DEFAULT_PORT})")
+    args = parser.parse_args()
+    login(args.port)

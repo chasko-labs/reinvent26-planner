@@ -44,6 +44,15 @@ def test_confirmed_items_resolves_live_shape():
     assert items[2] == {"title": "Lunch"}
 
 
+def test_summarize_personal_time_fallbacks():
+    from reinvent26.schedule import summarize
+    line = summarize({"blockId": "b1", "title": "Lunch",
+                      "start": "2026-12-01T12:00:00",
+                      "end": "2026-12-01T13:00:00"})
+    assert line.startswith("b1 | Lunch")
+    assert "2026-12-01T12:00:00->2026-12-01T13:00:00" in line
+
+
 def test_slots_parser_requires_window():
     with pytest.raises(SystemExit):
         build_parser().parse_args(["slots", "evt"])

@@ -8,6 +8,7 @@ so a bare `shortlist` reflects his topics without typing. Explicit
 
 from __future__ import annotations
 
+import glob
 import json
 import os
 import re
@@ -35,7 +36,7 @@ STOPWORDS = frozenset(
     every everything everyone someone something anything nothing missing
     ever never much many lot lots thing well better best good great big
     small large high low long short old young big small own self around
-    another other others else whereas whose whom allow allows called call
+    another others else whereas whose whom allow allows called call
     based upon along done doing done end start started starts sure true
     false yes no ok okay hey hi hello thanks thank please sorry well
     much ones kind sort type types term terms word words line lines page
@@ -45,7 +46,7 @@ STOPWORDS = frozenset(
     said tells told told ask asked answer show shows showed shown shows
     keep keeps kept hold holds held build builds built building makes
     work works worked working works does did done doing try tries tried
-    check checks checked test tests tested real really quite rather almost
+    check checks checked test tests tested really quite rather almost
     nearly enough less least most more much far far away ever
     """.split()
 )
@@ -59,6 +60,13 @@ def posts_root() -> str:
 
 def seed_path() -> str:
     return os.path.join(os.path.dirname(os.path.abspath(__file__)), "seeds.json")
+
+
+def notes_dir() -> str:
+    """Return the absolute path to repo-local notes/ directory."""
+    here = os.path.dirname(os.path.abspath(__file__))
+    repo_root = os.path.dirname(os.path.dirname(here))
+    return os.path.join(repo_root, "notes")
 
 
 def _tokens(text: str) -> list:
@@ -90,6 +98,18 @@ def derive_seeds(root: str | None = None, top: int = 25) -> list:
                     continue
                 for t in _tokens(text):
                     counts[t] = counts.get(t, 0) + 1
+
+    notes = notes_dir()
+    if os.path.isdir(notes):
+        for fn in sorted(glob.glob(os.path.join(notes, "**", "*.md"), recursive=True)):
+            try:
+                with open(fn, encoding="utf-8") as fh:
+                    text = fh.read()
+            except OSError:
+                continue
+            for t in _tokens(text):
+                counts[t] = counts.get(t, 0) + 1
+
     ranked = sorted(counts.items(), key=lambda kv: (-kv[1], kv[0]))
     return [term for term, _ in ranked[:top]]
 

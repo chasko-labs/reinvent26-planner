@@ -1,16 +1,24 @@
 #!/usr/bin/env python3
-"""AWS Events MCP token refresh helper — silent refresh using stored refresh token.
+"""AWS Events API token helper: return a valid access token, refreshing silently when expired.
 
-Reads refresh token from SSM, calls token endpoint, stores new tokens.
-Called by the bridge launcher when access token is expired.
+Token store: aws systems manager parameter store (securestring), account 211125425201, us-west-2
+  /heraldstack/shared/awsevents/access-token      60-minute bearer token for api.awsevents.com
+  /heraldstack/shared/awsevents/refresh-token     30-day refresh token (cognito; rotation not observed)
+  /heraldstack/shared/awsevents/token-expires-at  unix seconds when the access token expires
 
-Returns the new access token on stdout (for use by bridge scripts).
-Returns non-zero exit code on failure (caller should re-auth).
+Credential routing (why two profiles):
+  reads  try AWSEVENTS_SSM_PROFILE first (default aerospaceug-admin, sso, expires after hours idle),
+         then fall back to ops-reader (iam roles anywhere, read-only, does not expire like sso)
+  writes use AWSEVENTS_SSM_PROFILE only. when the write fails (sso expired), the freshly refreshed
+         access token is still returned for this run; the next run refreshes again. nothing is lost
+         unless the token endpoint rotates the refresh token, which is reported loudly on stderr
 
-SSM paths:
-  /heraldstack/shared/awsevents/access-token
-  /heraldstack/shared/awsevents/refresh-token
-  /heraldstack/shared/awsevents/token-expires-at
+Usage:
+  as a script: prints the access token on stdout, exit 0; exit 1 with a reason on stderr
+  as a module: get_valid_access_token() -> str | None (used by cli/reinvent26/fill.py)
+
+Tokens never go to logs, argv of other tools beyond the aws cli put-parameter call, or stdout
+except in script mode where stdout is the documented interface.
 """
 
 from __future__ import annotations
@@ -20,133 +28,144 @@ import os
 import subprocess
 import sys
 import time
+import urllib.error
 import urllib.parse
 import urllib.request
 
-TOKEN_URL = "https://oauth.awsevents.com/oauth2/token"
-CLIENT_ID = "7vmom55m1qstvq8i71ph127bfq"
+TOKEN_ENDPOINT_URL = "https://oauth.awsevents.com/oauth2/token"
+PUBLIC_CLIENT_ID = "7vmom55m1qstvq8i71ph127bfq"  # public pkce client from the events api docs; not a secret
 
-SSM_PREFIX = "/heraldstack/shared/awsevents"
-# dedicated var: the operator shell exports AWS_PROFILE=ops-reader (read-only), which breaks token writes
-SSM_PROFILE = os.environ.get("AWSEVENTS_SSM_PROFILE", "aerospaceug-admin")
-SSM_REGION = os.environ.get("AWS_REGION", "us-west-2")
+PARAMETER_PATH_PREFIX = "/heraldstack/shared/awsevents"
+# dedicated variable: the operator shell exports AWS_PROFILE=ops-reader, which must not route writes
+WRITER_PROFILE = os.environ.get("AWSEVENTS_SSM_PROFILE", "aerospaceug-admin")
+READ_FALLBACK_PROFILE = os.environ.get("AWSEVENTS_SSM_READ_PROFILE", "ops-reader")
+PARAMETER_REGION = os.environ.get("AWS_REGION", "us-west-2")
+
+REFRESH_BEFORE_EXPIRY_SECONDS = 60  # refresh a minute early so a request never carries a token mid-expiry
+AWS_CLI_TIMEOUT_SECONDS = 20
+TOKEN_ENDPOINT_TIMEOUT_SECONDS = 30
 
 
-def ssm_put(name: str, value: str, description: str = "") -> None:
-    """Store a parameter in SSM Parameter Store (SecureString)."""
-    full_name = f"{SSM_PREFIX}/{name}"
-    cmd = [
+def _warn(message: str) -> None:
+    """Report a non-fatal problem on stderr (never includes token values)."""
+    print(f"awsevents-refresh: {message}", file=sys.stderr)
+
+
+def write_parameter(parameter_name: str, parameter_value: str, description: str = "") -> None:
+    """Store one securestring parameter with the writer profile; raises RuntimeError on failure."""
+    put_command = [
         "aws", "ssm", "put-parameter",
-        "--name", full_name,
-        "--value", value,
+        "--name", f"{PARAMETER_PATH_PREFIX}/{parameter_name}",
+        "--value", parameter_value,
         "--type", "SecureString",
         "--overwrite",
-        "--profile", SSM_PROFILE,
-        "--region", SSM_REGION,
+        "--profile", WRITER_PROFILE,
+        "--region", PARAMETER_REGION,
     ]
     if description:
-        cmd.extend(["--description", description])
-    result = subprocess.run(cmd, capture_output=True, text=True)
-    if result.returncode != 0:
-        raise RuntimeError(f"ssm put-parameter failed: {result.stderr}")
+        put_command.extend(["--description", description])
+    put_result = subprocess.run(put_command, capture_output=True, text=True, timeout=AWS_CLI_TIMEOUT_SECONDS)
+    if put_result.returncode != 0:
+        # first stderr line only: enough to diagnose (expired sso, access denied) without noise
+        raise RuntimeError(f"put-parameter {parameter_name} via {WRITER_PROFILE} failed: "
+                           f"{(put_result.stderr.strip().splitlines() or ['no detail'])[0]}")
 
 
-def ssm_get(name: str) -> str | None:
-    """Get a parameter from SSM Parameter Store."""
-    full_name = f"{SSM_PREFIX}/{name}"
-    cmd = [
-        "aws", "ssm", "get-parameter",
-        "--name", full_name,
-        "--with-decryption",
-        "--profile", SSM_PROFILE,
-        "--region", SSM_REGION,
-    ]
-    result = subprocess.run(cmd, capture_output=True, text=True)
-    if result.returncode != 0:
-        return None
-    data = json.loads(result.stdout)
-    return data["Parameter"]["Value"]
+def read_parameter(parameter_name: str) -> str | None:
+    """Read one securestring parameter, trying the writer profile then the read-only fallback."""
+    for profile_name in dict.fromkeys([WRITER_PROFILE, READ_FALLBACK_PROFILE]):  # dedupe, keep order
+        get_command = [
+            "aws", "ssm", "get-parameter",
+            "--name", f"{PARAMETER_PATH_PREFIX}/{parameter_name}",
+            "--with-decryption",
+            "--profile", profile_name,
+            "--region", PARAMETER_REGION,
+        ]
+        try:
+            get_result = subprocess.run(get_command, capture_output=True, text=True, timeout=AWS_CLI_TIMEOUT_SECONDS)
+        except subprocess.TimeoutExpired:
+            continue
+        if get_result.returncode == 0:
+            return json.loads(get_result.stdout)["Parameter"]["Value"]
+    return None
 
 
-def _http_post_form(url: str, fields: dict) -> dict:
-    data = urllib.parse.urlencode(fields).encode()
-    req = urllib.request.Request(url, data=data, headers={
+def _post_form(url: str, form_fields: dict) -> dict:
+    """POST an urlencoded form and return the json body (oauth token endpoint convention)."""
+    request_body = urllib.parse.urlencode(form_fields).encode()
+    http_request = urllib.request.Request(url, data=request_body, headers={
         "Content-Type": "application/x-www-form-urlencoded",
         "Accept": "application/json",
     })
-    with urllib.request.urlopen(req, timeout=30) as resp:
-        return json.loads(resp.read().decode() or "{}")
+    with urllib.request.urlopen(http_request, timeout=TOKEN_ENDPOINT_TIMEOUT_SECONDS) as http_response:
+        return json.loads(http_response.read().decode() or "{}")
 
 
-def refresh_tokens(refresh_token: str) -> dict:
-    return _http_post_form(TOKEN_URL, {
+def exchange_refresh_token(refresh_token: str) -> dict:
+    """Trade the refresh token for a new access token at the cognito token endpoint."""
+    return _post_form(TOKEN_ENDPOINT_URL, {
         "grant_type": "refresh_token",
-        "client_id": CLIENT_ID,
+        "client_id": PUBLIC_CLIENT_ID,
         "refresh_token": refresh_token,
     })
 
 
-def store_tokens(resp: dict) -> str:
-    """Store tokens to SSM Parameter Store; return access token."""
-    access_token = resp.get("access_token", "")
-    refresh_token = resp.get("refresh_token", "")
-    expires_in = int(resp.get("expires_in", 3600))
-    expires_at = int(time.time() + expires_in)
+def store_tokens(token_response: dict) -> str:
+    """Persist a token response; return the access token even when persisting fails.
 
+    A failed write is survivable: the caller uses this access token now and the next run refreshes
+    again. A rotated refresh token that cannot be stored is not survivable for long, so it is reported.
+    """
+    access_token = token_response.get("access_token", "")
+    rotated_refresh_token = token_response.get("refresh_token", "")
     if not access_token:
-        raise ValueError("no access_token in response")
-
-    ssm_put("access-token", access_token, "AWS Events MCP access token (60 min TTL)")
-    if refresh_token:
-        # refresh token rotates on each refresh
-        ssm_put("refresh-token", refresh_token, "AWS Events MCP refresh token (30 day TTL, rotates)")
-    ssm_put("token-expires-at", str(expires_at), "AWS Events MCP access token expiry (unix timestamp)")
-
+        raise ValueError("token endpoint returned no access_token")
+    expires_at_unix = int(time.time() + int(token_response.get("expires_in", 3600)))
+    try:
+        write_parameter("access-token", access_token, "AWS Events API access token (60 min TTL)")
+        if rotated_refresh_token:
+            write_parameter("refresh-token", rotated_refresh_token, "AWS Events API refresh token (30 day TTL)")
+        write_parameter("token-expires-at", str(expires_at_unix), "AWS Events API access token expiry (unix seconds)")
+    except (RuntimeError, subprocess.TimeoutExpired) as write_error:
+        _warn(f"could not store refreshed tokens ({write_error}); using the new access token in memory")
+        if rotated_refresh_token:
+            _warn("WARNING: the refresh token rotated and the new one was not stored; "
+                  "log in to sso (aerospaceug-admin) and run any planner command within the hour")
     return access_token
 
 
 def get_valid_access_token() -> str | None:
-    """Return valid access token, refreshing if needed.
-
-    Returns None if refresh fails or never signed in.
-    """
-    expires_at_str = ssm_get("token-expires-at")
-    if not expires_at_str:
+    """Return a usable access token, refreshing when the stored one is expired; None when sign-in is needed."""
+    expires_at_text = read_parameter("token-expires-at")
+    if not expires_at_text:
+        _warn("no token-expires-at in ssm (never signed in, or ssm unreadable)")
         return None
+    if time.time() + REFRESH_BEFORE_EXPIRY_SECONDS < int(expires_at_text):
+        return read_parameter("access-token")
 
-    expires_at = int(expires_at_str)
-    skew = 60  # refresh 60 seconds before expiry
-
-    if time.time() + skew < expires_at:
-        # access token still valid
-        return ssm_get("access-token")
-
-    # access token expired, try refresh
-    refresh_token = ssm_get("refresh-token")
-    if not refresh_token:
+    stored_refresh_token = read_parameter("refresh-token")
+    if not stored_refresh_token:
+        _warn("no refresh-token in ssm; run bin/awsevents-mcp-login")
         return None
-
     try:
-        resp = refresh_tokens(refresh_token)
-        return store_tokens(resp)
-    except Exception:
-        # refresh failed (expired, revoked, etc.)
+        return store_tokens(exchange_refresh_token(stored_refresh_token))
+    except urllib.error.HTTPError as http_error:
+        # 400 invalid_grant here means the 30-day refresh token is dead: interactive sign-in required
+        _warn(f"token endpoint returned http {http_error.code}; run bin/awsevents-mcp-login")
+        return None
+    except (urllib.error.URLError, ValueError, TimeoutError) as refresh_error:
+        _warn(f"refresh failed: {refresh_error}")
         return None
 
 
 def main() -> int:
-    """Print access token on stdout, or exit 1 if refresh fails."""
-    try:
-        token = get_valid_access_token()
-        if token:
-            print(token)
-            return 0
-        else:
-            print("error: no valid token; run awsevents-mcp-login", file=sys.stderr)
-            return 1
-    except Exception as e:
-        print(f"error: {e}", file=sys.stderr)
-        return 1
+    """Script mode: print the access token on stdout (bridge launcher interface)."""
+    access_token = get_valid_access_token()
+    if access_token:
+        print(access_token)
+        return 0
+    print("error: no valid token; run bin/awsevents-mcp-login", file=sys.stderr)
+    return 1
 
 
 if __name__ == "__main__":

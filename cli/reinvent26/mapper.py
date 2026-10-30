@@ -1,10 +1,25 @@
 """Event map and launch ledger generator.
 
-Reads a catalog JSON (default: cache path, or --catalog), writes
-docs/event-map.md and docs/launch-ledger.md (or --out-dir).
+Reads catalog JSON (default: .cache/reinvent2026/catalog.json or --catalog),
+writes docs/event-map.md and docs/launch-ledger.md (or --out-dir).
 
 Config-driven: topics, anchors, pins, gaps, and exclusions come from
 data/reinvent2026/map-config.json, not code constants.
+
+Inputs:
+    catalog: list of session dicts from events API
+    config: dict with topics, anchors, pins, gaps, exclusions
+
+Outputs:
+    docs/event-map.md: scheduled sessions, excluded sessions, TBD sessions
+    docs/launch-ledger.md: sessions signaling new services/features
+
+Side effects:
+    Writes event-map.md and launch-ledger.md to output directory
+
+Failure modes:
+    FileNotFoundError: catalog or config not found
+    json.JSONDecodeError: malformed JSON input
 """
 
 from __future__ import annotations
@@ -18,6 +33,12 @@ from collections import defaultdict
 from datetime import datetime, timedelta
 
 
+# venue gap configuration (minutes)
+SAME_VENUE_GAP = 0
+NEAR_VENUE_GAP = 30
+FAR_VENUE_GAP = 60
+
+
 def _load_config() -> dict:
     """Load mapping config from data/reinvent2026/map-config.json."""
     here = os.path.dirname(os.path.abspath(__file__))
@@ -28,14 +49,14 @@ def _load_config() -> dict:
 
 
 def _load_favorites(repo_root: str) -> set:
-    """Load favorite codes from data/reinvent2026/favorites.json."""
+    """Load favorite session codes from data/reinvent2026/favorites.json."""
     fav_path = os.path.join(repo_root, "data", "reinvent2026", "favorites.json")
     try:
         with open(fav_path, encoding="utf-8") as fh:
-            d = json.load(fh)
-        items = d if isinstance(d, list) else d.get("sessions", [])
-        return {i.get("code") or i.get("abbreviation") for i in items if isinstance(i, dict)}
-    except Exception:
+            favorites_document = json.load(fh)
+        items = favorites_document if isinstance(favorites_document, list) else favorites_document.get("sessions", [])
+        return {favorite_entry.get("code") or favorite_entry.get("abbreviation") for favorite_entry in items if isinstance(favorite_entry, dict)}
+    except (OSError, ValueError):
         return set()
 
 
@@ -46,19 +67,23 @@ def _load_catalog(path: str) -> list:
 
 
 def _parse(ts: str) -> datetime:
+    """Parse ISO timestamp string to datetime."""
     return datetime.fromisoformat(ts.replace("Z", "+00:00").replace("+00:00", ""))
 
 
-def _text(s: dict) -> str:
-    return (s.get("title", "") + " " + (s.get("abstract") or "")).lower()
+def _text(session: dict) -> str:
+    """Combine title and abstract for pattern matching."""
+    return (session.get("title", "") + " " + (session.get("abstract") or "")).lower()
 
 
-def _services(s: dict) -> str:
-    return " ".join(s.get("services") or []).lower()
+def _services(session: dict) -> str:
+    """Join services list to lowercase string for pattern matching."""
+    return " ".join(session.get("services") or []).lower()
 
 
-def _when(s: dict) -> tuple | None:
-    st = s.get("sessionTime") or {}
+def _when(session: dict) -> tuple | None:
+    """Parse sessionTime to (start, end) datetime tuple or None."""
+    st = session.get("sessionTime") or {}
     if not st.get("date") or not st.get("time"):
         return None
     try:
@@ -70,22 +95,31 @@ def _when(s: dict) -> tuple | None:
 
 
 def _base(code: str) -> str:
+    """Strip -R or -R1 suffix from session code to get base code."""
     return re.sub(r"-R\d*$", "", code or "")
 
 
-def _lvl(s: dict) -> str:
-    return str(s.get("level") or "").split(" ")[0]
+def _lvl(session: dict) -> str:
+    """Extract level string (e.g. '300' from '300 - Intermediate')."""
+    return str(session.get("level") or "").split(" ")[0]
 
 
-def _tag(s: dict, topics: list) -> tuple:
-    """Return (core, rel) topic matches.
+def _tag(session: dict, topics: list) -> tuple:
+    """Return (core, rel) topic matches based on title/abstract patterns.
     
     Core: title match only (for open-weight models to avoid abstract noise)
     Rel: abstract match only (for related topics)
+    
+    Args:
+        session: session dict with title, abstract, services
+        topics: list of topic configs with name, pattern, optional abstract_pattern
+    
+    Returns:
+        (core, rel) tuple of matched topic names
     """
     core, rel = [], []
-    title_lower = s.get("title", "").lower()
-    abstract_lower = (s.get("abstract") or "").lower()
+    title_lower = session.get("title", "").lower()
+    abstract_lower = (session.get("abstract") or "").lower()
     for topic in topics:
         name = topic.get("name", "")
         pattern = topic.get("pattern", "")
@@ -103,43 +137,70 @@ def _tag(s: dict, topics: list) -> tuple:
     return core, rel
 
 
-def _is_anchor(s: dict, config: dict) -> bool:
-    """Check if session is an anchor (topic match or pinned code)."""
+def _is_anchor(session: dict, config: dict) -> bool:
+    """Check if session is an anchor (topic match or pinned code).
+    
+    Anchor sessions get a weight boost of 1e6 and are scheduled first per day.
+    
+    Args:
+        session: session dict with _core, _rel, abbreviation
+        config: config dict with anchors list and pinned set
+    
+    Returns:
+        True if session matches anchor criteria
+    """
     anchors = config.get("anchors", [])
     pinned = set(config.get("pinned", []))
-    core = s.get("_core", [])
-    rel = s.get("_rel", [])
-    code = s.get("abbreviation") or ""
+    core = session.get("_core", [])
+    rel = session.get("_rel", [])
+    code = session.get("abbreviation") or ""
     return bool(
         any(a in core or a in rel for a in anchors) or code in pinned
     )
 
 
-def _is_bedrock_excluded(s: dict, config: dict) -> bool:
-    """Check if session should be excluded due to bedrock."""
+def _is_bedrock_excluded(session: dict, config: dict) -> bool:
+    """Check if session should be excluded due to bedrock keywords.
+    
+    Nova exception: sessions with 'nova' in text are never excluded.
+    
+    Args:
+        session: session dict with title, abstract, services
+        config: config dict with bedrock_excluded, bedrock_keywords, nova_exception
+    
+    Returns:
+        True if session should be excluded
+    """
     if not config.get("bedrock_excluded", True):
         return False
     keywords = config.get("bedrock_keywords", [])
-    title = s.get("title", "").lower()
-    text = _text(s)
-    services_text = _services(s)
+    title = session.get("title", "").lower()
+    text = _text(session)
+    services_text = _services(session)
     # Nova exception: anything with nova is NOT excluded
     if config.get("nova_exception", True) and "nova" in text:
         return False
     return bool(re.search("|".join(keywords), title) or "bedrock" in services_text)
 
 
-def _is_frontier_excluded(s: dict, config: dict) -> tuple:
+def _is_frontier_excluded(session: dict, config: dict) -> tuple:
     """Check if session should be excluded due to frontier/proprietary models.
     
     Returns (is_excluded, reason, abstract_flag).
     reason is 'bedrock' or 'frontier'.
     abstract_flag is True if only abstract matched frontier keywords (for human review).
+    
+    Args:
+        session: session dict with title, abstract
+        config: config dict with frontier_excluded, frontier_title_patterns, frontier_abstract_keywords
+    
+    Returns:
+        (is_excluded, reason, abstract_flag) tuple
     """
     if not config.get("frontier_excluded", True):
         return (False, "", False)
-    title = s.get("title", "").lower()
-    abstract = (s.get("abstract") or "").lower()
+    title = session.get("title", "").lower()
+    abstract = (session.get("abstract") or "").lower()
     title_patterns = config.get("frontier_title_patterns", [])
     abstract_keywords = config.get("frontier_abstract_keywords", [])
     
@@ -156,66 +217,120 @@ def _is_frontier_excluded(s: dict, config: dict) -> tuple:
     return (False, "", False)
 
 
-def _gap_needed(a: dict, b: dict, config: dict) -> int:
-    """Return minimum gap in minutes between two sessions."""
-    same = config.get("same_venue_gap", 0)
-    near = config.get("near_venue_gap", 30)
-    far = config.get("far_venue_gap", 60)
+def _gap_needed(session_a: dict, session_b: dict, config: dict) -> int:
+    """Return minimum gap in minutes between two sessions based on venue distance.
+    
+    Same venue: 0 min
+    Near cluster (Venetian/Wynn/Caesars): 30 min
+    Far (MGM Grand): 60 min
+    
+    Args:
+        session_a: first session dict with venue
+        session_b: second session dict with venue
+        config: config dict with same_venue_gap, near_venue_gap, far_venue_gap, cluster_venues
+    
+    Returns:
+        Minimum gap in minutes
+    """
+    same = config.get("same_venue_gap", SAME_VENUE_GAP)
+    near = config.get("near_venue_gap", NEAR_VENUE_GAP)
+    far = config.get("far_venue_gap", FAR_VENUE_GAP)
     cluster = set(config.get("cluster_venues", []))
-    va, vb = a.get("venue"), b.get("venue")
-    if va == vb:
+    venue_a, venue_b = session_a.get("venue"), session_b.get("venue")
+    if venue_a == venue_b:
         return same
-    if va in cluster and vb in cluster:
+    if venue_a in cluster and venue_b in cluster:
         return near
     return far
 
 
-def _compatible(a: dict, b: dict, config: dict) -> bool:
-    """Check if session b can follow session a with gap rules."""
-    gap = _gap_needed(a, b, config)
-    return b.get("_start", datetime.max) >= a.get("_end", datetime.min) + timedelta(minutes=gap)
+def _compatible(session_a: dict, session_b: dict, config: dict) -> bool:
+    """Check if session_b can follow session_a respecting venue gap rules.
+    
+    Args:
+        session_a: first session dict with _start, _end, venue
+        session_b: second session dict with _start, _end, venue
+        config: config dict with venue gap settings
+    
+    Returns:
+        True if session_b starts after session_a plus required gap
+    """
+    gap = _gap_needed(session_a, session_b, config)
+    return session_b.get("_start", datetime.max) >= session_a.get("_end", datetime.min) + timedelta(minutes=gap)
 
 
-def _weight(s: dict, config: dict) -> float:
-    """Calculate session weight for scheduling."""
-    start = s.get("_start")
-    end = s.get("_end")
-    mins = (end - start).seconds / 60 if start and end else 60.0
+# scheduling weight constants (configurable)
+ANCHOR_BONUS = 1e6
+HELD_SEAT_BONUS_RESERVED_ONLY = 1e6
+OPEN_SEAT_MULTIPLIER = 3.0
+UNKNOWN_SEAT_MULTIPLIER = 2.0
+FAVORITE_MULTIPLIER = 1.5
+FAVORITE_MULTIPLIER_RESERVED_ONLY = 1.2
+ADVANCED_LEVEL_MULTIPLIER = 1.1
+DEFAULT_TOPIC_WEIGHT = 10.0
+RELATED_ONLY_WEIGHT = 3.0
+DEFAULT_FORMAT_WEIGHT = 5.0
+
+# day name abbreviations (reused everywhere the dayname dict is repeated)
+DAY_ABBREVIATIONS = {0: "mon", 1: "tue", 2: "wed", 3: "thu", 4: "fri", 5: "sat", 6: "sun"}
+
+# seat availability patterns
+OPEN_SEATS = {"available", "limited", "veryLimited"}
+
+
+def _weight(session: dict, config: dict) -> float:
+    """Calculate session weight for scheduling in weighted interval scheduling.
+    
+    Weights encode scheduling priority:
+    - reserved seats: +1e6 (fixed points, never churned)
+    - reservable open: 3x base weight (scarcest resource)
+    - reservable unknown: 2x base weight
+    - favorite: 1.5x (1.2x when reserved_only mode)
+    - level 300/400: 1.1x
+    - anchor: +1e6 (scheduled first per day)
+    
+    Args:
+        session: session dict with _start, _end, _core, _fav, isReservable, _seat, _reserved, type, level
+        config: config dict with type_weight, topic_weight, reserved_only
+    
+    Returns:
+        Weight value for scheduling priority
+    """
+    start = session.get("_start")
+    end = session.get("_end")
+    duration_minutes = (end - start).seconds / 60 if start and end else 60.0
     topic_weight = config.get("topic_weight", {})
-    core = s.get("_core", [])
-    fav = s.get("_fav", False)
-    reservable = s.get("isReservable", False)
-    level = _lvl(s)
+    core = session.get("_core", [])
+    is_favorite = session.get("_fav", False)
+    reservable = session.get("isReservable", False)
+    level = _lvl(session)
+    format_weight_by_type = config.get("type_weight", {})
 
-    w = (max(topic_weight.get(t, 10.0) for t in core) if core else 3.0) + mins / 60
-    seat = s.get("_seat")
+    weight = (max(topic_weight.get(t, DEFAULT_TOPIC_WEIGHT) for t in core) if core else RELATED_ONLY_WEIGHT) + duration_minutes / 60
+    seat = session.get("_seat")
     if config.get("reserved_only"):
         # session format leads, topic fit breaks ties, already-held seats are fixed points
-        tw = config.get("type_weight", {})
-        w = tw.get(s.get("type", ""), tw.get("_default", 5.0))
-        w += (max(topic_weight.get(t, 10.0) for t in core) * 0.5) if core else (2.0 if s.get("_rel") else 0.0)
-        w += mins / 120
-        if fav:
-            w *= 1.2
-        if s.get("_reserved"):
-            w += 1e6
-        return w
+        weight = format_weight_by_type.get(session.get("type", ""), DEFAULT_FORMAT_WEIGHT)
+        weight += (max(topic_weight.get(t, DEFAULT_TOPIC_WEIGHT) for t in core) * 0.5) if core else (2.0 if session.get("_rel") else 0.0)
+        weight += duration_minutes / 120
+        if is_favorite:
+            weight *= FAVORITE_MULTIPLIER_RESERVED_ONLY
+        if session.get("_reserved"):
+            weight += HELD_SEAT_BONUS_RESERVED_ONLY
+        return weight
     if reservable and seat in OPEN_SEATS:
-        w *= 3.0  # a reservable seat still open is the scarcest thing in the plan
+        weight *= OPEN_SEAT_MULTIPLIER  # a reservable seat still open is the scarcest thing in the plan
     elif reservable and seat is None:
-        w *= 2.0  # availability unknown: keep the old reservable preference
+        weight *= UNKNOWN_SEAT_MULTIPLIER  # availability unknown: keep the old reservable preference
     # reservable but full: walk-up line only, same value as a walk-up session
-    if fav:
-        w *= 1.5
+    if is_favorite:
+        weight *= FAVORITE_MULTIPLIER
     if level in ("300", "400"):
-        w *= 1.1
+        weight *= ADVANCED_LEVEL_MULTIPLIER
     # Anchor boost so every compatible anchor lands first
-    if _is_anchor(s, config):
-        w += 1e6
-    return w
-
-
-OPEN_SEATS = {"available", "limited", "veryLimited"}
+    if _is_anchor(session, config):
+        weight += ANCHOR_BONUS
+    return weight
 
 
 def _load_seats(repo_root: str) -> dict:
@@ -238,6 +353,28 @@ def _load_reserved(repo_root: str) -> set:
             return set(json.load(fh).get("schedule", {}).get("reserved", []))
     except (OSError, ValueError):
         return set()
+
+
+def _ledger_rows(ledger_sessions: list, signal: str) -> list:
+    """Generate table rows for a ledger signal type."""
+    rows = []
+    for s in ledger_sessions:
+        if s.get("_sig") != signal:
+            continue
+        st = s.get("_start")
+        rows.append("| " + " | ".join([
+            s.get("abbreviation", ""),
+            f"{DAY_ABBREVIATIONS.get(st.weekday(), 'tbd')} {st:%m-%d}" if st else "tbd",
+            f"{st:%H:%M}" if st else "tbd",
+            s.get("venue") or "tbd",
+            s.get("type", ""),
+            signal,
+            s.get("_kw", ""),
+            ", ".join(s.get("services") or [])[:120].replace("|", "/"),
+            (s.get("title") or "").replace("|", "/"),
+            "",
+        ]) + " |")
+    return rows
 
 
 def _build_map(catalog: list, config: dict, repo_root: str) -> tuple:
@@ -375,7 +512,7 @@ def _build_map(catalog: list, config: dict, repo_root: str) -> tuple:
 
 def _row(s: dict, config: dict, extra: str = "", dayname: dict | None = None, show_real_time: bool = False) -> str:
     """Format a session row for markdown table."""
-    st = s.get("_start")
+    session_start = s.get("_start")
     end = s.get("_end")
     
     # Use catalog times for excluded/tbd sessions (show_real_time=True)
@@ -389,9 +526,9 @@ def _row(s: dict, config: dict, extra: str = "", dayname: dict | None = None, sh
         else:
             d = "tbd"
             t = "tbd"
-    elif st:
-        d = f"{dayname.get(st.weekday(), 'tbd')} {st:%m-%d}" if st else "tbd"
-        t = f"{st:%H:%M}-{end:%H:%M}" if st and end else "tbd"
+    elif session_start:
+        d = f"{dayname.get(session_start.weekday(), 'tbd')} {session_start:%m-%d}" if session_start else "tbd"
+        t = f"{session_start:%H:%M}-{end:%H:%M}" if session_start and end else "tbd"
     else:
         d = "tbd"
         t = "tbd"
@@ -412,9 +549,9 @@ def _row(s: dict, config: dict, extra: str = "", dayname: dict | None = None, sh
     elif s.get("isReservable") and s.get("_seat"):
         seat = {"available": "reserve (open)", "limited": "reserve (limited)", "veryLimited": "reserve (very limited)",
                 "unavailable": "full, walk-up line", "walkUp": "walk-up"}.get(s["_seat"], seat)
-    if st and _is_anchor(s, config):
+    if session_start and _is_anchor(s, config):
         seat = "ANCHOR, " + seat
-    cols = [
+    table_columns = [
         s.get("abbreviation", ""),
         d,
         t,
@@ -427,10 +564,10 @@ def _row(s: dict, config: dict, extra: str = "", dayname: dict | None = None, sh
     ]
     # Add frontier abstract flag column if present
     if s.get("_frontier_abstract"):
-        cols.append("frontier abstract")
+        table_columns.append("frontier abstract")
     if extra:
-        cols.append(extra)
-    return "| " + " | ".join(cols) + " |"
+        table_columns.append(extra)
+    return "| " + " | ".join(table_columns) + " |"
 
 
 def _write_event_map(chosen: list, excluded: list, tbd: list, pool: list,

@@ -137,7 +137,26 @@ python -m reinvent26 unblock <eventId> <blockId>
 
 # reserve (api opens 8 Oct 2026; 409 before then)
 python -m reinvent26 reserve <eventId> <id1,id2>
+
+# curated catalogs: plan from data/reinvent2026 instead of the live pull
+python -m reinvent26 ingest <eventId>
+python -m reinvent26 shortlist <eventId> --curated --topics agents --top 20
+
+# seat-aware booking: fill free windows with open reserved seats (by hand)
+python -m reinvent26 fill --dry-run
+python -m reinvent26 fill
+
+# rebalance: re-plan the week, swap toward more reserved events
+python -m reinvent26 fill --rebalance --dry-run
+
+# event map plus launch ledger, full-but-interesting page
+python -m reinvent26 map
+python -m reinvent26 interest
 ```
+
+The full MCP approach walkthrough — sign-in, call order, seat-aware
+planning, plus the live schedule and open windows — lives in
+`docs/mcp-approach.md`.
 
 ## catalog cache plus rust pre-filter
 

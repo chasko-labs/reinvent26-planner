@@ -30,7 +30,9 @@ python3 -m reinvent26 fill              # book
 
 typical run on 2026-10-29: 100 fitting candidates checked in about 20 s
 
-## run daily (systemd user timer on rocm-aibox)
+## run daily (optional, for other attendees)
+
+reference setup for readers who want automation. it is not installed on the author's machine. the author runs fill by hand
 
 ```
 # ~/.config/systemd/user/reinvent26-fill.service

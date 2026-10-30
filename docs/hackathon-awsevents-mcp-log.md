@@ -146,4 +146,21 @@ done 2026-10-29 20:25 utc via the ssh tunnel (see entries below). this section o
   - SEC318-R1 (cryptographic computing, homomorphic encryption, tue 15:00-17:00 wynn, limited) replaced IND322-R + IND3304-R1
   - pattern: re-check the seat live, cancel, book, rebook the originals on failure. cancel returned true and booking succeeded both times
 - schedule now: 13 reserved, 8 of them workshops. live fill pass after the swaps: 0 open
-- daily run instructions (systemd user timer and cron): docs/daily-fill.md. caveat: an unattended run needs a non-sso writer role for the ssm token store
+- daily-run reference (systemd user timer and cron) for other attendees: docs/daily-fill.md. not installed on bryan's host by his choice; he runs fill by hand
+
+## 2026-10-29 book solid: week checks, re-sweep, rebalance, full-but-interesting
+
+- checked the edges before ruling them out:
+  - saturday 12-05 has no sessions
+  - sunday 11-29 has 5 all-day non-reservable items: merch store, kiro galaxy run, datadog observaball, two event-service rooms
+  - none of the 84 all-day or no-venue sessions is reservable
+  - bookable days: mon to fri
+- fresh full re-sweep of 1484 reservable sessions (10 chunks of about 55 s, no errors): 1425 unavailable, 32 veryLimited, 21 limited, 6 available
+- `fill --rebalance` re-plans the week over held seats plus open seats, then swaps toward the target. it re-checks each seat live, cancels conflicts, books, and rebooks the originals on failure
+- objective, first try: maximize reserved minutes. it wanted to trade CMP340 + AIM318 for a 4 h bootcamp, and SEC318-R1 for exam prep. 13 sessions would become 12, and formats outside bryan's ranking would come in. not run
+- objective, second try: sessions first, then minutes, then format. it wanted to undo the workshop swaps (two chalk talks per window, same minutes). kept the workshops: same reserved time, no 30-minute hole, and workshops rank first
+- every other open seat in the conference conflicts with a held seat. 13 reserved is the ceiling at current availability
+- full but interesting (`python3 -m reinvent26 interest` -> docs/full-but-interesting.md):
+  - 244 topic sessions without an open seat, each with presenters
+  - 72 flagged for youtube after the event (breakouts, lightning talks, keynotes). chalk talks and workshops are not recorded
+  - 354 presenters listed, sorted by session count, for following on social

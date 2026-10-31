@@ -83,16 +83,17 @@ seat-aware planning (`seats.py`, `mapper.py`, `fill.py`):
   toward the plan (re-check live, cancel conflicts, book, rebook originals
   on failure). nothing here runs on a timer; every run is by hand.
 
-## live state: 13 reserved (2026-10-30)
+## live state: 14 reserved (2026-10-30)
 
 - mon mgm, all four back to back at one venue
   - 08:30 STG363 chalk: modernizing vmware with fsx for netapp ontap
   - 11:30 INV530-R1 chalk: ec2 at 20, rebuilding the control plane live
   - 13:00 CMP340 chalk: drug discovery with braket and q-ctrl
   - 15:00 AIM318 workshop (2h): resilient vlm training on hyperpod
-- tue wynn
+- tue wynn plus caesars forum
   - 12:00 IND359-R1 chalk: in-country hpc seismic data on aws brazil
-  - 15:00 SEC318-R1 workshop (2h): homomorphic encryption in practice
+  - 15:00 IND322-R chalk: physical ai in telecom workload placement
+  - 16:30 IND3304-R1 chalk: knfsd file cache, nfs storage into cloud
 - wed mgm plus caesars forum
   - 08:00 ANT402-R workshop (2h): redshift data sharing
   - 13:30 INV537 chalk: safe physical interaction without torque sensors
@@ -115,18 +116,20 @@ every fitting session below was live-checked the same day; all seats read
 | Mon 14:00-15:00 | MGM CMP340 → MGM AIM318     | none scheduled        |
 | Mon 17:00-18:00 | MGM AIM318 → end            | none scheduled        |
 | Tue 08:00-12:00 | start → Wynn IND359         | 2 sessions, both full |
-| Tue 13:00-15:00 | Wynn IND359 → Wynn SEC318   | 11 sessions, all full |
-| Tue 17:00-18:00 | Wynn SEC318 → end           | none scheduled        |
+| Tue 13:00-15:00 | Wynn IND359 → Forum IND322  | 11 sessions, all full |
 | Wed 10:00-13:30 | MGM ANT402 → Forum INV537   | 45 sessions, all full |
 | Wed 14:30-15:30 | Forum INV537 → MGM AIM434   | 24 exist, gap-killed  |
 | Thu 10:00-12:00 | MGM STG412 → Wynn SEC401    | 10 sessions, all full |
 | Thu 14:00-15:30 | Wynn SEC401 → Palace MAM416 | 2 sessions, both full |
 | Fri 10:00-18:00 | Wynn BIZ321 → end           | 15 sessions, all full |
 
-beyond these windows, 48 seats conference-wide still read open but every
-one clashes with a held seat, repeats one, or is subject-excluded — so 13
-is the no-cancel ceiling. past it lies swaps (`fill --rebalance`), which
-cancel first and therefore stay a deliberate reviewed step.
+beyond these windows, a fresh sweep on 2026-10-30 found 43 open seats
+conference-wide (was 59 that morning; seats are tightening), and every
+one clashes with a held seat, repeats one, or is subject-excluded — so
+13 was the no-cancel ceiling. the sprint then traded one held workshop
+for two chalk talks (sec318-r1 -> ind322-r + ind3304-r1, tue), moving the
+line to 14 seats at the same 1260 minutes. past it lies more swaps
+(`fill --rebalance`), which cancel first and stay dry-run-first.
 
 ## further reading
 

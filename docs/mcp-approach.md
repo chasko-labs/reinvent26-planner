@@ -19,21 +19,15 @@ the rulebook both sides follow.
 
 ## sign-in from a headless host
 
-`rocm-aibox` has no browser, and the events oauth endpoint has no device
-grant, so sign-in rides an ssh tunnel from the browser machine:
+the events oauth endpoint uses a loopback redirect, so headless sign-in requires forwarding the callback port from a machine with a browser:
 
-1. on the mac: `ssh -L 8484:localhost:8484 rocm-aibox`
-2. on the host: `bin/awsevents-mcp-login` prints the authorize url and
+1. on a machine with a browser: `ssh -L 8484:localhost:8484 <headless-host>`
+2. on the host: `python3 -m reinvent26 login` prints the authorize url and
    listens on `127.0.0.1:8484`
-3. sign in with builder id in the mac browser; the callback tunnels back
-4. tokens land in ssm parameter store
-   (`/heraldstack/shared/awsevents/*`, account 211125425201), never in files
+3. sign in with builder id in the browser on the first machine; the callback tunnels back
+4. tokens land in the OS keychain or `~/.config/reinvent26/tokens.json`
 
-`bin/awsevents-mcp-refresh` serves tokens to both surfaces: reads try the
-sso profile then fall back to the roles-anywhere `ops-reader` profile, and
-a write failure still returns the fresh access token in memory for that
-run. the mcp bridge (`awsevents-bridge.sh` via supergateway) fetches a
-token from ssm per invocation and refreshes silently on expiry.
+the auth module (`cli/reinvent26/auth.py`) handles pkce s256 and token storage. tokens are never written to files outside the config directory.
 
 ## the mcp walkthrough, in call order
 
@@ -57,14 +51,14 @@ token from ssm per invocation and refreshes silently on expiry.
 
 ```
 cd cli
-python -m reinvent26 login
-python -m reinvent26 sessions reinvent2026            # full pull, cached
-python -m reinvent26 shortlist reinvent2026 --topics agents,mcp --level 3 --top 20
-python -m reinvent26 schedule reinvent2026            # clashes included
-python -m reinvent26 slots reinvent2026 --window 2026-12-01T13:00:00,2026-12-01T16:00:00
-python -m reinvent26 map                              # docs/event-map.md + launch ledger
-python -m reinvent26 fill --dry-run                   # what fits, books nothing
-python -m reinvent26 fill                             # book open seats, single pass
+python3 -m reinvent26 login
+python3 -m reinvent26 sessions reinvent2026            # full pull, cached
+python3 -m reinvent26 shortlist reinvent2026 --topics agents,mcp --level 3 --top 20
+python3 -m reinvent26 schedule reinvent2026            # clashes included
+python3 -m reinvent26 slots reinvent2026 --window 2026-12-01T13:00:00,2026-12-01T16:00:00
+python3 -m reinvent26 map                              # docs/event-map.md + launch ledger
+python3 -m reinvent26 fill --dry-run                   # what fits, books nothing
+python3 -m reinvent26 fill                             # book open seats, single pass
 ```
 
 seat-aware planning (`seats.py`, `mapper.py`, `fill.py`):

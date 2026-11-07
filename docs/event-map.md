@@ -40,7 +40,7 @@ self-managed agents, amazon braket, databricks, lambda microvms + web functions,
 
 ## build order
 
-- step 1: pin every amazon leo session as an anchor (marked ANCHOR in the seat column), plus bryan-approved pins
+- step 1: pin every amazon leo session as an anchor (marked ANCHOR in the seat column), plus configured pins
 - step 2: fill open time around the anchors, ranked by topic weight
 
 ## anchors

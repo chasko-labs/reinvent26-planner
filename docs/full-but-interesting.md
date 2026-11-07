@@ -240,7 +240,7 @@ sessions: 244, presenters: 354
 
 | code      | day   | time  | venue          | type              | status       | after the event | presenters                                                                                | title                                                                               |
 | --------- | ----- | ----- | -------------- | ----------------- | ------------ | --------------- | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| AIM401-R  | 11-30 | 08:30 | MGM Grand      | Builders' session | full         | not recorded    | Arron Bailiss, Patrick Gray, Gautam Sirdeshmukh, Rachit Mehta, Bryan Lu                   | Agents that train themselves: autonomous reinforcement learning on AWS              |
+| AIM401-R  | 11-30 | 08:30 | MGM Grand      | Builders' session | full         | not recorded    | Arron Bailiss, Patrick Gray, Gautam Sirdeshmukh, Rachit Mehta,                   | Agents that train themselves: autonomous reinforcement learning on AWS              |
 | AMZ202-R  | 11-30 | 08:30 | Caesars Forum  | Workshop          | full         | not recorded    | Kourtney Meiss, Emerson Sklar                                                             | Turn a Bee wearable into your re:Invent notetaking companion                        |
 | AIM346-R  | 11-30 | 10:00 | MGM Grand      | Chalk talk        | full         | not recorded    | Alex Iankoulski, Aniruddha Deodhar                                                        | Deploy, scale, and tune AI model serving with self-managed agents                   |
 | OPN408    | 11-30 | 10:00 | Wynn/Encore    | Code talk         | full         | not recorded    | Madhukiran J, Saurav Mohanty                                                              | Connect agents across frameworks live using the A2A open protocol                   |
@@ -264,7 +264,7 @@ sessions: 244, presenters: 354
 | OPN307-R  | 12-02 | 12:30 | Caesars Forum  | Workshop          | full         | not recorded    | Daniel Lorch, Arun Kumar Selvaraj                                                         | Build multi-agent workflows with Strands Agents SDK on AWS                          |
 | ANT419-R1 | 12-02 | 12:30 | Wynn/Encore    | Workshop          | full         | not recorded    | Austin Groeneveld, Swapna Bandla                                                          | Power streaming analytics on AWS with AI-driven insights                            |
 | AIM407-R1 | 12-02 | 13:30 | MGM Grand      | Builders' session | full         | not recorded    | Albert Zhao, Elizabeth Fuentes Leone, Joy Chakraborty, Nicholas Clegg, Jonathan Segev     | Build a production multi-Agent Systems with Strands                                 |
-| AIM401-R1 | 12-02 | 13:30 | Wynn/Encore    | Builders' session | full         | not recorded    | Arron Bailiss, Patrick Gray, Gautam Sirdeshmukh, Rachit Mehta, Bryan Lu                   | Agents that train themselves: autonomous reinforcement learning on AWS              |
+| AIM401-R1 | 12-02 | 13:30 | Wynn/Encore    | Builders' session | full         | not recorded    | Arron Bailiss, Patrick Gray, Gautam Sirdeshmukh, Rachit Mehta,                   | Agents that train themselves: autonomous reinforcement learning on AWS              |
 | AIM346-R1 | 12-02 | 14:30 | Wynn/Encore    | Chalk talk        | full         | not recorded    | Alex Iankoulski, Aniruddha Deodhar                                                        | Deploy, scale, and tune AI model serving with self-managed agents                   |
 | AIM446-R1 | 12-02 | 14:30 | Wynn/Encore    | Code talk         | full         | not recorded    | Po-Shin Chen, Jonathan Buck                                                               | Beyond Prompt Engineering: Optimize the Agent Harness                               |
 | CON402-R1 | 12-02 | 16:00 | Caesars Palace | Chalk talk        | full         | not recorded    | Sebastien Allamand, Alessandro Germer                                                     | Amazon EKS: Infrastructure as code, GitOps, or CI/CD                                |
@@ -349,7 +349,7 @@ names as listed in the catalog. sessions per presenter in the right column
 | Ayush Kulkarni               | SVS208, SVS307                                   |
 | Bashir Mohammed, PhD         | AIM304-R, AIM304-R1                              |
 | Benchen Huang                | CMP348-R, CMP348-R1                              |
-| Bryan Lu                     | AIM401-R, AIM401-R1                              |
+|                     | AIM401-R, AIM401-R1                              |
 | Chad Lingmann                | IND316-R, IND316-R1                              |
 | Chetan Suri                  | COP405-R, COP405-R1                              |
 | Chintan Gandhi               | BIZ201-R, BIZ201-R1                              |

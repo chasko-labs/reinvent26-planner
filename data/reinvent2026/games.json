@@ -21,7 +21,7 @@
     "endTime": "2026-12-02T17:30:00",
     "venue": "MGM Grand",
     "sponsored": false,
-    "abstract": "Experience the ultimate AI showdown as fifty finalists from the AWS AI League season battle head-to-head in real time for the $50,000 championship prize. Insights into agent orchestration, model customization, and multi-agent coordination at scale, as five-versus-five AI agent squads face off live in Agentic Football, built on Amazon Bedrock AgentCore and the Strands Agents SDK. video-games lens: agentic gameplay; ai lens: multi-agent coordination.",
+    "abstract": "Experience the ultimate AI showdown as fifty finalists from the AWS AI League season battle head-to-head in real time for the $50,000 championship prize. Insights into agent orchestration, model customization, and multi-agent coordination at scale, as five-versus-five AI agent squads face off live in Agentic Football, built on Amazon Bedrock AgentCore and the Strands Agents SDK.",
     "source": "paste-2026-games"
   },
   {
@@ -48,7 +48,7 @@
     "endTime": null,
     "venue": null,
     "sponsored": false,
-    "abstract": "Coordinating agents is where multi-agent systems break: they duplicate work, drop handoffs, burn tokens. Build and deploy five autonomous agents on Amazon Bedrock AgentCore using Kiro and the Strands Agents SDK, then field them five versus five in live Agentic Football matches. Write the tools your agents call, orchestrate multi-turn reasoning across a maze-like arena, solve coordination problems that decide the match. Tune prompts, roles, and tactics between rounds. video-games + favorites lens: hands-on multi-agent coordination built with Kiro, the exact haunting dispatch problem in game form.",
+    "abstract": "Coordinating agents is where multi-agent systems break: they duplicate work, drop handoffs, burn tokens. Build and deploy five autonomous agents on Amazon Bedrock AgentCore using Kiro and the Strands Agents SDK, then field them five versus five in live Agentic Football matches. Write the tools your agents call, orchestrate multi-turn reasoning across a maze-like arena, solve coordination problems that decide the match. Tune prompts, roles, and tactics between rounds. video-games +",
     "source": "paste-2026-games"
   }
 ]

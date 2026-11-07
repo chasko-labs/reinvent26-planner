@@ -12,11 +12,12 @@ from reinvent26 import mapper
 
 
 def test_venue_gap_compatibility() -> None:
-    """Test venue gap rules: same venue 0 min, cluster 30 min, mgm 60 min.
+    """Test venue gap rules: same venue 0 min, cluster 45 min, mgm 60 min.
     
     The gap rule ensures sessions at different venues have adequate time to
-    travel between them. Venetian/Wynn/Caesars form a cluster (30 min gap)
-    while MGM Grand requires 60 min due to distance.
+    travel between them. Venetian/Wynn/Caesars form a cluster (45 min gap,
+    covering shuttle wait plus entry lines) while MGM Grand
+    requires 60 min due to distance.
     """
     config = {
         "same_venue_gap": 0,
@@ -411,3 +412,20 @@ def test_main_works_with_explicit_out_dir(tmp_path) -> None:
     # Output files should exist
     assert (out_dir / "event-map.md").exists()
     assert (out_dir / "launch-ledger.md").exists()
+
+
+def test_launch_signals_title_beats_abstract_and_sorts_first() -> None:
+    """Title matches are strong signals and sort before abstract-only matches."""
+    catalog = [
+        {"abbreviation": "ABSTRACT-ONLY", "title": "Storage deep dive",
+         "abstract": "new capabilities in the engine",
+         "sessionTime": {"date": "2026-12-01", "time": "10:00", "length": 60}},
+        {"abbreviation": "PLAIN", "title": "Storage deep dive",
+         "abstract": "tuning and best practices"},
+        {"abbreviation": "TITLE-HIT", "title": "What's new with Amazon S3",
+         "sessionTime": {"date": "2026-12-01", "time": "11:00", "length": 60}},
+    ]
+    signals = mapper.launch_signals(catalog)
+    assert [s["abbreviation"] for s in signals] == ["TITLE-HIT", "ABSTRACT-ONLY"]
+    assert signals[0]["_sig"] == "title"
+    assert signals[1]["_sig"] == "abstract"

@@ -194,6 +194,22 @@ def iter_sessions(
             return
 
 
+def get_event(event_id: str, token: str | None = None) -> dict:
+    """One event by id: name, timezone, dates. Unwraps the envelope."""
+    out = read_with_retry(
+        _request,
+        "GET",
+        f"/v1/events/{event_id}",
+        token=token,
+    )
+    if isinstance(out, dict):
+        for key in ("event", "item", "data"):
+            if isinstance(out.get(key), dict):
+                return out[key]
+        return out
+    return {}
+
+
 def get_session(event_id: str, session_id: str, token: str | None = None) -> dict:
     return read_with_retry(
         _request,

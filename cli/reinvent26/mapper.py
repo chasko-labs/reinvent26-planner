@@ -35,7 +35,7 @@ from datetime import datetime, timedelta
 
 # venue gap configuration (minutes)
 SAME_VENUE_GAP = 0
-NEAR_VENUE_GAP = 30
+NEAR_VENUE_GAP = 45
 FAR_VENUE_GAP = 60
 
 
@@ -221,7 +221,8 @@ def _gap_needed(session_a: dict, session_b: dict, config: dict) -> int:
     """Return minimum gap in minutes between two sessions based on venue distance.
     
     Same venue: 0 min
-    Near cluster (Venetian/Wynn/Caesars): 30 min
+    Near cluster (Venetian/Wynn/Caesars): 45 min (shuttle wait plus
+    entry lines)
     Far (MGM Grand): 60 min
     
     Args:
@@ -583,7 +584,7 @@ def _write_event_map(chosen: list, excluded: list, tbd: list, pool: list,
               "coordination page for the hackathon team. built from the live events api catalog, pulled at build time. regenerate by re-pulling the catalog; session times and rooms move until the event",
               "", "## ground rules", "",
               "- home base: venetian",
-              "- strip cluster: venetian, wynn/encore, caesars palace, caesars forum. 30 minutes between venues inside the cluster",
+              "- strip cluster: venetian, wynn/encore, caesars palace, caesars forum. 45 minutes between venues inside the cluster",
               "- assumption: caesars forum treated as part of the cluster (behind the linq, walkable from caesars palace). flag if that is wrong",
               "- mgm grand sits at the south end of the strip. planner wants 60+ minutes to cross between mgm and the cluster, so mgm sessions group into mgm blocks",
               "- priority: reserved seats wall to wall. reservable sessions weigh 2x walk-ups, title matches weigh 1.4x abstract-only matches, favorites 1.5x, 300/400 level 1.1x",
@@ -609,7 +610,7 @@ def _write_event_map(chosen: list, excluded: list, tbd: list, pool: list,
               "", "## topics tracked", "",
               ", ".join(t.get("name", "") for t in config.get("topics", [])),
               "", "## build order", "",
-              "- step 1: pin every amazon leo session as an anchor (marked ANCHOR in the seat column), plus bryan-approved pins",
+              "- step 1: pin every amazon leo session as an anchor (marked ANCHOR in the seat column), plus configured pins",
               "- step 2: fill open time around the anchors, ranked by topic weight",
               "", "## anchors", "", "| code | day | time | venue | type | level | seat | topics | title |",
               "| --- | --- | --- | --- | --- | --- | --- | --- | --- |"]
@@ -680,13 +681,20 @@ def _write_event_map(chosen: list, excluded: list, tbd: list, pool: list,
         fh.write("\n".join(lines))
 
 
-def _write_launch_ledger(catalog: list, out_dir: str) -> None:
-    """Write docs/launch-ledger.md."""
+def launch_signals(catalog: list) -> list:
+    """Sessions whose title (strong) or abstract (weak) signals a launch.
+
+    Pure: returns session copies with _sig ("title"/"abstract"), _kw,
+    _start/_end attached, title signals first. Backs the launch ledger
+    and the new-session watcher.
+    """
     NEW = r"\bnew\b|newly|launch|introduc|announc|what's new|preview|now available|just released|first look|latest|next-generation|next generation"
     NEW_A = r"newly launched|recently launched|just launched|new capabilit\w*|new features?|new services?|announc\w*|introduc\w*|preview|now available|what's new|generally available"
 
     led = []
     for s in catalog:
+        if not isinstance(s, dict):
+            continue
         title = s.get("title", "")
         abstract = s.get("abstract") or ""
         m_t = re.findall(NEW, title.lower().replace("launchdarkly", ""))
@@ -710,6 +718,12 @@ def _write_launch_ledger(catalog: list, out_dir: str) -> None:
         led.append(s2)
 
     led.sort(key=lambda x: (x.get("_sig") != "title", x.get("_start") or datetime.max))
+    return led
+
+
+def _write_launch_ledger(catalog: list, out_dir: str) -> None:
+    """Write docs/launch-ledger.md."""
+    led = launch_signals(catalog)
 
     dayname = {0: "mon", 1: "tue", 2: "wed", 3: "thu", 4: "fri", 5: "sat", 6: "sun"}
 
@@ -794,7 +808,7 @@ def main(argv=None) -> None:
         elif os.path.exists(sess_path):
             args.catalog = sess_path
         else:
-            print(f"error: catalog not found at {cat_path} or {sess_path}; run 'python -m reinvent26 sessions reinvent2026' first", file=sys.stderr)
+            print(f"error: catalog not found at {cat_path} or {sess_path}; run 'python3 -m reinvent26 sessions reinvent2026' first", file=sys.stderr)
             print(f"note: catalog persists in project at .cache/reinvent2026/catalog.json; tests never write catalog", file=sys.stderr)
             raise SystemExit(2)
 

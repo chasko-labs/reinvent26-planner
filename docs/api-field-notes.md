@@ -70,7 +70,7 @@ for code in pool_codes:
 token handling: the access token lives 60 minutes, so read it through the refresh helper every time
 
 ```python
-tok = refresh_helper.get_valid_access_token()  # reads ssm, refreshes when expired, rotates and stores
+tok = reinvent26.auth.stored_access_token()  # reads stored token, refreshes when expired
 ```
 
 ## enums worth knowing
@@ -96,7 +96,7 @@ tok = refresh_helper.get_valid_access_token()  # reads ssm, refreshes when expir
 | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
 | seats go fast                     | on 2026-10-29 all 16 reservable sessions in the first plan returned `sessionFull`. a full sweep of 1484 reservable sessions found 61 with seats (24 workshops, 26 chalk talks, 0 breakouts) | reserved-only mode on the sweep; booked 15 seats, all confirmed                                                                        |
 | verify before long runs           | a long sweep started without checking the token or timing a sample                                                                                                                          | pre-flight: decode the token, read the schedule, time a 24-session probe, then sweep in persisted, resumable chunks with hard timeouts |
-| silent refresh failure            | refresh got a new token from oauth, then the ssm write failed under a read-only profile. the helper returned None, so the next call went out without a token: 401 "Sign in to continue"     | dedicated profile variable, and surface the store error instead of swallowing it                                                       |
+| silent refresh failure            | refresh got a new token from oauth, then persisting the rotated token failed. the helper returned None, so the next call went out without a token: 401 "Sign in to continue"     | dedicated profile variable, and surface the store error instead of swallowing it
 | first bulk batch failed           | the first favorites batch of 10 came back all `other`. an identical retry succeeded                                                                                                         | retry `other` once, then confirm via schedule                                                                                          |
 | list vs get fields differ         | `seatAvailability` appears only on GetSession                                                                                                                                               | per-session fetch for the shortlist                                                                                                    |
 | sequential gets are slow          | 252 GetSession calls took 666 s                                                                                                                                                             | next: bounded concurrency with 429-aware backoff; check docs quotas first                                                              |

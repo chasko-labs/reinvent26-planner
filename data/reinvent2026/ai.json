@@ -80,7 +80,7 @@
     "endTime": "2026-12-01T15:30:00",
     "venue": "MGM Grand",
     "sponsored": true,
-    "abstract": "Enterprises are waking up to a hard truth: the AI their business depends on runs on infrastructure, models, and pricing they don't control. Boomi shows AI agents that run anywhere you choose (your Amazon VPC, data center, behind your firewall) powered by small language models fine-tuned to each agent's job and served on infrastructure you govern. Full architecture on AWS: Amazon EKS, EC2 GPU instances, Amazon S3, Aurora, MSK, and Amazon Bedrock as a governed escalation path, plus the fine-tuning pipeline (LoRA SFT + DPO), the evaluation gate deciding when a small model is ready, and a live demo of an agent reasoning locally at a fraction of frontier-LLM latency and cost. ai lens: local/self-hosted SLM, the on-host-inference territory.",
+    "abstract": "Enterprises are waking up to a hard truth: the AI their business depends on runs on infrastructure, models, and pricing they don't control. Boomi shows AI agents that run anywhere you choose (your Amazon VPC, data center, behind your firewall) powered by small language models fine-tuned to each agent's job and served on infrastructure you govern. Full architecture on AWS: Amazon EKS, EC2 GPU instances, Amazon S3, Aurora, MSK, and Amazon Bedrock as a governed escalation path, plus the fine-tuning pipeline (LoRA SFT + DPO), the evaluation gate deciding when a small model is ready, and a live demo of an agent reasoning locally at a fraction of frontier-LLM latency and cost.",
     "source": "paste-2026-ai"
   },
   {
@@ -105,7 +105,7 @@
     "endTime": "2026-11-30T16:00:00",
     "venue": "Caesars Palace",
     "sponsored": false,
-    "abstract": "Deploying AI voice agents beyond English introduces unique challenges: accent handling, language detection, code-switching mid-conversation, and cultural nuances in conversation flow. Architecture patterns for building multilingual voice agents using Amazon Connect Agentic Voice. Real-world scenarios from Spanish/English coexistence, German with regional dialects, and Italian conversational AI. When speech-to-speech models work natively, when to fall back to TTS pipelines, how to handle polyglot non-native accents, knowledge base localization. ai lens: directly relevant to EN/ES transcription and multilingual caption work.",
+    "abstract": "Deploying AI voice agents beyond English introduces unique challenges: accent handling, language detection, code-switching mid-conversation, and cultural nuances in conversation flow. Architecture patterns for building multilingual voice agents using Amazon Connect Agentic Voice. Real-world scenarios from Spanish/English coexistence, German with regional dialects, and Italian conversational AI. When speech-to-speech models work natively, when to fall back to TTS pipelines, how to handle polyglot non-native accents, knowledge base localization.",
     "source": "paste-2026-ai"
   },
   {

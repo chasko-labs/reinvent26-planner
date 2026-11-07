@@ -1,6 +1,6 @@
 """Blog-aware topic seeds for the shortlist command.
 
-Derives default shortlist keywords from bryan's writing beats
+Derives default shortlist keywords from writing beats
 (~/writing posts under articles/aws/blog/conference) by unigram frequency,
 so a bare `shortlist` reflects his topics without typing. Explicit
 --topics always overrides. Stdlib only.

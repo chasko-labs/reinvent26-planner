@@ -22,7 +22,7 @@
     "endTime": "2026-12-03T10:30:00",
     "venue": "MGM Grand",
     "sponsored": false,
-    "abstract": "As organizations use agentic AI to automate complex infrastructure operations, many face constraints around data residency, low latency, and security that prevent reliance on cloud-hosted AI services alone. Deploy self-managed agentic AI at the hybrid edge: provision, configure, and optimize AI agents across AWS Outposts and AWS Local Zones. Architect and operate agents that run locally, satisfying data sovereignty, latency, and security mandates. self-managed-agents lens: the definitional session, agents on infrastructure you control.",
+    "abstract": "As organizations use agentic AI to automate complex infrastructure operations, many face constraints around data residency, low latency, and security that prevent reliance on cloud-hosted AI services alone. Deploy self-managed agentic AI at the hybrid edge: provision, configure, and optimize AI agents across AWS Outposts and AWS Local Zones. Architect and operate agents that run locally, satisfying data sovereignty, latency, and security mandates.",
     "source": "paste-2026-self-managed"
   },
   {
@@ -74,7 +74,7 @@
     "endTime": "2026-12-03T11:00:00",
     "venue": "Venetian",
     "sponsored": false,
-    "abstract": "Enterprises running AI agents across multiple clouds face fragmented model access, inconsistent pricing, and vendor lock-in. Open-source frameworks like LiteLLM provide a unified interface to orchestrate LLMs across Amazon Bedrock, Azure OpenAI, and Google Vertex AI based on use-case and token economics. How Emirates built a multi-cloud agent architecture using LiteLLM as the routing layer with Bedrock as the primary backbone: cost-based routing, fallback strategies, model selection by capability, unified observability. self-managed-agents lens: self-hosted LiteLLM routing, the gander/openrouter pattern.",
+    "abstract": "Enterprises running AI agents across multiple clouds face fragmented model access, inconsistent pricing, and vendor lock-in. Open-source frameworks like LiteLLM provide a unified interface to orchestrate LLMs across Amazon Bedrock, Azure OpenAI, and Google Vertex AI based on use-case and token economics. How Emirates built a multi-cloud agent architecture using LiteLLM as the routing layer with Bedrock as the primary backbone: cost-based routing, fallback strategies, model selection by capability, unified observability.",
     "source": "paste-2026-self-managed"
   },
   {
@@ -101,7 +101,7 @@
     "endTime": "2026-12-03T16:00:00",
     "venue": "Caesars Forum",
     "sponsored": false,
-    "abstract": "AWS and Hugging Face collaborate on open source Deep Learning Containers, optimized inference frameworks, and Neuron integrations that make deploying community models production-ready. The open source stack from Transformers optimizations for Graviton and Trainium to TGI container contributions enables serving Hugging Face models at 50% lower cost. Deployment patterns for enterprises running open weight LLMs at millions of requests per day. self-managed-agents lens: self-hosted open-weight LLM serving.",
+    "abstract": "AWS and Hugging Face collaborate on open source Deep Learning Containers, optimized inference frameworks, and Neuron integrations that make deploying community models production-ready. The open source stack from Transformers optimizations for Graviton and Trainium to TGI container contributions enables serving Hugging Face models at 50% lower cost. Deployment patterns for enterprises running open weight LLMs at millions of requests per day.",
     "source": "paste-2026-self-managed"
   },
   {
@@ -129,7 +129,7 @@
     "endTime": "2026-12-03T16:00:00",
     "venue": "Caesars Forum",
     "sponsored": false,
-    "abstract": "As enterprises onboard AI assets (MCP servers, Agents, Skills) they face a governance problem: no unified way to discover, authenticate, or observe them. MCP Gateway and Registry is an open source control plane with centralized registration, OAuth2 auth, semantic tool discovery, end-to-end telemetry. The project's architecture, pluggable auth and storage backends, deployment patterns on Amazon EKS, and a production rollout across business units. self-managed-agents lens: self-hosted MCP registry + gateway, directly the haunting's MCP-fleet governance.",
+    "abstract": "As enterprises onboard AI assets (MCP servers, Agents, Skills) they face a governance problem: no unified way to discover, authenticate, or observe them. MCP Gateway and Registry is an open source control plane with centralized registration, OAuth2 auth, semantic tool discovery, end-to-end telemetry. The project's architecture, pluggable auth and storage backends, deployment patterns on Amazon EKS, and a production rollout across business units.",
     "source": "paste-2026-self-managed"
   },
   {
@@ -157,7 +157,7 @@
     "endTime": "2026-11-30T17:00:00",
     "venue": "MGM Grand",
     "sponsored": false,
-    "abstract": "Build a fine-tuning pipeline that proves its own results. Run the full loop, baseline eval, fine-tune, RL, re-eval, against the same bar every time. Start with a benchmark baseline on a Hugging Face model, fine-tune with QLoRA on SageMaker AI Training Jobs with full control over your training script and compute, add an RL pass with RLAIF or RLVR, re-evaluate against the same baseline. Put the sequence into a SageMaker Pipeline that reruns on new data. Bedrock Guardrails at the deployment gate. self-managed-agents lens: QLoRA fine-tune + evaluation gate, the QLoRA-pipeline territory.",
+    "abstract": "Build a fine-tuning pipeline that proves its own results. Run the full loop, baseline eval, fine-tune, RL, re-eval, against the same bar every time. Start with a benchmark baseline on a Hugging Face model, fine-tune with QLoRA on SageMaker AI Training Jobs with full control over your training script and compute, add an RL pass with RLAIF or RLVR, re-evaluate against the same baseline. Put the sequence into a SageMaker Pipeline that reruns on new data. Bedrock Guardrails at the deployment gate.",
     "source": "paste-2026-self-managed"
   },
   {
@@ -207,7 +207,7 @@
     "endTime": "2026-12-03T14:30:00",
     "venue": "MGM Grand",
     "sponsored": false,
-    "abstract": "World models generate real-time video by learning environment dynamics, powering interactive simulation for gaming, robotics, and autonomous driving, but deploying these latency-sensitive pipelines is complex. Deploy and optimize a real-time video world model on AWS Trainium using AWS Neuron Agentic Development skills that automate compilation, profiling, and kernel optimization through natural language. The agent identifies bottlenecks, then selects optimized kernels from Hugging Face or writes custom kernels. video-games lens: real-time simulation for gaming; self-managed-agents lens: self-optimized inference on your own silicon.",
+    "abstract": "World models generate real-time video by learning environment dynamics, powering interactive simulation for gaming, robotics, and autonomous driving, but deploying these latency-sensitive pipelines is complex. Deploy and optimize a real-time video world model on AWS Trainium using AWS Neuron Agentic Development skills that automate compilation, profiling, and kernel optimization through natural language. The agent identifies bottlenecks, then selects optimized kernels from Hugging Face or writes custom kernels. video-games lens: real-time simulation for gaming;",
     "source": "paste-2026-self-managed"
   },
   {
@@ -235,7 +235,7 @@
     "endTime": "2026-12-03T12:30:00",
     "venue": "MGM Grand",
     "sponsored": false,
-    "abstract": "Stop paying frontier-model prices for agentic workloads. Build production-ready AI agents powered by open-source models like Qwen3 and Gemma4 running entirely on Amazon SageMaker AI. Deploy models with optimized serving, connect them to multi-turn tool-use workflows through OpenAI-compatible APIs, enable real-time bi-directional streaming. Leave with a cost-optimized agent stack you fully control: fast inference, zero vendor lock-in, patterns for scaling agentic workloads on your own terms. self-managed-agents lens: OSS models you fully control, the exact on-host-inference philosophy.",
+    "abstract": "Stop paying frontier-model prices for agentic workloads. Build production-ready AI agents powered by open-source models like Qwen3 and Gemma4 running entirely on Amazon SageMaker AI. Deploy models with optimized serving, connect them to multi-turn tool-use workflows through OpenAI-compatible APIs, enable real-time bi-directional streaming. Leave with a cost-optimized agent stack you fully control: fast inference, zero vendor lock-in, patterns for scaling agentic workloads on your own terms.",
     "source": "paste-2026-self-managed"
   },
   {
@@ -262,7 +262,7 @@
     "endTime": "2026-12-02T14:00:00",
     "venue": "MGM Grand",
     "sponsored": false,
-    "abstract": "Frontier models are powerful but costly to deploy. On-policy distillation, adopted by Qwen3, MiMo, and GLM-5, compresses a large teacher into a lean domain-specialized student by training on the student's own rollouts with dense token-level feedback. Cheaper and more stable than RL with verifiable rewards, no verifier required. A working implementation on HyperPod EKS: orchestrate teacher inference and student training across GPU pools, manage the rollout buffer, evaluate convergence. self-managed-agents lens: distilling your own small models, the local-model-training territory.",
+    "abstract": "Frontier models are powerful but costly to deploy. On-policy distillation, adopted by Qwen3, MiMo, and GLM-5, compresses a large teacher into a lean domain-specialized student by training on the student's own rollouts with dense token-level feedback. Cheaper and more stable than RL with verifiable rewards, no verifier required. A working implementation on HyperPod EKS: orchestrate teacher inference and student training across GPU pools, manage the rollout buffer, evaluate convergence.",
     "source": "paste-2026-self-managed"
   }
 ]

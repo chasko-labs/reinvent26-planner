@@ -53,7 +53,7 @@ earlier notes in this repo say reserve/cancel returns 409 until 8 oct 2026 (READ
 
 - re-test reserve and cancel against the live api; fix stale 409 text everywhere
 - finish the mcp bridge, run tools/list and one real tool call, record the tool names
-- done: event map generator lives in cli/reinvent26/mapper.py (`python -m reinvent26 map`), config in data/reinvent2026/map-config.json, catalog snapshot persisted at .cache/reinvent2026/catalog.json
+- done: event map generator lives in cli/reinvent26/mapper.py (`python3 -m reinvent26 map`), config in data/reinvent2026/map-config.json, catalog snapshot persisted at .cache/reinvent2026/catalog.json
 - favorite the scheduled sessions through the api, then reserve when verified
 - refresh readme, record a short demo, draft the builder center article from the hackathon log
 - publish the article and submit before 2026-11-06 23:59 pt, aiming for 2026-11-04 to leave margin

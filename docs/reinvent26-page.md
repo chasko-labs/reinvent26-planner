@@ -42,9 +42,9 @@ Live commands (need `EVENTS_ACCESS_TOKEN` plus event registration):
 
 ```
 cd cli
-python -m reinvent26 events
-python -m reinvent26 shortlist <eventId> --topics agents,mcp,bedrock --level 3 --top 20
-python -m reinvent26 schedule <eventId>
+python3 -m reinvent26 events
+python3 -m reinvent26 shortlist <eventId> --topics agents,mcp,bedrock --level 3 --top 20
+python3 -m reinvent26 schedule <eventId>
 ```
 
 ## key dates

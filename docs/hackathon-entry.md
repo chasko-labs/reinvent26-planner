@@ -65,7 +65,7 @@ and Gemini (all verified live, limits documented).
 dependency: python 3.10+, nothing to install (standard library only).
 
 ```
-git clone git@github.com:chasko-labs/reinvent26-attendee-planner.git reinvent26-planner
+git clone https://github.com/chasko-labs/reinvent26-planner.git
 cd reinvent26-planner/cli
 python3 -m reinvent26 status reinvent2026   # sign-in state, no secrets printed
 python3 -m reinvent26 login                 # Builder ID, loopback callback

@@ -22,7 +22,7 @@ python3 --version
 # entirely: `brew install python` (or python.org), then re-check.
 
 git remote -v
-# run inside the repo. want chasko-labs/reinvent26-attendee-planner.
+# run inside the repo. want chasko-labs/reinvent26-planner.
 # any other URL means a stale clone. stop and reclone before you
 # trust any output from it.
 
@@ -48,7 +48,7 @@ your Mac. you run nothing over ssh until step 6.
 
 1. open Terminal on your Mac. open a local window, not an ssh session.
 2. go to the repo. you run `cd <repo>`. running `git pull` anywhere else fails with "not a git repository".
-3. confirm the remote. you run `git remote -v`. you must see `chasko-labs/reinvent26-attendee-planner`. any other URL means a stale clone. stop and reclone.
+3. confirm the remote. you run `git remote -v`. you must see `chasko-labs/reinvent26-planner`. any other URL means a stale clone. stop and reclone.
 4. update. you run `git pull`. you expect "Already up to date" or a short fast-forward list.
 5. verify the cli loads. you run `cd cli && python3 -m reinvent26 status reinvent2026`. you expect a sign-in line, an api reachability line, and a schedule line. any `command not found: python` means you typed `python` instead of `python3`.
 6. open a second terminal tab for the always-on machine. you run `ssh -L 8484:localhost:8484 YOU@YOUR-BOX`. you land in that machine's start directory, which is usually not the planner. you stay in this session for steps 7 to 9.

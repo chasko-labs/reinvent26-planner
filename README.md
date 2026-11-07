@@ -1,4 +1,4 @@
-# reinvent26-attendee-planner
+# reinvent26-planner
 
 A Python command-line interface (CLI) for re:Invent 2026 session discovery, planning, and seat booking. It talks to the public Events API (application programming interface). The project uses only the Python standard library, so there is nothing to install.
 
@@ -14,10 +14,10 @@ python3 --version
 
 macOS ships no `python` command. You must type `python3`, not `python`. If your Mac has no Python 3 at all, install it with `brew install python` and re-run the check.
 
-You must clone the live repo. A stale repo with a similar name exists, and it will never catch up:
+You must clone the canonical repo. The old `reinvent26-attendee-planner` fork is retired and will never catch up:
 
 ```bash
-git clone git@github.com:chasko-labs/reinvent26-attendee-planner.git reinvent26-planner
+git clone https://github.com/chasko-labs/reinvent26-planner.git
 cd reinvent26-planner/cli
 ```
 

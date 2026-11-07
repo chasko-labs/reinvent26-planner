@@ -64,7 +64,7 @@
     "Caesars Forum"
   ],
   "same_venue_gap": 0,
-  "near_venue_gap": 30,
+  "near_venue_gap": 45,
   "far_venue_gap": 60,
   "anchors": ["amazon leo"],
   "reserved_only": true,

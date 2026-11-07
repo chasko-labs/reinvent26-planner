@@ -55,7 +55,7 @@ when dates, quotas, or error behavior matter.
 
 ## Repo workflow
 
-- `python -m reinvent26 events` then `sessions <eventId>` (see `cli/` README
+- `python3 -m reinvent26 events` then `sessions <eventId>` (see `cli/` README
   path in root README).
 - shortlist: rank by topic keywords, filter level 300/400, pull abstracts
   for the shortlist only.

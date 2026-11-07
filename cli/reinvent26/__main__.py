@@ -1,4 +1,4 @@
-"""Entry point: python -m reinvent26 <command> (run from cli/)."""
+"""Entry point: python3 -m reinvent26 <command> (run from cli/)."""
 
 from __future__ import annotations
 

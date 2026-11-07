@@ -23,27 +23,27 @@ def mock_api(monkeypatch):
 
 
 def test_favorite_round_trip_with_schedule_confirm(mock_api):
-    body = api.favorite_sessions("reinvent2026", "test-token", ["ant301-a"])
-    assert body[0]["result"]["successful"] == ["ant301-a"]
+    body = api.favorite_sessions("reinvent2026", "test-token", ["net301-a"])
+    assert body[0]["result"]["successful"] == ["net301-a"]
     sched = api.get_schedule("reinvent2026", "test-token")
-    assert sched["schedule"]["favorites"] == ["ant301-a"]
-    assert api.remove_favorite("reinvent2026", "test-token", "ant301-a") is True
-    assert api.remove_favorite("reinvent2026", "test-token", "ant301-a") is False
+    assert sched["schedule"]["favorites"] == ["net301-a"]
+    assert api.remove_favorite("reinvent2026", "test-token", "net301-a") is True
+    assert api.remove_favorite("reinvent2026", "test-token", "net301-a") is False
     sched = api.get_schedule("reinvent2026", "test-token")
     assert sched["schedule"]["favorites"] == []
 
 
 def test_closed_gate_409s_reserve_and_cancel(mock_api):
     with pytest.raises(api.EventsError) as exc:
-        api.reserve_sessions("reinvent2026", "test-token", ["ant301-a"])
+        api.reserve_sessions("reinvent2026", "test-token", ["net301-a"])
     assert exc.value.status == 409
     mock_api.mock_state.closed = False
     try:
-        body = api.reserve_sessions("reinvent2026", "test-token", ["ant301-a"])
-        assert body[0]["result"]["successful"] == ["ant301-a"]
+        body = api.reserve_sessions("reinvent2026", "test-token", ["net301-a"])
+        assert body[0]["result"]["successful"] == ["net301-a"]
         sched = api.get_schedule("reinvent2026", "test-token")
-        assert sched["schedule"]["reserved"] == ["ant301-a"]
-        assert api.cancel_reservation("reinvent2026", "test-token", "ant301-a") is True
+        assert sched["schedule"]["reserved"] == ["net301-a"]
+        assert api.cancel_reservation("reinvent2026", "test-token", "net301-a") is True
         sched = api.get_schedule("reinvent2026", "test-token")
         assert sched["schedule"]["reserved"] == []
     finally:
@@ -71,5 +71,5 @@ def test_personal_time_round_trip(mock_api):
 
 def test_writes_need_a_token(mock_api):
     with pytest.raises(api.EventsError) as exc:
-        api.favorite_sessions("reinvent2026", None, ["ant301-a"])
+        api.favorite_sessions("reinvent2026", None, ["net301-a"])
     assert exc.value.status == 401

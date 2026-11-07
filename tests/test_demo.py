@@ -41,7 +41,7 @@ def test_demo_runs_with_no_token():
     out = proc.stdout
     assert "no token, no network" in out
     assert "shortlist" in out
-    assert "# clash: ANT301 x CON401" in out
+    assert "# clash: NET301 x CMP401" in out
     assert "open slots" in out
     assert "stack-aware" in out.lower() or "keywords" in out
 

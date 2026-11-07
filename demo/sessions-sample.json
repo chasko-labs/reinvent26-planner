@@ -1,22 +1,32 @@
 [
   {
-    "sessionId": "ant301-a",
-    "code": "ANT301",
-    "title": "Agent orchestration with Bedrock Agents",
+    "sessionId": "net301-a",
+    "code": "NET301",
+    "title": "Building hybrid satellite and cloud networks with Amazon Leo",
     "level": "300",
-    "topics": ["agents", "bedrock"],
-    "services": ["Amazon Bedrock"],
+    "topics": [
+      "leo",
+      "networking"
+    ],
+    "services": [
+      "Amazon Leo"
+    ],
     "startTime": "2026-12-01T09:00:00",
     "endTime": "2026-12-01T10:00:00",
     "room": "Venetian L2"
   },
   {
-    "sessionId": "con401-a",
-    "code": "CON401",
-    "title": "MCP servers in production: auth and tool design",
+    "sessionId": "cmp401-a",
+    "code": "CMP401",
+    "title": "Quantum-classical workflows on Amazon Braket",
     "level": "400",
-    "topics": ["mcp", "agents"],
-    "services": ["Amazon Bedrock"],
+    "topics": [
+      "braket",
+      "compute"
+    ],
+    "services": [
+      "Amazon Braket"
+    ],
     "startTime": "2026-12-01T09:30:00",
     "endTime": "2026-12-01T10:30:00",
     "room": "Venetian L3"
@@ -26,8 +36,14 @@
     "code": "SRV301",
     "title": "Event-driven serverless with Lambda and EventBridge",
     "level": "300",
-    "topics": ["serverless", "event-driven"],
-    "services": ["AWS Lambda", "Amazon EventBridge"],
+    "topics": [
+      "serverless",
+      "event-driven"
+    ],
+    "services": [
+      "AWS Lambda",
+      "Amazon EventBridge"
+    ],
     "startTime": "2026-12-01T11:00:00",
     "endTime": "2026-12-01T12:00:00",
     "room": "MGM Grand"
@@ -35,10 +51,14 @@
   {
     "sessionId": "dat402-a",
     "code": "DAT402",
-    "title": "Data modeling with DynamoDB for agent memory",
+    "title": "Data modeling with DynamoDB at scale",
     "level": "400",
-    "topics": ["dynamodb", "agents"],
-    "services": ["Amazon DynamoDB"],
+    "topics": [
+      "dynamodb"
+    ],
+    "services": [
+      "Amazon DynamoDB"
+    ],
     "startTime": "2026-12-01T13:00:00",
     "endTime": "2026-12-01T14:00:00",
     "room": "Venetian L2"
@@ -46,10 +66,15 @@
   {
     "sessionId": "stg301-a",
     "code": "STG301",
-    "title": "S3 Vectors for retrieval at re:Invent scale",
+    "title": "S3 storage tiers for retrieval at re:Invent scale",
     "level": "300",
-    "topics": ["s3", "retrieval"],
-    "services": ["Amazon S3"],
+    "topics": [
+      "s3",
+      "storage"
+    ],
+    "services": [
+      "Amazon S3"
+    ],
     "startTime": "2026-12-01T14:00:00",
     "endTime": "2026-12-01T15:00:00",
     "room": "Caesars Forum"
@@ -57,10 +82,14 @@
   {
     "sessionId": "obs301-a",
     "code": "OBS301",
-    "title": "Observability for agent fleets with CloudWatch",
+    "title": "Observability with CloudWatch at fleet scale",
     "level": "300",
-    "topics": ["observability", "agents"],
-    "services": ["Amazon CloudWatch"],
+    "topics": [
+      "observability"
+    ],
+    "services": [
+      "Amazon CloudWatch"
+    ],
     "startTime": "2026-12-01T15:00:00",
     "endTime": "2026-12-01T16:00:00",
     "room": "Mandalay Bay"

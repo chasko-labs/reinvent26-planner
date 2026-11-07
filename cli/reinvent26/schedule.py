@@ -15,17 +15,26 @@ def _parse(ts: str) -> datetime:
     return datetime.fromisoformat(ts.replace("Z", "+00:00").replace("+00:00", ""))
 
 
+def _sessions_overlap(first: dict, second: dict) -> bool:
+    return _parse(first["startTime"]) < _parse(
+        second["endTime"]
+    ) and _parse(second["startTime"]) < _parse(first["endTime"])
+
+
 def find_clashes(items: list) -> list:
     """Return pairs of items whose time ranges overlap.
 
     Each item needs startTime/endTime plus sessionId or title for reporting.
+    Pairwise comparison: an item spanning two later items clashes with both,
+    not just its immediate neighbor.
     """
     timed = [i for i in items if i.get("startTime") and i.get("endTime")]
-    timed.sort(key=lambda i: i["startTime"])
+    timed.sort(key=lambda i: _parse(i["startTime"]))
     clashes = []
-    for a, b in zip(timed, timed[1:]):
-        if _parse(b["startTime"]) < _parse(a["endTime"]):
-            clashes.append((a, b))
+    for index, first in enumerate(timed):
+        for second in timed[index + 1:]:
+            if _sessions_overlap(first, second):
+                clashes.append((first, second))
     return clashes
 
 
@@ -41,6 +50,9 @@ def find_open_slots(
     """Return sessions that fit fully inside any free window and do not clash
     with already scheduled items."""
     scheduled = scheduled or []
+    timed_scheduled = [
+        t for t in scheduled if t.get("startTime") and t.get("endTime")
+    ]
     out = []
     for s in sessions:
         if not (s.get("startTime") and s.get("endTime")):
@@ -50,7 +62,7 @@ def find_open_slots(
             for w in windows
         ):
             continue
-        if find_clashes(scheduled + [s]):
+        if any(_sessions_overlap(s, t) for t in timed_scheduled):
             continue
         out.append(s)
     return out

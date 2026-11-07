@@ -151,7 +151,7 @@
     "endTime": "2026-11-30T15:30:00",
     "venue": "MGM Grand",
     "sponsored": false,
-    "abstract": "Artists, engineers, and scientists need GPU-powered virtual workstations, but managing VDI at scale means navigating instance selection, capacity, and cost. Match EC2 G instances to user personas, from fractional GPU for task workers to full GPU for power users running 3D modeling, compositing, or subsurface visualization. Decision framework covering instance types, DCV streaming, storage, security, and fleet orchestration with Research and Engineering Studio (RES). video-games lens: VFX render farm artist desktops.",
+    "abstract": "Artists, engineers, and scientists need GPU-powered virtual workstations, but managing VDI at scale means navigating instance selection, capacity, and cost. Match EC2 G instances to user personas, from fractional GPU for task workers to full GPU for power users running 3D modeling, compositing, or subsurface visualization. Decision framework covering instance types, DCV streaming, storage, security, and fleet orchestration with Research and Engineering Studio (RES).",
     "source": "paste-2026-compute-gpu"
   },
   {
@@ -469,7 +469,7 @@
     "endTime": "2026-11-30T13:00:00",
     "venue": "MGM Grand",
     "sponsored": false,
-    "abstract": "AI agents write, execute, and iterate on code autonomously. Every session needs an isolated sandbox to run untrusted code safely. How customers deploy agent sandboxes on EC2 across distinct patterns, each trading off isolation, latency, and performance across instance families. Isolation trade-offs, cost per sandbox-second, capacity planning at scale. A decision model for selecting the right pattern. favorites lens: directly relevant to the microvm/firecracker sandbox work.",
+    "abstract": "AI agents write, execute, and iterate on code autonomously. Every session needs an isolated sandbox to run untrusted code safely. How customers deploy agent sandboxes on EC2 across distinct patterns, each trading off isolation, latency, and performance across instance families. Isolation trade-offs, cost per sandbox-second, capacity planning at scale. A decision model for selecting the right pattern.",
     "source": "paste-2026-compute-gpu"
   },
   {
@@ -519,7 +519,7 @@
     "endTime": "2026-11-30T14:00:00",
     "venue": "MGM Grand",
     "sponsored": false,
-    "abstract": "SageMaker HyperPod lets teams build complete training pipelines, from data prep through distributed training to deployment, on one self-healing platform. Tencent Games, a game AI team not an infra team, went from first cluster to thousand-GPU training in weeks for their VISVISE engine powering 90+ titles including PUBG Mobile. Lessons on EFA networking, FSx storage, GPU fault tolerance. video-games lens: game AI at production scale.",
+    "abstract": "SageMaker HyperPod lets teams build complete training pipelines, from data prep through distributed training to deployment, on one self-healing platform. Tencent Games, a game AI team not an infra team, went from first cluster to thousand-GPU training in weeks for their VISVISE engine powering 90+ titles including PUBG Mobile. Lessons on EFA networking, FSx storage, GPU fault tolerance.",
     "source": "paste-2026-compute-gpu"
   },
   {
@@ -551,7 +551,7 @@
     "endTime": "2026-12-02T14:00:00",
     "venue": "Caesars Forum",
     "sponsored": false,
-    "abstract": "Premium animated series traditionally take 3.5 years to produce. Prime Video AI Studios built the AI-Assisted Creative Suite on AWS to compress production to under 12 months, extending to live-action shorts, second-unit VFX, feature films. Powered by AI agents on Amazon Bedrock AgentCore and AWS Strands that select models, build creative workflows, construct prompts, evaluate outputs. Trains and serves a first-party diffusion-model fleet on SageMaker and EKS on EC2 P6 GPU clusters. video-games lens: creative/animation AI pipeline.",
+    "abstract": "Premium animated series traditionally take 3.5 years to produce. Prime Video AI Studios built the AI-Assisted Creative Suite on AWS to compress production to under 12 months, extending to live-action shorts, second-unit VFX, feature films. Powered by AI agents on Amazon Bedrock AgentCore and AWS Strands that select models, build creative workflows, construct prompts, evaluate outputs. Trains and serves a first-party diffusion-model fleet on SageMaker and EKS on EC2 P6 GPU clusters.",
     "source": "paste-2026-compute-gpu"
   },
   {
@@ -626,7 +626,7 @@
     "endTime": "2026-11-30T13:20:00",
     "venue": "Wynn/Encore",
     "sponsored": false,
-    "abstract": "How Bee built a personal AI assistant where privacy is cryptographically guaranteed, not policy-promised. Bee processes user data exclusively within hardware-isolated EC2 Confidential VMs powered by AWS Nitro, where no one including Amazon can access unencrypted data. NitroTPM attestation that lets devices verify server integrity before sharing keys, Sigstore transparency logs, mutual TLS with embedded attestation, key lifecycle within encrypted VM memory. favorites lens: Bee is the ambient-audio source in ARC324; zero-trust personal AI is squarely bryan's interest.",
+    "abstract": "How Bee built a personal AI assistant where privacy is cryptographically guaranteed, not policy-promised. Bee processes user data exclusively within hardware-isolated EC2 Confidential VMs powered by AWS Nitro, where no one including Amazon can access unencrypted data. NitroTPM attestation that lets devices verify server integrity before sharing keys, Sigstore transparency logs, mutual TLS with embedded attestation, key lifecycle within encrypted VM memory.",
     "source": "paste-2026-compute-gpu"
   },
   {
@@ -652,7 +652,7 @@
     "endTime": "2026-11-30T11:00:00",
     "venue": "Caesars Forum",
     "sponsored": false,
-    "abstract": "EC2 Image Builder pipelines sprawl fast, and frontier agents that run for hours unattended need guardrails. Decompose Image Builder operations into reusable agent skills run via Kiro, Claude Code. Author AWSTOE components and orchestrate workflows, harden images, scan for CVEs. Mid-build, a WaitForAction step pauses the pipeline and hands the image to AWS Security Agent to pentest; findings decide whether the build ships, bounded by severity, iteration caps, and human approval. favorites lens: Kiro agent skills + governance gate, directly the haunting pattern.",
+    "abstract": "EC2 Image Builder pipelines sprawl fast, and frontier agents that run for hours unattended need guardrails. Decompose Image Builder operations into reusable agent skills run via Kiro, Claude Code. Author AWSTOE components and orchestrate workflows, harden images, scan for CVEs. Mid-build, a WaitForAction step pauses the pipeline and hands the image to AWS Security Agent to pentest; findings decide whether the build ships, bounded by severity, iteration caps, and human approval.",
     "source": "paste-2026-compute-gpu"
   },
   {

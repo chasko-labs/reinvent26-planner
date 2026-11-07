@@ -1,17 +1,17 @@
 [
   {
-    "sessionId": "ant301-a",
-    "code": "ANT301",
-    "title": "Agent orchestration with Bedrock Agents",
+    "sessionId": "net301-a",
+    "code": "NET301",
+    "title": "Building hybrid satellite and cloud networks with Amazon Leo",
     "level": "300",
     "startTime": "2026-12-01T09:00:00",
     "endTime": "2026-12-01T10:00:00",
     "room": "Venetian L2"
   },
   {
-    "sessionId": "con401-a",
-    "code": "CON401",
-    "title": "MCP servers in production: auth and tool design",
+    "sessionId": "cmp401-a",
+    "code": "CMP401",
+    "title": "Quantum-classical workflows on Amazon Braket",
     "level": "400",
     "startTime": "2026-12-01T09:30:00",
     "endTime": "2026-12-01T10:30:00",

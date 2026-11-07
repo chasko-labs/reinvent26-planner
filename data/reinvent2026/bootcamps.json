@@ -79,7 +79,7 @@
     "endTime": "2026-12-01T12:00:00",
     "venue": "Caesars Palace",
     "sponsored": false,
-    "abstract": "The AI Development Lifecycle (AI-DLC) reimagines how teams plan, build, and ship software with AI as a first-class participant. Learn the three phases (Inception, Construction, Operation), apply the Intent-Unit-Bolt framework to decompose requirements into AI-executable work items, then use Kiro IDE's Spec-Driven Development to generate domain models, code, tests, and infrastructure. Leave with a working application built entirely through AI-DLC. favorites lens: Kiro + spec-driven, directly the haunting's development methodology.",
+    "abstract": "The AI Development Lifecycle (AI-DLC) reimagines how teams plan, build, and ship software with AI as a first-class participant. Learn the three phases (Inception, Construction, Operation), apply the Intent-Unit-Bolt framework to decompose requirements into AI-executable work items, then use Kiro IDE's Spec-Driven Development to generate domain models, code, tests, and infrastructure. Leave with a working application built entirely through AI-DLC.",
     "source": "paste-2026-bootcamps"
   },
   {
@@ -105,7 +105,7 @@
     "endTime": "2026-11-30T12:30:00",
     "venue": "Caesars Palace",
     "sponsored": false,
-    "abstract": "AWS Transform orchestrates AI agents that analyze, refactor, and convert legacy applications without manual line-by-line rewrites. Set modernization objectives, let AI agents decompose and transform .NET Framework code to cross-platform .NET on Linux, migrate a SQL Server database to Amazon Aurora PostgreSQL. Practice agentic assessment, wave planning, code transformation, schema conversion end to end. favorites lens: the same AWS Transform agentic-modernization pattern seen in MAM206. real-estate lens: modernizing legacy MLS-era systems and aging property-platform monoliths, the hands-on version of the MAM206 mortgage-app story.",
+    "abstract": "AWS Transform orchestrates AI agents that analyze, refactor, and convert legacy applications without manual line-by-line rewrites. Set modernization objectives, let AI agents decompose and transform .NET Framework code to cross-platform .NET on Linux, migrate a SQL Server database to Amazon Aurora PostgreSQL. Practice agentic assessment, wave planning, code transformation, schema conversion end to end.",
     "source": "paste-2026-bootcamps"
   },
   {
@@ -155,7 +155,7 @@
     "endTime": "2026-12-01T17:00:00",
     "venue": "Caesars Palace",
     "sponsored": false,
-    "abstract": "The AI Development Lifecycle (AI-DLC) brings structure, traceability, and human oversight to high-velocity agentic-AI software delivery. Apply AI-DLC in Kiro to build a production application through Feature Specs, control agent behavior with steering files and execution modes, extend capabilities with MCP servers and Kiro Powers, automate workflows with hooks. Leave with a governed, repeatable process. favorites lens: Kiro steering files, MCP servers, and hooks are exactly the haunting's stack.",
+    "abstract": "The AI Development Lifecycle (AI-DLC) brings structure, traceability, and human oversight to high-velocity agentic-AI software delivery. Apply AI-DLC in Kiro to build a production application through Feature Specs, control agent behavior with steering files and execution modes, extend capabilities with MCP servers and Kiro Powers, automate workflows with hooks. Leave with a governed, repeatable process.",
     "source": "paste-2026-bootcamps"
   },
   {
@@ -230,7 +230,7 @@
     "endTime": "2026-12-02T12:30:00",
     "venue": "Caesars Palace",
     "sponsored": false,
-    "abstract": "Application failures and security vulnerabilities demand fast answers. Set up AWS DevOps Agent to automate investigation through logs, metrics, and code changes, then generate remediation plans. Use AWS Security Agent to configure domain-scoped penetration tests, monitor real-time execution, interpret severity-rated findings. Two agents that compress hours of investigation into minutes. favorites lens: agent-driven investigation + remediation, the haunting's dispatch pattern.",
+    "abstract": "Application failures and security vulnerabilities demand fast answers. Set up AWS DevOps Agent to automate investigation through logs, metrics, and code changes, then generate remediation plans. Use AWS Security Agent to configure domain-scoped penetration tests, monitor real-time execution, interpret severity-rated findings. Two agents that compress hours of investigation into minutes.",
     "source": "paste-2026-bootcamps"
   },
   {
@@ -256,7 +256,7 @@
     "endTime": "2026-12-01T12:30:00",
     "venue": "Caesars Palace",
     "sponsored": false,
-    "abstract": "AWS Partners only. AI agents work in demos but break in production. Replace luck with observability. Prototype a role-based agent with the Strands SDK. Evaluate with custom evaluators for quality and compliance. Deploy to production on Amazon Bedrock AgentCore. Observe with OpenTelemetry tracing and CloudWatch dashboards. Detect drift by evaluating production traffic at scale. favorites lens: OTEL tracing of agents pairs with the otel-monitor poltergeist work.",
+    "abstract": "AWS Partners only. AI agents work in demos but break in production. Replace luck with observability. Prototype a role-based agent with the Strands SDK. Evaluate with custom evaluators for quality and compliance. Deploy to production on Amazon Bedrock AgentCore. Observe with OpenTelemetry tracing and CloudWatch dashboards. Detect drift by evaluating production traffic at scale.",
     "source": "paste-2026-bootcamps"
   },
   {
@@ -304,7 +304,7 @@
     "endTime": "2026-11-30T17:00:00",
     "venue": "Caesars Palace",
     "sponsored": false,
-    "abstract": "Customer-facing AI Agents can resolve issues end-to-end. Build two complementary AI agents on Amazon Connect AI Customer: an agent-assistance copilot that watches live chats and surfaces real-time knowledge base answers and customer data, and a self-service AI agent that handles routine requests autonomously using MCP tools for Cases and Customer Profiles, with structured escalation preserving conversation context. real-estate lens: buyer/seller/tenant support at marketplace scale, the hands-on build behind IND393 and the servicing side of the buyer journey.",
+    "abstract": "Customer-facing AI Agents can resolve issues end-to-end. Build two complementary AI agents on Amazon Connect AI Customer: an agent-assistance copilot that watches live chats and surfaces real-time knowledge base answers and customer data, and a self-service AI agent that handles routine requests autonomously using MCP tools for Cases and Customer Profiles, with structured escalation preserving conversation context.",
     "source": "paste-2026-bootcamps"
   },
   {
@@ -333,7 +333,7 @@
     "endTime": "2026-12-01T15:00:00",
     "venue": "Caesars Palace",
     "sponsored": false,
-    "abstract": "AWS Partners only. AI workflows fail in ways that don't show up until production: a human misses a deadline, an external system says no, a sub-workflow loses state mid-flight. Combine Step Functions, Lambda durable functions, and Amazon Bedrock AgentCore into a three-layer stack that routes decisions, checkpoints execution, and reasons through uncertainty. Run scenarios through the Simulator Panel, trace every layer live. favorites lens: durable multi-layer agent orchestration, the haunting's delegation-chain concern.",
+    "abstract": "AWS Partners only. AI workflows fail in ways that don't show up until production: a human misses a deadline, an external system says no, a sub-workflow loses state mid-flight. Combine Step Functions, Lambda durable functions, and Amazon Bedrock AgentCore into a three-layer stack that routes decisions, checkpoints execution, and reasons through uncertainty. Run scenarios through the Simulator Panel, trace every layer live.",
     "source": "paste-2026-bootcamps"
   },
   {
@@ -359,7 +359,7 @@
     "endTime": "2026-12-01T12:30:00",
     "venue": "Caesars Palace",
     "sponsored": false,
-    "abstract": "Multi-agent systems unlock powerful workflows, but production demands more than chaining agents. Advanced patterns using Amazon Bedrock AgentCore: agent-as-tool communication, shared memory across agents, context-window optimization for cost and performance, policy-based access control, VPC integration, distributed tracing, evaluation frameworks, deployment strategies from prototype to production. favorites lens: agent-as-tool + shared memory + context-window optimization is the exact haunting dispatch architecture. real-estate lens: the multi-agent engine under the home-buying journey (IND329-R1) and the property/listing knowledge layer (IND367).",
+    "abstract": "Multi-agent systems unlock powerful workflows, but production demands more than chaining agents. Advanced patterns using Amazon Bedrock AgentCore: agent-as-tool communication, shared memory across agents, context-window optimization for cost and performance, policy-based access control, VPC integration, distributed tracing, evaluation frameworks, deployment strategies from prototype to production.",
     "source": "paste-2026-bootcamps"
   },
   {
@@ -386,7 +386,7 @@
     "endTime": "2026-11-30T12:30:00",
     "venue": "Caesars Palace",
     "sponsored": false,
-    "abstract": "AWS Partners only. A good prompt gets you a chatbot; everything else on AgentCore turns it into an agent. Build a customer support agent from scratch and progressively add persistent memory, tools through Gateway to reach real data, Cedar policies that enforce boundaries, plus production traces, quality evaluations, AI-driven optimization with A/B testing. favorites lens: persistent memory + policy-enforced boundaries + tracing, the haunting agent shape.",
+    "abstract": "AWS Partners only. A good prompt gets you a chatbot; everything else on AgentCore turns it into an agent. Build a customer support agent from scratch and progressively add persistent memory, tools through Gateway to reach real data, Cedar policies that enforce boundaries, plus production traces, quality evaluations, AI-driven optimization with A/B testing.",
     "source": "paste-2026-bootcamps"
   },
   {
@@ -412,7 +412,7 @@
     "endTime": "2026-11-30T17:30:00",
     "venue": "Caesars Palace",
     "sponsored": false,
-    "abstract": "AWS Partners only. Exploit a live AI agent with a prompt injection attack that approves a fraudulent transaction, then defend it. Fix with Amazon Bedrock Guardrails to block prompt attacks and PII leaks. Verify controls with AWS Config conformance packs, find ungoverned AI resources with Resource Explorer. Observe agent decisions and guardrail interventions in Amazon Bedrock AgentCore. favorites lens: prompt-injection defense + governance gates, directly the haunting's agent-governance concern.",
+    "abstract": "AWS Partners only. Exploit a live AI agent with a prompt injection attack that approves a fraudulent transaction, then defend it. Fix with Amazon Bedrock Guardrails to block prompt attacks and PII leaks. Verify controls with AWS Config conformance packs, find ungoverned AI resources with Resource Explorer. Observe agent decisions and guardrail interventions in Amazon Bedrock AgentCore.",
     "source": "paste-2026-bootcamps"
   }
 ]

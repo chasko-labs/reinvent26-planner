@@ -107,11 +107,9 @@ technology query stay independent. a session may carry more than one lens.
 
 | lens                  | covers                                                                                                                           |
 | --------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| `favorites`           | bryan's personal favorites, hand-picked regardless of other lens                                                                 |
+| `favorites`           | personal favorites, hand-picked regardless of other lens                                                                 |
 | `ai`                  | core AI/ML: models, inference, agents, kernels, neurosymbolic, voice                                                             |
 | `self-managed-agents` | run your own models/agents/MCP on infra you control: VM isolation, self-hosted inference, open weights, sovereignty, hybrid edge |
-| `real-estate`         | property, listings, valuation, rental, proptech, the realtor.com lens                                                            |
-| `space-satellite`     | Amazon Leo, low-earth-orbit connectivity, aerospace, HPC for space                                                               |
 | `next-gen-stats`      | analytics, business/operational intelligence, telemetry, location data                                                           |
 | `video-games`         | gameday, gamified learning, world models and physical-AI for simulation                                                          |
 | `nvidia`              | NVIDIA-sponsored or NVIDIA-relevant: cuVS, GPU accel, GR00T/Cosmos, etc                                                          |

@@ -29,7 +29,7 @@
     "endTime": "2026-11-30T10:00:00",
     "venue": "MGM Grand",
     "sponsored": false,
-    "abstract": "An agent's context window is a finite attention budget; database-backed agents must keep context current, selective, traceable. Architect solutions to trace a task as it builds context using Amazon Aurora PostgreSQL, ElastiCache for Valkey, Neptune, and Bedrock AgentCore. How agents cache hot state, retrieve operational rows, apply SQL filters, maintain vector and full-text indexes, refresh stale records, traverse knowledge-graph relationships, load skills, discover MCP tools. Freshness policies, invalidation, provenance ledgers, access boundaries, compaction. favorites lens: context-window economy + Valkey + skills + MCP is the exact haunting stack.",
+    "abstract": "An agent's context window is a finite attention budget; database-backed agents must keep context current, selective, traceable. Architect solutions to trace a task as it builds context using Amazon Aurora PostgreSQL, ElastiCache for Valkey, Neptune, and Bedrock AgentCore. How agents cache hot state, retrieve operational rows, apply SQL filters, maintain vector and full-text indexes, refresh stale records, traverse knowledge-graph relationships, load skills, discover MCP tools. Freshness policies, invalidation, provenance ledgers, access boundaries, compaction.",
     "source": "paste-2026-knowledge-graph"
   },
   {
@@ -118,7 +118,7 @@
     "endTime": "2026-11-30T13:00:00",
     "venue": "Caesars Forum",
     "sponsored": false,
-    "abstract": "Every organization bleeds knowledge when people leave. Use Kiro, AWS's AI-powered development environment, to reverse that loss. Configure steering files that encode team conventions, connect MCP servers to pull context from docs and APIs, deploy subagents that generate living architecture diagrams and knowledge bases as code evolves. Walk away with a Kiro workspace that turns any new hire into a productive contributor from day one. favorites lens: Kiro steering files + MCP + subagents, the haunting's exact configuration.",
+    "abstract": "Every organization bleeds knowledge when people leave. Use Kiro, AWS's AI-powered development environment, to reverse that loss. Configure steering files that encode team conventions, connect MCP servers to pull context from docs and APIs, deploy subagents that generate living architecture diagrams and knowledge bases as code evolves. Walk away with a Kiro workspace that turns any new hire into a productive contributor from day one.",
     "source": "paste-2026-knowledge-graph"
   },
   {
@@ -167,7 +167,7 @@
     "endTime": "2026-12-01T14:30:00",
     "venue": "Caesars Forum",
     "sponsored": false,
-    "abstract": "How Kiro turns working sessions into durable knowledge, and how to design, debug, and evaluate an agent's memory lifecycle. Kiro extracts learnings from explicit instructions and task outcomes (successful build commands, rejected pull requests), consolidates new knowledge with existing memories, resolves contradictions and expiring facts, retrieves only relevant context. How provenance keeps memories auditable, how memory stays consistent across IDE/CLI/web, how AgentCore Memory scopes knowledge globally or by repository, how retrieval quality is measured by task outcomes. favorites lens: Kiro session-to-memory lifecycle, directly the session-continuity concern.",
+    "abstract": "How Kiro turns working sessions into durable knowledge, and how to design, debug, and evaluate an agent's memory lifecycle. Kiro extracts learnings from explicit instructions and task outcomes (successful build commands, rejected pull requests), consolidates new knowledge with existing memories, resolves contradictions and expiring facts, retrieves only relevant context. How provenance keeps memories auditable, how memory stays consistent across IDE/CLI/web, how AgentCore Memory scopes knowledge globally or by repository, how retrieval quality is measured by task outcomes.",
     "source": "paste-2026-knowledge-graph"
   },
   {
@@ -241,7 +241,7 @@
     "endTime": "2026-12-03T13:00:00",
     "venue": "MGM Grand",
     "sponsored": false,
-    "abstract": "AI agents assert relationships (compatible products, cleared counterparties, approved suppliers) derived from LLM reasoning rather than verified data. When wrong, downstream decisions fail. Implement Amazon Neptune as a post-generation verification layer: before the agent responds, a graph traversal confirms or contradicts the assertion against a live knowledge graph. Build the verification tool, the override pattern when Neptune contradicts the model, the graph data model for authoritative relationship data. favorites lens: graph-verified agent guardrails, the validation-gate pattern.",
+    "abstract": "AI agents assert relationships (compatible products, cleared counterparties, approved suppliers) derived from LLM reasoning rather than verified data. When wrong, downstream decisions fail. Implement Amazon Neptune as a post-generation verification layer: before the agent responds, a graph traversal confirms or contradicts the assertion against a live knowledge graph. Build the verification tool, the override pattern when Neptune contradicts the model, the graph data model for authoritative relationship data.",
     "source": "paste-2026-knowledge-graph"
   },
   {
@@ -314,7 +314,7 @@
     "endTime": "2026-12-03T15:30:00",
     "venue": "MGM Grand",
     "sponsored": false,
-    "abstract": "Unintended agent actions and incorrect outputs are hard to investigate without a structured provenance layer. Design an agent observability system using DynamoDB for the operational audit log and Neptune to model causal dependencies between retrieved facts and agent decisions. Data model, instrumentation patterns, and graph query techniques that answer what data an agent retrieved, what it concluded, how those conclusions shaped the output. favorites lens: explainable agent provenance, the OTEL-monitor concern in graph form.",
+    "abstract": "Unintended agent actions and incorrect outputs are hard to investigate without a structured provenance layer. Design an agent observability system using DynamoDB for the operational audit log and Neptune to model causal dependencies between retrieved facts and agent decisions. Data model, instrumentation patterns, and graph query techniques that answer what data an agent retrieved, what it concluded, how those conclusions shaped the output.",
     "source": "paste-2026-knowledge-graph"
   },
   {
@@ -338,7 +338,7 @@
     "endTime": "2026-12-02T13:00:00",
     "venue": "Caesars Forum",
     "sponsored": false,
-    "abstract": "What formal properties must a software representation satisfy for agents to manage entire application lifecycles autonomously, reasoning at the specification level not the code level? Encoding structural topology and business semantics into a unified knowledge graph, extracting and grounding business rules when institutional context is lost, agent reasoning over large heterogeneous graphs without coherence degradation, deterministic validation signals that replace human judgment with formal guarantees. Distinguished (500). favorites lens: spec-level autonomy + validation signals, the spec-discipline concern.",
+    "abstract": "What formal properties must a software representation satisfy for agents to manage entire application lifecycles autonomously, reasoning at the specification level not the code level? Encoding structural topology and business semantics into a unified knowledge graph, extracting and grounding business rules when institutional context is lost, agent reasoning over large heterogeneous graphs without coherence degradation, deterministic validation signals that replace human judgment with formal guarantees. Distinguished (500).",
     "source": "paste-2026-knowledge-graph"
   },
   {
@@ -362,7 +362,7 @@
     "endTime": "2026-11-30T09:30:00",
     "venue": "Caesars Forum",
     "sponsored": false,
-    "abstract": "Can an AI system move beyond answering questions to conducting research alongside you? AtoZ AI Co-Scientist is a multi-agent orchestration platform where specialized agents collaborate through a unified interface to discover literature, synthesize knowledge via graph-routed retrieval, generate hypotheses, implement baselines from papers, run experiments autonomously. The compositional architecture, graph-routed retrieval achieving <200ms with structural signals flat search cannot capture, and an agent-agnostic evaluation framework. Distinguished (500). favorites lens: multi-agent research orchestration, the haunting's research-analyst pattern.",
+    "abstract": "Can an AI system move beyond answering questions to conducting research alongside you? AtoZ AI Co-Scientist is a multi-agent orchestration platform where specialized agents collaborate through a unified interface to discover literature, synthesize knowledge via graph-routed retrieval, generate hypotheses, implement baselines from papers, run experiments autonomously. The compositional architecture, graph-routed retrieval achieving <200ms with structural signals flat search cannot capture, and an agent-agnostic evaluation framework. Distinguished (500).",
     "source": "paste-2026-knowledge-graph"
   },
   {
@@ -464,7 +464,7 @@
     "endTime": "2026-12-03T09:30:00",
     "venue": "Wynn/Encore",
     "sponsored": false,
-    "abstract": "If one of your AI agents quietly gained admin-level access right now, would you know? In multi-agent systems each handoff can widen permissions, and traditional monitoring won't catch it. Build a real-time graph answering: who are my agents, what can each do, what can they reach through each other? Connect IAM roles, Cedar policies, and CloudWatch data into one visual map, add alerts that fire the instant any permission chain exceeds what you defined. favorites lens: multi-agent privilege monitoring, the dispatch-security concern.",
+    "abstract": "If one of your AI agents quietly gained admin-level access right now, would you know? In multi-agent systems each handoff can widen permissions, and traditional monitoring won't catch it. Build a real-time graph answering: who are my agents, what can each do, what can they reach through each other? Connect IAM roles, Cedar policies, and CloudWatch data into one visual map, add alerts that fire the instant any permission chain exceeds what you defined.",
     "source": "paste-2026-knowledge-graph"
   },
   {

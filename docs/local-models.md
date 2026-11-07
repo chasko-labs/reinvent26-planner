@@ -25,7 +25,7 @@ sessions.json -> ./target/release/catalog-filter --topics agents,mcp --levels 30
 ## rank command
 
 ```
-python -m reinvent26 rank --cache .cache/<eventId>/sessions.json \
+python3 -m reinvent26 rank --cache .cache/<eventId>/sessions.json \
   --query "agents for a python dev, nothing before 9am" \
   --endpoint http://127.0.0.1:8181/v1 --model local --top 10
 ```

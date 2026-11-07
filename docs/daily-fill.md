@@ -8,7 +8,7 @@ popular reserved sessions fill within days of seating opening. seats come back w
 - finds reservable catalog sessions that fit between held seats under the venue-gap rules in data/reinvent2026/map-config.json (same venue 0 min, strip cluster 30 min, anything involving mgm grand 60 min)
 - drops bedrock and frontier-model sessions, and skips repeats of a session you already hold
 - live-checks seatAvailability only for those candidates. GetSession is the only call that returns it
-- books in priority order: workshop > builders' session > lab > chalk talk > code talk > breakout, then topic fit. re-checks fit after every booking. retries a `other` failure once
+- books scarcest seats first (veryLimited, then limited, then available); ties break by format (workshop first), then topic fit. every booking prints its reason: seat band, format, topic match, start time. re-checks fit after every booking. retries a `other` failure once
 - writes the resulting schedule to .cache/reinvent2026/schedule.json
 
 ## fail fast
@@ -41,8 +41,7 @@ Description=reinvent26 fill: book released re:Invent seats
 
 [Service]
 Type=oneshot
-WorkingDirectory=%h/code/chasko-labs/reinvent26-planner/cli
-Environment=AWSEVENTS_SSM_PROFILE=aerospaceug-admin
+WorkingDirectory=%h/code/<path-to-repo>/cli
 ExecStart=/usr/bin/timeout 180 /usr/bin/python3 -m reinvent26 fill
 ```
 
@@ -68,14 +67,8 @@ journalctl --user -u reinvent26-fill -n 20
 cron alternative:
 
 ```
-0 7,19 * * * cd ~/code/chasko-labs/reinvent26-planner/cli && AWSEVENTS_SSM_PROFILE=aerospaceug-admin timeout 180 python3 -m reinvent26 fill >> ~/code/chasko-labs/reinvent26-planner/.cache/reinvent2026/fill.log 2>&1
+0 7,19 * * * cd ~/code/<path-to-repo>/cli && timeout 180 python3 -m reinvent26 fill >> ~/.cache/reinvent2026/fill.log 2>&1
 ```
-
-## credentials for unattended runs
-
-- the refresh token lasts 30 days and rotates on use, so a twice-daily timer keeps it alive
-- the timer reads and writes ssm through `AWSEVENTS_SSM_PROFILE`. an sso profile expires after 8 hours without a login, so an unattended timer needs a non-sso writer role (roles anywhere). until that exists, run fill by hand after an sso login
-- when the refresh token dies, fill exits 2 with the login command. re-run bin/awsevents-mcp-login over the ssh tunnel
 
 ## swaps (manual, judgment call)
 

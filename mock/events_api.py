@@ -10,7 +10,7 @@ cli under test cannot tell it apart from the real thing:
 Point the cli at it with EVENTS_API_BASE_URL plus any bearer token:
 
     EVENTS_API_BASE_URL=http://127.0.0.1:8499 EVENTS_ACCESS_TOKEN=test \\
-        python -m reinvent26 reserve reinvent2026 <sessionId>
+        python3 -m reinvent26 reserve reinvent2026 <sessionId>
 
 State (favorites, reservations, personal-time blocks) lives in memory.
 """

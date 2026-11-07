@@ -4,7 +4,7 @@ Uses checked-in cached samples only. Exercises the same pure schedule
 logic the live CLI uses: shortlist, clash check, open-slot finder, and
 stack-aware keyword mapping.
 
-Run: python demo/demo_public.py
+Run: python3 demo/demo_public.py
 No EVENTS_ACCESS_TOKEN is read or required. No tokens are printed.
 """
 
@@ -38,8 +38,8 @@ def main() -> int:
 
     print(f"# loaded {len(sessions)} cached sessions, {len(scheduled)} scheduled items (no token, no network)")
 
-    print("\n## shortlist: topics=agents,mcp,bedrock level=300/400 top=3")
-    ranked = match_topics(sessions, ["agents", "mcp", "bedrock"])
+    print("\n## shortlist: topics=leo,braket,dynamodb level=300/400 top=3")
+    ranked = match_topics(sessions, ["leo", "braket", "dynamodb"])
     ranked = [s for s in ranked if str(s.get("level", "")).startswith(("3", "4"))]
     for s in ranked[:3]:
         print(summarize(s))
@@ -55,7 +55,7 @@ def main() -> int:
         print("# no double bookings")
 
     print("\n## open slots: window 2026-12-01T13:00:00 to 2026-12-01T16:00:00")
-    print("# baseline is clash-free (ANT301 + SRV301); CON401 excluded because it clashes above")
+    print("# baseline is clash-free (NET301 + SRV301); CMP401 excluded because it clashes above")
     windows = [{"start": "2026-12-01T13:00:00", "end": "2026-12-01T16:00:00"}]
     baseline = [scheduled[0], scheduled[2]]
     for s in find_open_slots(sessions, windows, baseline):

@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# fail-fast local gate: secret shapes, then compile, then tests
+# enable once per clone: git config core.hooksPath .githooks
+set -euo pipefail
+cd "$(git rev-parse --show-toplevel)"
+echo "pre-push: secret-shape scan"
+if git grep -n -I -E "AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{20,}|eyJ[A-Za-z0-9_-]{30,}|BEGIN [A-Z ]*PRIVATE KEY" -- . ; then
+  echo "pre-push: secret-shaped string found" >&2; exit 1
+fi
+echo "pre-push: no bare-python invocations"
+if git grep -n -I -E "python -m " -- cli docs demo mock README.md skills; then
+  echo "pre-push: bare 'python -m' found; use 'python3 -m' (no bare python on mac or the box)" >&2; exit 1
+fi
+echo "pre-push: compile"
+python3 -m compileall -q cli mock demo tests
+echo "pre-push: pytest"
+python3 -m pytest -q -p no:cacheprovider
+echo "pre-push: offline demo"
+python3 demo/demo_public.py > /dev/null

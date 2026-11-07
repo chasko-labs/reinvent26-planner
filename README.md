@@ -173,6 +173,17 @@ You run the suite with:
 python3 -m pytest -q
 ```
 
+## reproduce it
+
+```bash
+git clone https://github.com/chasko-labs/reinvent26-planner.git
+cd reinvent26-planner
+python3 -m pytest -q
+cd cli
+```
+
+166 tests green means your checkout matches mine. Docs answer one question each, starting with [sign-in](docs/sign-in.md).
+
 ## contributing gate
 
 You enable the pre-push hook once per clone:

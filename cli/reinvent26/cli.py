@@ -50,6 +50,17 @@ def cmd_new_sessions(args) -> None:
     raise SystemExit(newevents_mod.main(argv))
 
 
+def cmd_launches(args) -> None:
+    """AWS What's New launches in the event window, matched to sessions."""
+    import reinvent26.launches as launches_mod
+    argv = [args.event_id, "--feed-url", args.feed_url]
+    if args.dry_run:
+        argv.append("--dry-run")
+    if args.as_json:
+        argv.append("--json")
+    raise SystemExit(launches_mod.main(argv))
+
+
 def cmd_fill(args) -> None:
     """Book open seats into free windows of the live schedule."""
     import reinvent26.fill as fill_mod
@@ -907,6 +918,13 @@ def build_parser() -> argparse.ArgumentParser:
     ns.add_argument("--model", default="local")
     ns.add_argument("--out-dir", default=None, help="report directory (default: docs/new-sessions)")
     ns.set_defaults(fn=cmd_new_sessions)
+
+    la = sub.add_parser("launches", help="AWS What's New launches in the event window, matched to sessions")
+    la.add_argument("event_id", nargs="?", default="reinvent2026")
+    la.add_argument("--feed-url", default="https://aws.amazon.com/about-aws/whats-new/recent/feed/")
+    la.add_argument("--dry-run", action="store_true", help="print, write no cache")
+    la.add_argument("--json", action="store_true", dest="as_json")
+    la.set_defaults(fn=cmd_launches)
 
     fm = sub.add_parser("find-me", help="render a shareable find-bryan page from the live schedule")
     fm.add_argument("event_id", nargs="?", default="reinvent2026")

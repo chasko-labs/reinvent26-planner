@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"><channel><title>What's New</title>
+<item><title>Amazon S3 Tables now supports compaction</title>
+<link>https://aws.amazon.com/about-aws/whats-new/2026/11/s3-tables/</link>
+<guid isPermaLink="false">guid-s3tables</guid>
+<pubDate>Mon, 23 Nov 2026 17:00:00 +0000</pubDate></item>
+<item><title>AWS Lambda adds new runtime</title>
+<link>https://aws.amazon.com/about-aws/whats-new/2026/12/lambda/</link>
+<guid isPermaLink="false">guid-lambda</guid>
+<pubDate>Tue, 01 Dec 2026 18:00:00 +0000</pubDate></item>
+<item><title>Amazon Bedrock AgentCore now generally available</title>
+<link>https://aws.amazon.com/about-aws/whats-new/2026/11/agentcore/</link>
+<guid isPermaLink="false">guid-agentcore</guid>
+<pubDate>Sun, 15 Nov 2026 17:00:00 +0000</pubDate></item>
+<item><title>Amazon EC2 old launch</title>
+<link>https://aws.amazon.com/about-aws/whats-new/2026/10/ec2/</link>
+<guid isPermaLink="false">guid-old</guid>
+<pubDate>Thu, 01 Oct 2026 17:00:00 +0000</pubDate></item>
+<item><title>Amazon DynamoDB after the event</title>
+<link>https://aws.amazon.com/about-aws/whats-new/2026/12/ddb/</link>
+<guid isPermaLink="false">guid-late</guid>
+<pubDate>Mon, 07 Dec 2026 17:00:00 +0000</pubDate></item>
+</channel></rss>

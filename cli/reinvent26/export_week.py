@@ -19,6 +19,7 @@ import re
 import sys
 
 from reinvent26 import api, auth, cache, cli, findme, mapper
+from reinvent26 import launches as launches_mod
 
 EVENT_ID = "reinvent2026"
 CODE_RE = re.compile(r"\b([A-Z]{2,4}\d{3,4}(?:-R\d?|-S)?)\b")
@@ -94,8 +95,16 @@ def _overlaps_lunch(start: str, end: str) -> bool:
     return start < "14:00" and end > "11:00"
 
 
+def signal_entries(catalog: list) -> list:
+    """mapper.launch_signals narrowed to JSON-safe fields."""
+    return [{"code": s.get("abbreviation") or s.get("code") or s.get("sessionId"),
+             "title": s.get("title") or "", "signal": s.get("_sig"),
+             "keywords": s.get("_kw", "")}
+            for s in mapper.launch_signals(catalog)]
+
+
 def build_week(schedule: dict, catalog: list, watcher_dir: str,
-               generated_at: str) -> dict:
+               generated_at: str, launches: list | None = None) -> dict:
     """Pure build: schedule plus catalog rows in, week dict out."""
     catalog_by_session_id = {
         catalog_row.get("sessionId"): catalog_row
@@ -231,6 +240,8 @@ def build_week(schedule: dict, catalog: list, watcher_dir: str,
         "windows": windows,
         "timeline": timeline,
         "watcher": watcher_latest(watcher_dir),
+        "launches": launches or [],
+        "launch_signals": signal_entries(catalog),
     }
 
 
@@ -249,7 +260,8 @@ def run(event_id: str, out: str, watcher_dir: str) -> int:
         print(f"error: schedule read failed: {exc}", file=sys.stderr)
         return 1
     week = build_week(schedule, catalog, watcher_dir,
-                      _dt.datetime.now(_dt.timezone.utc).strftime("%Y-%m-%d"))
+                      _dt.datetime.now(_dt.timezone.utc).strftime("%Y-%m-%d"),
+                      launches=launches_mod.cached_launches(event_id, catalog))
     with open(out, "w", encoding="utf-8") as handle:
         json.dump(week, handle, indent="\t")
         handle.write("\n")

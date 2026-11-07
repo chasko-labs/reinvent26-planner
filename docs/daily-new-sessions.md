@@ -72,6 +72,7 @@ Description=reinvent26 new-session watcher
 Type=oneshot
 WorkingDirectory=%h/<path-to-repo>/cli
 ExecStart=/usr/bin/timeout 600 /usr/bin/python3 -m reinvent26 new-sessions reinvent2026
+ExecStartPost=-/usr/bin/timeout 120 /usr/bin/python3 -m reinvent26 launches reinvent2026
 ```
 
 ```
@@ -96,8 +97,16 @@ journalctl --user -u reinvent26-new-sessions -n 20
 cron alternative:
 
 ```
-0 7,19 * * * cd ~/<path-to-repo>/cli && timeout 600 python3 -m reinvent26 new-sessions reinvent2026 >> ~/.cache/reinvent26/new-sessions.log 2>&1
+0 7,19 * * * cd ~/<path-to-repo>/cli && timeout 600 python3 -m reinvent26 new-sessions reinvent2026 >> ~/.cache/reinvent26/new-sessions.log 2>&1; timeout 120 python3 -m reinvent26 launches reinvent2026 >> ~/.cache/reinvent26/new-sessions.log 2>&1
 ```
+
+the `launches` step reads the public AWS What's New feed (no token), keeps
+items from 14 days before the event through its last day, dedupes by guid
+into `.cache/reinvent2026/launches.json`, and matches each item to catalog
+sessions by service keyword. the leading `-` on `ExecStartPost` keeps a
+feed outage (exit 1, nothing written) from failing the watcher unit.
+`export_week` reads that cache and emits `launches` plus `launch_signals`.
+run it by hand with `python3 -m reinvent26 launches --dry-run`.
 
 read `docs/new-sessions/new-sessions-<date>.md`, then paste the handoff
 block at the bottom into kiro-cli (setup: `docs/integrations/kiro-cli.md`).

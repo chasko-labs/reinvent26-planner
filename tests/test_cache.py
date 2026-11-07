@@ -5,7 +5,7 @@ import sys
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "cli"))
 
 from reinvent26 import cache  # noqa: E402
-from reinvent26.schedule import filter_by_day  # noqa: E402
+from reinvent26.schedule import filter_by_day, filter_by_type  # noqa: E402
 
 SAMPLE = [
     {"sessionId": "a", "title": "agents with bedrock",
@@ -62,3 +62,17 @@ def test_day_keeps_only_that_date():
     assert [s["sessionId"] for s in out] == ["early", "mid", "late"]
     assert filter_by_day(sessions, "") == sessions
     assert filter_by_day(sessions, None) == sessions
+
+
+def test_type_keeps_only_that_format():
+    sessions = [
+        {"sessionId": "w", "type": "Workshop"},
+        {"sessionId": "c", "type": "Chalk talk"},
+        {"sessionId": "u", "title": "no type here"},
+    ]
+    out = filter_by_type(sessions, "workshop")
+    assert [s["sessionId"] for s in out] == ["w"]
+    out = filter_by_type(sessions, "CHALK TALK")
+    assert [s["sessionId"] for s in out] == ["c"]
+    assert filter_by_type(sessions, "") == sessions
+    assert filter_by_type(sessions, None) == sessions

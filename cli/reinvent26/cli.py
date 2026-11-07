@@ -277,6 +277,7 @@ def cmd_shortlist(args):
     else:
         sessions = _fetch_sessions(args)
     sessions = schedule.filter_by_day(sessions, args.day)
+    sessions = schedule.filter_by_type(sessions, getattr(args, "type", ""))
     sessions = _apply_time_filters(sessions, args)
     if args.offbeat:
         pick = schedule.find_offbeat(sessions, keywords, exclude=exclude)
@@ -695,6 +696,8 @@ def build_parser() -> argparse.ArgumentParser:
                     help="block out lunch, e.g. --lunch 12:00-13:00")
     sl.add_argument("--offbeat", action="store_true",
                     help="pick exactly one session unrelated to --topics")
+    sl.add_argument("--type", default="", metavar="TYPE",
+                    help="e.g. Workshop (case-insensitive)")
     sl.add_argument("--day", default="", metavar="YYYY-MM-DD",
                     help="only sessions starting that day")
     sl.add_argument("--cached", action="store_true",

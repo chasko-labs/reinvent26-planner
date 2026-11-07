@@ -201,6 +201,14 @@ def filter_by_day(sessions: list, day: str | None) -> list:
     return [s for s in sessions if (s.get("startTime") or "").startswith(day)]
 
 
+def filter_by_type(sessions: list, session_type: str | None) -> list:
+    """Keep sessions of one format (Workshop, Chalk talk, ...). Case-insensitive. None/empty is a no-op."""
+    if not session_type:
+        return sessions
+    want = session_type.strip().lower()
+    return [s for s in sessions if str(s.get("type", "")).lower() == want]
+
+
 def find_offbeat(sessions: list, keywords: list, exclude=None) -> dict | None:
     """Pick one session with nothing to do with the given keywords.
 

@@ -260,11 +260,15 @@ def stack_keywords(resources: list) -> list:
 PERSONAL_TIME_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$")
 
 
-def validate_personal_time(title: str, start: str, end: str) -> tuple:
+def validate_personal_time(title: str, start: str, end: str,
+                           description: str | None = None,
+                           location: str | None = None) -> tuple:
     """Validate a personal-time block. Returns (start_dt, end_dt).
 
-    Rules: title 1-128 chars; UTC YYYY-MM-DDTHH:mm:ss with no Z;
-    seconds 00; end after start; whole 5-minute duration.
+    Rules: title 1-128 chars; event-local YYYY-MM-DDTHH:mm:ss with no Z
+    or offset; seconds 00; end after start on the same date; whole
+    5-minute duration. When given, description is 1-250 chars and
+    location 1-255 chars.
     Raises ValueError describing the first violation.
     """
     if not (1 <= len(title) <= 128):
@@ -272,7 +276,7 @@ def validate_personal_time(title: str, start: str, end: str) -> tuple:
     for label, ts in (("start", start), ("end", end)):
         if not PERSONAL_TIME_RE.match(ts):
             raise ValueError(
-                f"{label} must be UTC YYYY-MM-DDTHH:mm:ss with no Z, got {ts!r}")
+                f"{label} must be event-local YYYY-MM-DDTHH:mm:ss with no Z or offset, got {ts!r}")
         try:
             parsed = datetime.strptime(ts, "%Y-%m-%dT%H:%M:%S")
         except ValueError:
@@ -283,8 +287,14 @@ def validate_personal_time(title: str, start: str, end: str) -> tuple:
     end_dt = datetime.strptime(end, "%Y-%m-%dT%H:%M:%S")
     if not end_dt > start_dt:
         raise ValueError("end must be after start")
+    if start_dt.date() != end_dt.date():
+        raise ValueError("end must be on the same date as start")
     if int((end_dt - start_dt).total_seconds()) % 300 != 0:
         raise ValueError("duration must be a whole number of 5-minute blocks")
+    if description is not None and not (1 <= len(description) <= 250):
+        raise ValueError("description must be 1-250 chars")
+    if location is not None and not (1 <= len(location) <= 255):
+        raise ValueError("location must be 1-255 chars")
     return start_dt, end_dt
 
 

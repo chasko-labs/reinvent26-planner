@@ -312,8 +312,8 @@ def add_personal_time(
     description: str = "",
     location: str | None = None,
 ) -> None:
-    """Timestamps are UTC YYYY-MM-DDTHH:mm:ss without Z, seconds 00, end after
-    start, whole 5-minute duration. Create returns no body; read the new id
+    """Timestamps are event-local YYYY-MM-DDTHH:mm:ss (no Z, no offset), seconds
+    00, end after start on the same date, whole 5-minute duration. Create returns no body; read the new id
     back from get_schedule."""
     from reinvent26.schedule import validate_personal_time
 
@@ -374,3 +374,7 @@ def delete_personal_time(event_id: str, token: str, block_id: str) -> bool:
     return _delete_once(
         "DELETE", f"/v1/events/{event_id}/personal-time/{block_id}", token
     )
+
+
+create_personal_time = add_personal_time
+update_personal_time = replace_personal_time

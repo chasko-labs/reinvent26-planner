@@ -540,6 +540,71 @@ def cmd_unblock(args):
         print(f"# personal-time {args.block_id} already absent: complete")
 
 
+def cmd_personal_time_sync(args):
+    """Plan (and with --apply, write) personal time from week.json."""
+    from reinvent26 import personal_time as pt
+
+    with open(args.source, encoding="utf-8") as fh:
+        week = json.load(fh)
+    event_id = args.event_id or week.get("event_id") or "reinvent2026"
+    state_path = args.state or pt.state_file(event_id)
+    state = pt.load_state(state_path)
+    entries, skipped = pt.build_entries(week)
+
+    token = _token(args)
+    live, auth_state = [], "signed out (no stored token)"
+    if token:
+        try:
+            live = pt.schedule_personal_time(api.get_schedule(event_id, token))
+            auth_state = "signed in; schedule readable"
+        except api.EventsError as e:
+            if e.status not in (401, 403):
+                raise
+            token = None
+            auth_state = (f"token rejected (http {e.status})" if e.status == 401
+                          else "signed in but not registered (http 403)")
+
+    actions = pt.plan(entries, live, state)
+    print(pt.format_table(actions, skipped))
+    c = pt.counts(actions, skipped)
+    print(f"# planned {c['planned']}: create {c['create']}, update "
+          f"{c['update']}, unchanged {c['noop']}, delete {c['delete']}; "
+          f"skipped {c['skipped']}")
+    for s in skipped:
+        print(f"# skipped {s['key']} {s['title']}: {s['reason']}")
+    print(f"# auth: {auth_state}")
+    if not live and not token:
+        print("# plan built without the live schedule; ids come from the "
+              f"state file only ({state_path})")
+
+    if not args.apply:
+        print("# dry run: nothing changed (add --apply to write)")
+        return
+    if not token:
+        print("# --apply needs a valid sign-in; run: "
+              "cd cli && python3 -m reinvent26 login", file=sys.stderr)
+        raise SystemExit(1)
+
+    new_state, failures = pt.apply(event_id, token, actions, state)
+    pt.save_state(state_path, new_state)
+    after = pt.schedule_personal_time(api.get_schedule(event_id, token))
+    problems = pt.verify(entries, after)
+    done = {op: sum(a["op"] == op for a in actions) - sum(
+        f["op"] == op for f in failures) for op in ("create", "update", "delete")}
+    print(f"# applied: created {done['create']}, updated {done['update']}, "
+          f"deleted {done['delete']}, unchanged {c['noop']}, failed "
+          f"{len(failures)}; {len(after)} personal-time blocks live; "
+          f"state {state_path}")
+    for f in failures:
+        print(f"# failed {f['op']} {f['entry'].get('start')} "
+              f"{f['entry'].get('title')}: {f['error']}", file=sys.stderr)
+    if problems or failures:
+        for p in problems:
+            print(f"# verify: {p}", file=sys.stderr)
+        raise SystemExit(1)
+    print(f"# verify: all {len(entries)} entries appear exactly once")
+
+
 def cmd_stack_pick(args):
     """Stack-aware picker end to end: live resources map to catalog keywords."""
     if args.resources_json:
@@ -740,8 +805,8 @@ def build_parser() -> argparse.ArgumentParser:
     b = sub.add_parser("block", help="create a personal-time block")
     b.add_argument("event_id")
     b.add_argument("--title", required=True, help="1-128 chars")
-    b.add_argument("--start", required=True, help="UTC YYYY-MM-DDTHH:mm:ss, no Z")
-    b.add_argument("--end", required=True, help="UTC YYYY-MM-DDTHH:mm:ss, no Z")
+    b.add_argument("--start", required=True, help="event-local YYYY-MM-DDTHH:mm:ss, no Z")
+    b.add_argument("--end", required=True, help="event-local YYYY-MM-DDTHH:mm:ss, no Z")
     b.add_argument("--description", default="")
     b.add_argument("--location", default=None)
     b.set_defaults(fn=cmd_block)
@@ -750,8 +815,8 @@ def build_parser() -> argparse.ArgumentParser:
     rb.add_argument("event_id")
     rb.add_argument("block_id")
     rb.add_argument("--title", required=True, help="1-128 chars")
-    rb.add_argument("--start", required=True, help="UTC YYYY-MM-DDTHH:mm:ss, no Z")
-    rb.add_argument("--end", required=True, help="UTC YYYY-MM-DDTHH:mm:ss, no Z")
+    rb.add_argument("--start", required=True, help="event-local YYYY-MM-DDTHH:mm:ss, no Z")
+    rb.add_argument("--end", required=True, help="event-local YYYY-MM-DDTHH:mm:ss, no Z")
     rb.add_argument("--description", default="")
     rb.add_argument("--location", default=None,
                     help="omitted clears location")
@@ -761,6 +826,15 @@ def build_parser() -> argparse.ArgumentParser:
     ub.add_argument("event_id")
     ub.add_argument("block_id")
     ub.set_defaults(fn=cmd_unblock)
+
+    ptp = sub.add_parser("personal-time", help="sync week.json meals, windows and legs to personal time")
+    ptsub = ptp.add_subparsers(dest="pt_cmd", required=True)
+    pts = ptsub.add_parser("sync", help="plan create/update/delete; --apply writes")
+    pts.add_argument("--from", dest="source", required=True, help="week.json path")
+    pts.add_argument("--apply", action="store_true", help="write changes (default is a dry run)")
+    pts.add_argument("--event-id", default=None, help="defaults to week.json event_id")
+    pts.add_argument("--state", default=None, help="state file mapping entry key to personalTimeId")
+    pts.set_defaults(fn=cmd_personal_time_sync)
 
     rf = sub.add_parser("remove-favorite", help="remove one favorite (404 means already absent)")
     rf.add_argument("event_id")

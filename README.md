@@ -182,7 +182,7 @@ python3 -m pytest -q
 cd cli
 ```
 
-166 tests green means your checkout matches mine. Docs answer one question each, starting with [sign-in](docs/sign-in.md).
+A fully green suite means your checkout matches mine. Docs answer one question each, starting with [sign-in](docs/sign-in.md).
 
 ## contributing gate
 

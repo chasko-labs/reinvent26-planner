@@ -75,8 +75,8 @@ The authenticated step is intentionally not in the token-free demo; run:
 
 ```
 export EVENTS_ACCESS_TOKEN=<builder-id-access-token>
-python -m reinvent26 favorite <eventId> <id1,id2>
-python -m reinvent26 schedule <eventId>   # GetSchedule confirm
+python3 -m reinvent26 favorite <eventId> <id1,id2>
+python3 -m reinvent26 schedule <eventId>   # GetSchedule confirm
 ```
 
 ## key dates
